@@ -1,0 +1,11 @@
+Package: pseval
+Type: Package
+Title: Methods for Evaluating Principal Surrogates of Treatment Response
+Version: 0.1
+Date: 2015-04-15
+Author: Michael C Sachs
+Maintainer: Michael C Sachs <sachsmc@gmail.com>
+Description: More about what it does (maybe more than one line)
+License: MIT + file LICENSE
+LazyData: TRUE
+Suggests: testthat
