@@ -15,6 +15,23 @@ add_imputation <- function(psdesign, imputation){
 
 }
 
+#' Add imputation model to a psdesign object
+#'
+#' @param psdesign A psdesign object
+#' @param risk A risk model object, such as \link{risk_logistic}
+#'
+#' @export
+
+add_riskmodel <- function(psdesign, riskmodel){
+
+  stopifnot(inherits(psdesign, "psdesign"))
+  stopifnot(inherits(riskmodel, "riskmodel"))
+
+  psdesign <- riskmodel(psdesign)
+  psdesign
+
+}
+
 
 #' Modify a psdesign object by adding on new components.
 #'
@@ -32,6 +49,10 @@ add_imputation <- function(psdesign, imputation){
 
 "+.ps" <- function(p1, p2){
 
-  if(inherits(p2, "imputation")) add_imputation(p1, p2)
+  if(inherits(p2, "imputation")){
+    add_imputation(p1, p2)
+    } else if(inherits(p2, "riskmodel")){
+      add_riskmodel(p1, p2)
+    }
 
 }
