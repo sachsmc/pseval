@@ -5,7 +5,7 @@
 \title{Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood}
 \usage{
 ps_bootstrap(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL,
-  control = list(fnscale = -1), ...)
+  control = list(), ...)
 }
 \arguments{
 \item{psdesign}{A psdesign object with a risk model and imputation model specified}

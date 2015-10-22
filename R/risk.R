@@ -32,7 +32,7 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
       untrted <- matrix(risk(untrt.expand %*% beta)^Y.untrt *
         (1 - risk(untrt.expand %*% beta))^(1 - Y.untrt), nrow = D, byrow = TRUE)
 
-      sum(log(trted)) + sum(log(colMeans(untrted)))
+      -1 * (sum(log(trted)) + sum(log(colMeans(untrted))))
 
     }
 
@@ -91,7 +91,7 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
       untrted <- matrix(((shapepram/scale.untrt)*(Y.untrt/scale.untrt)^(shapepram-1))^delt.untrt *
                           exp(-(Y.untrt/scale.untrt)^shapepram), nrow = D, byrow = TRUE)
 
-      sum(log(trtlike)) + sum(log(colMeans(untrted)))
+      -1 * (sum(log(trtlike)) + sum(log(colMeans(untrted))))
 
     }
 

@@ -4,7 +4,7 @@
 \alias{ps_estimate}
 \title{Estimate parameters from a specified model using estimated maximum likelihood}
 \usage{
-ps_estimate(psdesign, start = NULL, control = list(fnscale = -1), ...)
+ps_estimate(psdesign, start = NULL, control = list(), ...)
 }
 \arguments{
 \item{psdesign}{A psdesign object with a risk model and imputation model specified}

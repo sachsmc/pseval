@@ -16,6 +16,7 @@ object.
 
 \itemize{
   \item \code{imputation}: Add or replace imputation model
+  \item \code{riskmodel}: Add or replace risk model
 }
 }
 

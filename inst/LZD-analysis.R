@@ -45,14 +45,14 @@ swank.one <- function(dat){
     rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
 
     ghdes <- psdesign(dat, Z = Z, Y = Surv(Time_AE, event_AE), S = S_I1, BIP = S_D1)
-    ghdes2 <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = rho.init)
+    ghdes2 <- ghdes + impute_bivnorm(x = S.1, mu = mu, sd = sd, rho = rho.init)
     ghdes3 <- ghdes2 + risk_weibull(Y ~ S.1 * Z)
 
 
 
     start <- c(.856, 6.376, -.326, -.528, .134)
 
-    est1 <- ps_estimate(ghdes3, start = start, method = "BFGS", control = list(maxit = 2000))
+    est1 <- ps_estimate(ghdes3, start = rep(0, 5), method = "BFGS")
 
     ghdes2.lower <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = .2)
     ghdes3.lower <- ghdes2.lower + risk_weibull(Time_AE ~ S_I1 * Z, cens = "event_AE")

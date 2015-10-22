@@ -5,7 +5,7 @@
 #' @param control List of control parameters for passed to \link{optim}
 #' @param ... Arguments passed to \link{optim}
 #'
-ps_estimate <- function(psdesign, start = NULL, control = list(fnscale = -1), ...){
+ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 
   if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
   if(!"imputation.models" %in% names(psdesign)) stop("No imputation models specified")
@@ -36,7 +36,7 @@ ps_estimate <- function(psdesign, start = NULL, control = list(fnscale = -1), ..
 #
 
 
-ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL, control = list(fnscale = -1), ...){
+ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL, control = list(), ...){
 
   stopifnot("impute.model" %in% names(psdesign) && "risk.model" %in% names(psdesign))
 

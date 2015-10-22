@@ -19,7 +19,7 @@ impute_bivnorm(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = 0.2)
 This model assumes that the pair [S(1), W] are bivariate normal, where W is
 the BIP. The means, standard deviations, and correlation are estimated or
 fixed before calling this function. Then the conditional normal formula is
-applied in order to get the distribution of S(1) | S(0). That distribution is
+applied in order to get the distribution of S(1) | W. That distribution is
 used to impute the missing S(1) values. This method requires a BIP in the
 design.
 }

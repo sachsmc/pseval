@@ -2,13 +2,14 @@
 % Please edit documentation in R/impute.R
 \name{impute_parametric}
 \alias{impute_parametric}
-\title{Imputation models for the missing S(1)}
+\title{Parametric imputation model for the missing S(1)}
 \usage{
 impute_parametric(formula, distribution = gaussian, ...)
 }
 \arguments{
 \item{formula}{Formula specifying the imputation model for the surrogate
-under treatment}
+under treatment. Generally the candidate surrogate will be on the left side
+in the formula, and the BIP or BIPs will be on the right side}
 
 \item{distribution}{Assumed distribution for the imputation model. Must be
 compatible with the \code{family} argument of \link{glm}. Currenly only
@@ -17,6 +18,6 @@ Gaussian models are supported}
 \item{...}{Arguments passed to \link{glm}}
 }
 \description{
-Imputation models for the missing S(1)
+Parametric imputation model for the missing S(1)
 }
 

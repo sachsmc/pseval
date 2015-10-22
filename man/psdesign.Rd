@@ -13,8 +13,8 @@ psdesign(data, Z, Y, S, BIP = NULL, CPV = NULL, BSM = NULL,
 \item{Z}{Expression defining the treatment variable which has 2 levels}
 
 \item{Y}{Expression defining the outcome variable. For binary events this
-should be coded as 0/1 or a factor with 2 levels. For censored time-to-event outcomes this can be a call to
-\link[survival]{Surv}}
+should be coded as 0/1 or a factor with 2 levels. For censored
+time-to-event outcomes this can be a call to \link[survival]{Surv}}
 
 \item{S}{Expression defining the candidate surrogate}
 
@@ -28,7 +28,8 @@ measurement}
 \item{weights}{optional expression defining weights to accomodate nonrandom
 subsampling, such as case control or two phase}
 
-\item{...}{Other key-value pairs that will be included in the augmented data}
+\item{...}{Other key-value pairs that will be included in the augmented data,
+  e.g. additional candidate surrogates, covariates for adjustment, variables used for imputation}
 }
 \description{
 Generate mappings that describe how variables in the data are mapped to
