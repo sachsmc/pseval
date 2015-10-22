@@ -9,6 +9,7 @@ expit <- function(x) exp(x)/(1 + exp(x))
 
 #' Generate sample data used for testing
 #'
+#' @export
 
 generate_gh_data <- function(n){
 
@@ -28,7 +29,16 @@ generate_gh_data <- function(n){
   Y.1 <- rbinom(n, 1, trunc01(risk.1))
   Y.obs <- ifelse(Z == 1, Y.1, Y.0)
 
-  data.frame(Z, X, S.0, S.1, risk.obs, risk.0, risk.1, Y.obs, Y.0, Y.1)
+  ## CPV measure noisy S.1 at the end of the study for placebo subjects non-event
+
+  CPV <- S.1 + rnorm(n, sd = .1)
+  CPV[Z == 1 | Y.obs == 1] <- NA
+
+  ## BSM measure noisy S.0 at start
+
+  BSM <- S.0 + rnorm(n, sd = .1)
+
+  data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, Y.obs, Y.0, Y.1)
 
 }
 

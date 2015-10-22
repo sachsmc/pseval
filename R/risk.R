@@ -1,24 +1,23 @@
-#' Logistic risk model for binary outcome
+#' Risk model for binary outcome
 #'
 #' @param model Formula specifying the risk model
 #' @param D number of samples for the simulated annealing integration
+#' @param risk Function for transforming a linear predictor into a probability.
+#'   E.g., risk.expit for the logistic model, risk.probit for the probit model
 
 
-risk_logistic <- function(model = Y ~ S.1 * Z, D = 5000, ...){
+risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
-    risk <- function(beta, mat) {
-
-      exp(mat %*% beta)/(1 + exp(mat %*% beta))
-
-    }
+    # refactor to include possible CPV and/or BSM
+    # break of into separate function called expand_augdata
 
     trtmat <- model.matrix(model, psdesign$augdata[psdesign$augdata$Z == 1, ])
     Y.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y
 
-    untrtsamp <- c((psdesign$icdf_sbarw(runif(D))))
+    untrtsamp <- c(psdesign$icdf_sbarw(runif(D)))
     dex <- (1:nrow(psdesign$augdata))[psdesign$augdata$Z == 0]
     untrtobs <- psdesign$augdata[rep(dex, D), ]
     untrtobs$S.1 <- untrtsamp
@@ -28,13 +27,13 @@ risk_logistic <- function(model = Y ~ S.1 * Z, D = 5000, ...){
 
     likelihood <- function(beta){
 
-      trted <- risk(beta, trtmat)^Y.trt *
-        (1 - risk(beta, trtmat))^(1 - Y.trt)
+      trted <- risk(trtmat %*% beta)^Y.trt *
+        (1 - risk(trtmat %*% beta))^(1 - Y.trt)
 
       # for each W in untrted, sample a bunch from cdf_sbarw and take the mean
 
-      untrted <- matrix(risk(beta, untrt.expand)^Y.untrt *
-        (1 - risk(beta, untrt.expand))^(1 - Y.untrt), nrow = D, byrow = TRUE)
+      untrted <- matrix(risk(untrt.expand %*% beta)^Y.untrt *
+        (1 - risk(untrt.expand %*% beta))^(1 - Y.untrt), nrow = D, byrow = TRUE)
 
       sum(log(trted)) + sum(log(colMeans(untrted)))
 
@@ -56,29 +55,27 @@ risk_logistic <- function(model = Y ~ S.1 * Z, D = 5000, ...){
 
 #' Weibull risk model for time to event outcome
 #'
-#' @param model Formula specifying the risk model
-#' @param cens Symbol identifying the censoring indicator
+#' @param model Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring
 #' @param D number of samples for simulated annealing
 #' @param ...
 #'
-risk_weibull <- function(model = Y ~ S.1 * Z, cens = delt, D = 5000, ... ){
-
+risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
     trtmat <- model.matrix(model, psdesign$augdata[psdesign$augdata$Z == 1, ])
-    Y.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y
-    delt.trt <- psdesign$augdata[psdesign$augdata$Z == 1, cens]
+    Y.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y[,1]
+    delt.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y[, 2]
 
-    untrtsamp <- c((psdesign$icdf_sbarw(runif(D))))
+    untrtsamp <- c(psdesign$icdf_sbarw(runif(D)))
     dex <- (1:nrow(psdesign$augdata))[psdesign$augdata$Z == 0]
     untrtobs <- psdesign$augdata[rep(dex, D), ]
     untrtobs[ , attr(terms.formula(model), "term.labels")[1]] <- untrtsamp
 
     untrt.expand <- model.matrix(model, untrtobs)
-    Y.untrt <- untrtobs$Y
-    delt.untrt <- untrtobs[, cens]
+    Y.untrt <- untrtobs$Y[, 1]
+    delt.untrt <- untrtobs[, 2]
 
     likelihood <- function(beta){
 
@@ -115,3 +112,18 @@ risk_weibull <- function(model = Y ~ S.1 * Z, cens = delt, D = 5000, ... ){
   rval
 
 }
+
+
+risk.expit <- function(x) {
+
+  exp(x)/(1 + exp(x))
+
+}
+
+
+risk.probit <- function(x) {
+
+  pnorm(x)
+
+}
+

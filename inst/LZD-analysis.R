@@ -44,9 +44,9 @@ swank.one <- function(dat){
     sd <- sapply(dat[, c("S_I1", "S_D1")], sd, na.rm = TRUE)
     rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
 
-    ghdes <- psdesign(dat, Z, Time_AE, surrogate = S_I1, BIP = S_D1)
+    ghdes <- psdesign(dat, Z = Z, Y = Surv(Time_AE, event_AE), S = S_I1, BIP = S_D1)
     ghdes2 <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = rho.init)
-    ghdes3 <- ghdes2 + risk_weibull(Time_AE ~ S_I1 * Z, cens = "event_AE")
+    ghdes3 <- ghdes2 + risk_weibull(Y ~ S_I1 * Z)
 
     start <- c(.856, 6.376, -.326, -.528, .134)
     est1 <- optim(start, fn = ghdes3$likelihood, method = "BFGS",

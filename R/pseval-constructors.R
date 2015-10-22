@@ -15,7 +15,7 @@ add_imputation <- function(psdesign, imputation){
 
 }
 
-#' Add imputation model to a psdesign object
+#' Add risk model to a psdesign object
 #'
 #' @param psdesign A psdesign object
 #' @param risk A risk model object, such as \link{risk_logistic}
