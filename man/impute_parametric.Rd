@@ -7,9 +7,12 @@
 impute_parametric(formula, distribution = gaussian, ...)
 }
 \arguments{
-\item{formula}{Formula specifying the imputation model for the surrogate under treatment}
+\item{formula}{Formula specifying the imputation model for the surrogate
+under treatment}
 
-\item{distribution}{Assumed distribution for the imputation model. Must be compatible with the \code{family} argument of \link{glm}}
+\item{distribution}{Assumed distribution for the imputation model. Must be
+compatible with the \code{family} argument of \link{glm}. Currenly only
+Gaussian models are supported}
 
 \item{...}{Arguments passed to \link{glm}}
 }

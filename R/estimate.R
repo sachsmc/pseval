@@ -1,4 +1,4 @@
-#' Estimate parameters from a specified model
+#' Estimate parameters from a specified model using estimated maximum likelihood
 #'
 #' @param psdesign A psdesign object with a risk model and imputation model specified
 #' @param start Vector of starting values, if NULL, will come up with starting values
@@ -22,7 +22,7 @@ ps_estimate <- function(psdesign, start = NULL, control = list(fnscale = -1), ..
 }
 
 
-#' Estimate parameters from a specified model using bootstrap resampling
+#' Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood
 #'
 #' @param psdesign A psdesign object with a risk model and imputation model specified
 #' @param n.boots Number of bootstrap replicates

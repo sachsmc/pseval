@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimate.R
 \name{ps_estimate}
 \alias{ps_estimate}
-\title{Estimate parameters from a specified model}
+\title{Estimate parameters from a specified model using estimated maximum likelihood}
 \usage{
 ps_estimate(psdesign, start = NULL, control = list(fnscale = -1), ...)
 }
@@ -16,6 +16,6 @@ ps_estimate(psdesign, start = NULL, control = list(fnscale = -1), ...)
 \item{...}{Arguments passed to \link{optim}}
 }
 \description{
-Estimate parameters from a specified model
+Estimate parameters from a specified model using estimated maximum likelihood
 }
 

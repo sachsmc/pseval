@@ -4,29 +4,45 @@
 \alias{psdesign}
 \title{Specify a design for a principal surrogate evaluation}
 \usage{
-psdesign(data = NULL, treatment, outcome, surrogate, BIP = NULL,
-  CPV = NULL, BSM = NULL, weights = NULL, ...)
+psdesign(data, Z, Y, S, BIP = NULL, CPV = NULL, BSM = NULL,
+  weights = NULL, ...)
 }
 \arguments{
 \item{data}{Data frame containing data to be analyzed}
 
-\item{treatment}{Expression defining the treatment variable}
+\item{Z}{Expression defining the treatment variable which has 2 levels}
 
-\item{outcome}{Expression defining the outcome variable}
+\item{Y}{Expression defining the outcome variable. For binary events this
+should be coded as 0/1 or a factor with 2 levels. For censored time-to-event outcomes this can be a call to
+\link[survival]{Surv}}
 
-\item{surrogate}{Expression defining the candidate surrogate}
+\item{S}{Expression defining the candidate surrogate}
 
 \item{BIP}{Optional expression defining the baseline irrelevant predictor}
 
-\item{CPV}{Optional expression defining the closeout placebo vaccination measurement}
+\item{CPV}{Optional expression defining the closeout placebo vaccination
+measurement}
 
 \item{BSM}{Optional expression defining the baseline surrogate measurement}
 
-\item{weights}{optional expression defining weights to accomodate nonrandom subsampling, such as case control or two phase}
+\item{weights}{optional expression defining weights to accomodate nonrandom
+subsampling, such as case control or two phase}
 
-\item{...}{Not currently used}
+\item{...}{Other key-value pairs that will be included in the augmented data}
 }
 \description{
-Specify a design for a principal surrogate evaluation
+Generate mappings that describe how variables in the data are mapped to
+components of the principal surrogate analysis. Other than \code{data}, this
+is a list of key-value pairs desribing the common elements of a ps analysis.
+The required keys are Z, Y, and S. Optional keys are BIP, CPV, BSM, and
+weights. These elements are described in details below. Additional keys-value
+pairs can be included in \code{...}. This function generates an augmented
+dataset and additional information for subsequent steps in the analysis. In
+the subsequent steps, refer to the variables by the keys. See
+\link{add_imputation} and \link{add_riskmodel} for information on how to
+proceed in the analysis.
+}
+\details{
+TODO
 }
 

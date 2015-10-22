@@ -3,6 +3,7 @@
 S3method("+",ps)
 export(add_imputation)
 export(add_riskmodel)
+export(generate_gh_data)
 export(impute_bivnorm)
 export(impute_parametric)
 export(psdesign)

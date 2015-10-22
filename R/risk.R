@@ -14,16 +14,13 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
     # refactor to include possible CPV and/or BSM
     # break of into separate function called expand_augdata
 
-    trtmat <- model.matrix(model, psdesign$augdata[psdesign$augdata$Z == 1, ])
-    Y.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y
+    expanded <- expand_augdata(model, psdesign, D = D)
 
-    untrtsamp <- c(psdesign$icdf_sbarw(runif(D)))
-    dex <- (1:nrow(psdesign$augdata))[psdesign$augdata$Z == 0]
-    untrtobs <- psdesign$augdata[rep(dex, D), ]
-    untrtobs$S.1 <- untrtsamp
+    trtmat <- expanded$noimp
+    Y.trt <- expanded$noimp.Y
 
-    untrt.expand <- model.matrix(model, untrtobs)
-    Y.untrt <- untrtobs$Y
+    untrt.expand <- expanded$imp
+    Y.untrt <- expanded$imp.Y
 
     likelihood <- function(beta){
 
@@ -64,18 +61,17 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
-    trtmat <- model.matrix(model, psdesign$augdata[psdesign$augdata$Z == 1, ])
-    Y.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y[,1]
-    delt.trt <- psdesign$augdata[psdesign$augdata$Z == 1, ]$Y[, 2]
+    expanded <- expand_augdata(model, psdesign, D = D)
 
-    untrtsamp <- c(psdesign$icdf_sbarw(runif(D)))
-    dex <- (1:nrow(psdesign$augdata))[psdesign$augdata$Z == 0]
-    untrtobs <- psdesign$augdata[rep(dex, D), ]
-    untrtobs[ , attr(terms.formula(model), "term.labels")[1]] <- untrtsamp
+    if(!inherits(expanded$noimp.Y, "Surv")) stop("Requires a survival outcome specified with Surv(time, event)")
 
-    untrt.expand <- model.matrix(model, untrtobs)
-    Y.untrt <- untrtobs$Y[, 1]
-    delt.untrt <- untrtobs[, 2]
+    trtmat <- expanded$noimp
+    Y.trt <- expanded$noimp.Y[, 1]
+    delt.trt <- expanded$noimp.Y[, 2]
+
+    untrt.expand <- expanded$imp
+    Y.untrt <- expanded$imp.Y[, 1]
+    delt.untrt <- expanded$imp.Y[, 2]
 
     likelihood <- function(beta){
 
@@ -101,7 +97,6 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
     psdesign$likelihood <- likelihood
     psdesign$risk.model <- list(model = "weibull", args = arglist )
     psdesign$nparam <- ncol(trtmat) + 1
-    psdesign$censored <- cens
 
     psdesign
 
@@ -124,6 +119,28 @@ risk.expit <- function(x) {
 risk.probit <- function(x) {
 
   pnorm(x)
+
+}
+
+
+expand_augdata <- function(model, psdesign, D = 500){
+
+  vars <- paste(attr(terms(model), "variables"))[-1]
+  stopifnot("S.1" %in% vars)
+  noimpdex <- !is.na(psdesign$augdata["S.1"])
+
+  trtmat <- model.matrix(model, psdesign$augdata[noimpdex, ])
+  Y.trt <- psdesign$augdata[noimpdex, ]$Y
+
+  untrtsamp <- c(psdesign$icdf_sbarw(runif(D)))
+  dex <- (1:nrow(psdesign$augdata))[!noimpdex]
+  untrtobs <- psdesign$augdata[rep(dex, D), ]
+  untrtobs$S.1 <- untrtsamp
+
+  untrt.expand <- model.matrix(model, untrtobs)
+  Y.untrt <- untrtobs$Y
+
+  list(noimp = trtmat, noimp.Y = Y.trt, imp = untrt.expand, imp.Y = Y.untrt)
 
 }
 

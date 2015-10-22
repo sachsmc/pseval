@@ -42,7 +42,7 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
         sapply(U.1, function(u) qnorm(u, mean = mu, sd = sd))
 
       }
-    ## return function of S and W that returns a probability, i.e., a cdf
+
     psdesign
   }
 
@@ -61,21 +61,23 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
 #' used to impute the missing S(1) values. This method requires a BIP in the
 #' design.
 #'
+#' @param x, expression identifying the variable to be imputed. Typically this is S.1 or S.0
 #' @param mu, means of the pair of surrogates, missing one first
 #' @param sd, standard deviations of the pair, missing one first
 #' @param rho, the correlation between X1 and X2
 #'
 #' @export
 
-impute_bivnorm <- function(mu = c(0, 0), sd = c(1, 1), rho = .2){
+impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
 
   rval <- function(psdesign){
 
     psdesign$impute.model <- "bivnorm"
 
-    mindelta <- subset(psdesign$augdata, Z != 1)
+    missdex <- !is.na(eval(substitute(x), envir = psdesign$augdata))
+    mindelta <- subset(psdesign$augdata, !missdex)
 
-    vmu <- mu[1] + sd[1]/sd[2] * rho * (mindelta$W - mu[2])
+    vmu <- mu[1] + sd[1]/sd[2] * rho * (mindelta$BIP - mu[2])
     vsd <- (1 - rho^2) * sd[1]^2
 
 
@@ -91,7 +93,7 @@ impute_bivnorm <- function(mu = c(0, 0), sd = c(1, 1), rho = .2){
         sapply(U.1, function(s) qnorm(s, mean = vmu, sd = vsd))
 
       }
-    ## return function of S and W that returns a probability, i.e., a cdf
+
     psdesign
   }
 

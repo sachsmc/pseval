@@ -2,7 +2,7 @@
 % Please edit documentation in R/pseval-constructors.R
 \name{add_riskmodel}
 \alias{add_riskmodel}
-\title{Add imputation model to a psdesign object}
+\title{Add risk model to a psdesign object}
 \usage{
 add_riskmodel(psdesign, riskmodel)
 }
@@ -12,6 +12,6 @@ add_riskmodel(psdesign, riskmodel)
 \item{risk}{A risk model object, such as \link{risk_logistic}}
 }
 \description{
-Add imputation model to a psdesign object
+Add risk model to a psdesign object
 }
 

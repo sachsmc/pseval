@@ -12,7 +12,7 @@
 #' proceed in the analysis.
 #'
 #' @details
-#'
+#' TODO
 #'
 #' @param data Data frame containing data to be analyzed
 #' @param Z Expression defining the treatment variable which has 2 levels

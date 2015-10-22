@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimate.R
 \name{ps_bootstrap}
 \alias{ps_bootstrap}
-\title{Estimate parameters from a specified model using bootstrap resampling}
+\title{Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood}
 \usage{
 ps_bootstrap(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL,
   control = list(fnscale = -1), ...)
@@ -21,6 +21,6 @@ ps_bootstrap(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL,
 \item{...}{Arguments passed to \link{optim}}
 }
 \description{
-Estimate parameters from a specified model using bootstrap resampling
+Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood
 }
 
