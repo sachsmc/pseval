@@ -26,7 +26,7 @@
 #' @param weights optional expression defining weights to accomodate nonrandom
 #'   subsampling, such as case control or two phase
 #' @param ... Other key-value pairs that will be included in the augmented data,
-#'   e.g. additional candidate surrogates
+#'   e.g. additional candidate surrogates, covariates for adjustment, variables used for imputation
 #'
 #' @export
 
@@ -73,8 +73,6 @@ psdesign <- function(data, Z, Y, S,
 
   optionals <- do.call(cbind, eval(substitute(list(...)), envir = data))
   if(!is.null(optionals)) rval$augdata <- data.frame(rval$augdata, optionals)
-
-  rval$augdata <- data.frame(rval$augdata, data)
 
   rval$mapping <- mapping
 

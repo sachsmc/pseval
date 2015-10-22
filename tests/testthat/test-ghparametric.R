@@ -5,7 +5,8 @@ test_that("Gilbert Hudgens estimates work", {
     ghdat <- generate_gh_data(400)
     ghdes <- psdesign(ghdat, Z = Z, Y = Y.obs, S = S.1, BIP = X, CPV = CPV, BSM = BSM)
     ghdes2 <- ghdes + impute_parametric(S.1 ~ BIP)
-    ghdes3 <- ghdes2 + risk_binary(D = 500, risk = risk.expit)
+    ghdes2b <- ghdes2 + impute_parametric(S.0 ~ BIP)
+    ghdes3 <- ghdes2b + risk_binary(D = 500, risk = risk.expit)
 
 
     truepar <- c(-1, 2, 0, -1)

@@ -1,7 +1,8 @@
 #' Imputation models for the missing S(1)
 #'
 #' @param formula Formula specifying the imputation model for the surrogate
-#'   under treatment
+#'   under treatment. Generally the candidate surrogate will be on the left side
+#'   in the formula, and the BIP or BIPs will be on the right side
 #' @param distribution Assumed distribution for the imputation model. Must be
 #'   compatible with the \code{family} argument of \link{glm}. Currenly only
 #'   Gaussian models are supported
@@ -16,15 +17,17 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
+    if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
+
     missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
 
     fit <- glm(formula, data = psdesign$augdata[missdex, ], family = distribution, weights = cdfweights, ...)
 
-    psdesign$impute.model <- list(model = "parametric", args = arglist)
+    psdesign$imputation.models[[paste(formula[[2]])]]$model <- list(model = "parametric", args = arglist)
 
     mindelta <- subset(psdesign$augdata, !missdex)
 
-    psdesign$cdf_sbarw <-
+    psdesign$imputation.models[[paste(formula[[2]])]]$cdf_sbarw <-
       function(S.1){
 
         mu <- predict(fit, newdata = mindelta, type = "response")
@@ -33,7 +36,7 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
         sapply(S.1, function(s) pnorm(s, mean = mu, sd = sd))
 
       }
-    psdesign$icdf_sbarw <-
+    psdesign$imputation.models[[paste(formula[[2]])]]$icdf_sbarw <-
       function(U.1){
 
         mu <- predict(fit, newdata = mindelta, type = "response")
@@ -57,7 +60,7 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
 #' This model assumes that the pair [S(1), W] are bivariate normal, where W is
 #' the BIP. The means, standard deviations, and correlation are estimated or
 #' fixed before calling this function. Then the conditional normal formula is
-#' applied in order to get the distribution of S(1) | S(0). That distribution is
+#' applied in order to get the distribution of S(1) | W. That distribution is
 #' used to impute the missing S(1) values. This method requires a BIP in the
 #' design.
 #'

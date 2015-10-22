@@ -7,7 +7,9 @@
 #'
 ps_estimate <- function(psdesign, start = NULL, control = list(fnscale = -1), ...){
 
-  stopifnot("impute.model" %in% names(psdesign) && "risk.model" %in% names(psdesign))
+  if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
+  if(!"imputation.models" %in% names(psdesign)) stop("No imputation models specified")
+
 
   if(is.null(start)){
 

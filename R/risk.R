@@ -127,6 +127,7 @@ risk.probit <- function(x) {
 
 expand_augdata <- function(model, psdesign, D = 500){
 
+
   vars <- paste(attr(terms(model), "variables"))[-1]
   stopifnot("S.1" %in% vars)
   noimpdex <- !is.na(psdesign$augdata["S.1"])
@@ -134,7 +135,7 @@ expand_augdata <- function(model, psdesign, D = 500){
   trtmat <- model.matrix(model, psdesign$augdata[noimpdex, ])
   Y.trt <- psdesign$augdata[noimpdex, ]$Y
 
-  untrtsamp <- c(psdesign$icdf_sbarw(runif(D)))
+  untrtsamp <- c(psdesign$imputation.models$S.1$icdf_sbarw(runif(D)))
   dex <- (1:nrow(psdesign$augdata))[!noimpdex]
   untrtobs <- psdesign$augdata[rep(dex, D), ]
   untrtobs$S.1 <- untrtsamp
