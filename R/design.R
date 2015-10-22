@@ -11,14 +11,13 @@
 #' \link{add_imputation} and \link{add_riskmodel} for information on how to
 #' proceed in the analysis.
 #'
-#' @details
-#' TODO
+#' @details TODO
 #'
 #' @param data Data frame containing data to be analyzed
 #' @param Z Expression defining the treatment variable which has 2 levels
 #' @param Y Expression defining the outcome variable. For binary events this
-#'   should be coded as 0/1 or a factor with 2 levels. For censored time-to-event outcomes this can be a call to
-#'   \link[survival]{Surv}
+#'   should be coded as 0/1 or a factor with 2 levels. For censored
+#'   time-to-event outcomes this can be a call to \link[survival]{Surv}
 #' @param S Expression defining the candidate surrogate
 #' @param BIP Optional expression defining the baseline irrelevant predictor
 #' @param CPV Optional expression defining the closeout placebo vaccination
@@ -26,13 +25,16 @@
 #' @param BSM Optional expression defining the baseline surrogate measurement
 #' @param weights optional expression defining weights to accomodate nonrandom
 #'   subsampling, such as case control or two phase
-#' @param ... Other key-value pairs that will be included in the augmented data
+#' @param ... Other key-value pairs that will be included in the augmented data,
+#'   e.g. additional candidate surrogates
 #'
 #' @export
 
 psdesign <- function(data, Z, Y, S,
                      BIP = NULL, CPV = NULL, BSM = NULL, weights = NULL, ...){
 
+
+  mapping <- sapply(as.list(match.call())[-c(1, 2)], as.character)
 
   trt <- verify_trt(eval(substitute(Z), envir = data))
   oot <- eval(substitute(Y), envir = data)
@@ -68,7 +70,14 @@ psdesign <- function(data, Z, Y, S,
   if(!is.null(cpv)) rval$augdata <- data.frame(rval$augdata, CPV = cpv)
   if(!is.null(bsm)) rval$augdata <- data.frame(rval$augdata, BSM = bsm)
 
+
+  optionals <- do.call(cbind, eval(substitute(list(...)), envir = data))
+  if(!is.null(optionals)) rval$augdata <- data.frame(rval$augdata, optionals)
+
   rval$augdata <- data.frame(rval$augdata, data)
+
+  rval$mapping <- mapping
+
   class(rval) <- c("ps", "psdesign")
 
   rval

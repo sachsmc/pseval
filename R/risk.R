@@ -37,8 +37,9 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
     }
 
     psdesign$likelihood <- likelihood
-    psdesign$risk.model <- list(model = "logistic", args = arglist)
+    psdesign$risk.model <- list(model = "binary", args = arglist)
     psdesign$nparam <- ncol(trtmat)
+    psdesign$param.names <- colnames(trtmat)
 
     psdesign
 
@@ -97,6 +98,7 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
     psdesign$likelihood <- likelihood
     psdesign$risk.model <- list(model = "weibull", args = arglist )
     psdesign$nparam <- ncol(trtmat) + 1
+    psdesign$param.names <- c("shape", colnames(trtmat))
 
     psdesign
 

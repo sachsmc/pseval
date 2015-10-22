@@ -10,7 +10,7 @@ test_that("Gilbert Hudgens estimates work", {
 
     truepar <- c(-1, 2, 0, -1)
 
-    test2 <- ps_estimate(ghdes3, start = truepar, method = "BFGS")
+    test2 <- ps_estimate(ghdes3, start = rep(0, 4), method = "BFGS")
 
     #test <- ps_bootstrap(ghdes3, n.boots = 50, start = truepar, method = "BFGS")
 

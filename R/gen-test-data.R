@@ -37,6 +37,8 @@ generate_gh_data <- function(n){
   ## BSM measure noisy S.0 at start
 
   BSM <- S.0 + rnorm(n, sd = .1)
+  S.1[Z == 0] <- NA
+  S.0[Z == 1] <- NA
 
   data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, Y.obs, Y.0, Y.1)
 

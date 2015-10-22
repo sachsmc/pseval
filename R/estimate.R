@@ -16,6 +16,7 @@ ps_estimate <- function(psdesign, start = NULL, control = list(fnscale = -1), ..
   }
 
   est1 <- optim(start, fn = psdesign$likelihood, control = control, ...)
+  names(est1$par) <- psdesign$param.names
 
   est1
 
