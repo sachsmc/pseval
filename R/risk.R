@@ -114,6 +114,65 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 }
 
 
+
+#' Exponential risk model for time to event outcome
+#'
+#' @param model Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring
+#' @param D number of samples for simulated annealing
+#' @param ...
+#'
+#'@export
+
+risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
+
+  arglist <- as.list(match.call())
+  rval <- function(psdesign){
+
+    expanded <- expand_augdata(model, psdesign, D = D)
+
+    if(!inherits(expanded$noimp.Y, "Surv")) stop("Requires a survival outcome specified with Surv(time, event)")
+
+    trtmat <- expanded$noimp
+    Y.trt <- expanded$noimp.Y[, 1]
+    delt.trt <- expanded$noimp.Y[, 2]
+
+    untrt.expand <- expanded$imp
+    Y.untrt <- expanded$imp.Y[, 1]
+    delt.untrt <- expanded$imp.Y[, 2]
+
+    likelihood <- function(beta){
+
+      scalepram <- 1/exp(trtmat %*% beta)
+
+      trtlike <- scalepram^delt.trt * exp(-scalepram * Y.trt)
+
+      # for each W in untrted, sample a bunch from cdf_sbarw and take the mean
+
+      scale.untrt <- 1/exp(untrt.expand %*% beta)
+
+      untrted <- matrix(scale.untrt^delt.untrt * exp(-scale.untrt * Y.untrt), nrow = D, byrow = TRUE)
+
+      -1 * (sum(log(trtlike)) + sum(log(colMeans(untrted))))
+
+    }
+
+    psdesign$likelihood <- likelihood
+    psdesign$risk.model <- list(model = "exponential", args = arglist )
+    psdesign$nparam <- ncol(trtmat)
+    psdesign$param.names <- colnames(trtmat)
+
+    psdesign
+
+  }
+  ## return a likelihood closure
+
+  class(rval) <- c("ps", "riskmodel")
+  rval
+
+}
+
+
+
 risk.expit <- function(x) {
 
   exp(x)/(1 + exp(x))
