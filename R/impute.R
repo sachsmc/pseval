@@ -22,7 +22,8 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
 
     missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
 
-    fit <- glm(formula, data = psdesign$augdata[missdex, ], family = distribution, weights = cdfweights, ...)
+    fit <- glm(formula, data = psdesign$augdata[missdex, ], family = distribution,
+               weights = cdfweights, ...)
 
     psdesign$imputation.models[[outname]]$model <- list(model = "parametric", args = arglist)
 
@@ -117,10 +118,12 @@ impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
 #' @param formula.location Formula specifying the imputation model for the location component of the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
-#
 #' @param formula.scale Formula specifying the imputation model for the scale component of the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
+#'   @param ... Other parameters passed to \link{sp_locscale}
+#'
+#'   @export
 
 impute_semiparametric <- function(formula.location, formula.scale, ...){
   arglist <- as.list(match.call())
@@ -132,28 +135,33 @@ impute_semiparametric <- function(formula.location, formula.scale, ...){
     missdex <- !is.na(get(paste(formula.location[[2]]), psdesign$augdata))
 
     fit <- sp_locscale(formula.location = formula.location, formula.scale = formula.scale,
-                       data = psdesign$augdata[missdex, ], weights = cdfweights, ...)
+                       data = psdesign$augdata[missdex, ], weights = psdesign$augdata$cdfweights[missdex], ...)
 
-    psdesign$imputation.models[[paste(formula[[2]])]]$model <- list(model = "semiparametric", args = arglist)
+    stopifnot(fit$converge)
+
+    psdesign$imputation.models[[paste(formula.location[[2]])]]$model <- list(model = "semiparametric", args = arglist)
 
     mindelta <- subset(psdesign$augdata, !missdex)
 
-    psdesign$imputation.models[[paste(formula[[2]])]]$cdf_sbarw <-
+    psdesign$imputation.models[[paste(formula.location[[2]])]]$cdf_sbarw <-
       function(S.1){
 
-        mu <- predict(fit, newdata = mindelta, type = "response")
-        sd <- sd(fit$residuals)
+        mu <- model.matrix(formula.location[-2], data = mindelta) %*% fit$beta.l
+        sig <- exp(model.matrix(formula.scale[-2], data = mindelta) %*% fit$beta.s)
 
-        sapply(S.1, function(s) pnorm(s, mean = mu, sd = sd))
+        sapply(S.1, function(s){
+          sapply((s - mu)/sig, function(s.in) mean(fit$resid < s.in))
+        })
 
       }
-    psdesign$imputation.models[[paste(formula[[2]])]]$icdf_sbarw <-
+    psdesign$imputation.models[[paste(formula.location[[2]])]]$icdf_sbarw <-
       function(U.1){
 
-        mu <- predict(fit, newdata = mindelta, type = "response")
-        sd <- sd(fit$residuals)
+        mu <- model.matrix(formula.location[-2], data = mindelta) %*% fit$beta.l
+        sig <- exp(model.matrix(formula.scale[-2], data =mindelta) %*% fit$beta.s)
 
-        sapply(U.1, function(u) qnorm(u, mean = mu, sd = sd))
+        U.new <- sample(fit$resid, size = length(U.1), replace = TRUE)
+        sapply(U.new, function(u) u * sig + mu)
 
       }
 
@@ -166,7 +174,96 @@ impute_semiparametric <- function(formula.location, formula.scale, ...){
 }
 
 
-sp_locscale <- function(formula.location, formula.scale, data, weights, ...){
-  # do stuff
+#' Fit the semi-parametric location-scale model
+#'
+#' This estimates the location-scale model as described in Heagerty and Pepe (1999) using the Newton-Raphson method. The location and scale formulas must have the same outcome, but they may have different predictors.
+#'
+#' @param formula.location Formula specifying the model for the location
+#' @param formula.scale Formula specifying the model for the scale
+#' @param data Data used to estimate the model
+#' @param weights Weights applied to the estimating equations
+#' @param tol Convergence tolerance
+#' @param maxit Maximum number of iterations
+#'
+#' @return A list containing the parameter estimates, the convergence indicator, and residuals
+#'
+#' @export
+
+sp_locscale <- function(formula.location, formula.scale, data, weights, tol = 1e-6, maxit = 100){
+
+  stopifnot(identical(formula.location[[2]], formula.scale[[2]]))
+
+
+  mf.l <- model.frame(formula.location, data = data)
+  mf.s <- model.frame(formula.scale, data = data)
+
+  stopifnot(all.equal(model.response(mf.l), model.response(mf.s)))
+
+  resp <- model.response(mf.l)
+  if(missing(weights)) weights <- rep(1, length(resp))
+  desmat.l <- model.matrix(formula.location, data = data)
+  desmat.s <- model.matrix(formula.scale, data = data)
+
+  nmu <- ncol(desmat.l)
+  nsig <- ncol(desmat.s)
+  nobs <- nrow(desmat.l)
+
+
+  fitU <- glm(resp ~ desmat.l - 1, weights=weights)
+  eta <- fitU$coef
+  mu1 <- fitU$fitted.value
+
+  res2 <- (resp - mu1)^2
+
+  fitW <- glm(res2 ~ desmat.s - 1, weights = weights, family=quasi(var="mu", link="log"))
+
+  delta<-fitW$coef/2
+
+  beta <- c(eta,delta)
+
+  i <- 1
+  for(i in 1:maxit){
+
+    beta.l <- beta[1:nmu]
+    beta.s <- beta[-c(1:nmu)]
+
+    mu <- desmat.l %*% beta.l
+    sig2 <- exp(desmat.s %*% beta.s)^2
+
+    eeq.l <- matrix(rep(weights * (resp - mu) / sig2, nmu), byrow = FALSE, ncol = nmu)
+    eeq.s <- matrix(rep(weights * ((resp - mu)^2 - sig2) / sig2, nsig), byrow = FALSE, ncol = nsig)
+
+    eeq.all <- c(colMeans(desmat.l * eeq.l),
+      colMeans(desmat.s * eeq.s))
+
+    matrixUU <- desmat.l / matrix(rep(sig2, nmu), byrow=FALSE, nrow = nobs)
+    H.UU<--t(desmat.l * weights) %*% matrixUU / nobs
+
+    matrixUW <- desmat.s * matrix(rep((resp - mu) / sig2, nsig), byrow = FALSE, nrow = nobs)
+    H.UW <- -2 * t(desmat.l * weights) %*% matrixUW / nobs
+
+    matrixWW <- desmat.s * matrix(rep((resp - mu)^2 / sig2, nsig), byrow = FALSE, nrow = nobs)
+    H.WW <- -2 * t(desmat.s * weights) %*% matrixWW / nobs
+
+    H<-rbind(cbind(H.UU,H.UW),cbind(t(H.UW),H.WW))
+
+    beta.0 <- beta - c(solve(H) %*% eeq.all)
+
+    if(sum((beta.0 - beta)^2) < tol){
+      break
+    }
+    beta <- beta.0
+
+    i <- i + 1
+
+  }
+
+  beta <- beta.0
+  converge <- i < maxit
+
+  resid <- c((resp - desmat.l %*% beta[1:nmu])/exp(desmat.s %*% beta[-c(1:nmu)]))
+
+  list(beta.l = beta[1:nmu], beta.s = beta[-c(1:nmu)], converge = converge, resid = resid)
+
 }
 

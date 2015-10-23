@@ -1,25 +1,22 @@
 library(pseval)
+library(splines)
 
 test_that("Gilbert Hudgens estimates work", {
 
-    ghdat <- generate_gh_data(400)
+    ghdat <- generate_gh_data(2000)
     ghdes <- psdesign(ghdat, Z = Z, Y = Y.obs, S = S.1, BIP = X, CPV = CPV, BSM = BSM)
-    ghdes2 <- ghdes + impute_parametric(S.1 ~ BIP)
-    ghdes2b <- ghdes2 + impute_parametric(S.0 ~ BIP)
-    ghdes3 <- ghdes2b + risk_binary(D = 500, risk = risk.expit)
+    ghdes2 <- ghdes + impute_parametric(S.1 ~ bs(BIP, df = 3))
+    ghdes2b <- ghdes2 + impute_semiparametric(S.1 ~ bs(BIP, df = 3), S.1 ~ 1)
+
+    ghdes3 <- ghdes2 + risk_binary(D = 5000, risk = risk.expit)
+    ghdes3b <- ghdes2b + risk_binary(D = 5000, risk = risk.expit)
 
 
     truepar <- c(-1, 2, 0, -1)
 
     test2 <- ps_estimate(ghdes3, start = rep(0, 4), method = "BFGS")
-
+    test2b <- ps_estimate(ghdes3b, start = truepar, method = "BFGS")
     #test <- ps_bootstrap(ghdes3, n.boots = 50, start = truepar, method = "BFGS")
-
-
-    estpar <- optim(truepar, fn = ghdes3$likelihood, method = "Nelder",
-                    control = list(fnscale = -1, maxit = 5000))
-
-
 
 
   # classes
