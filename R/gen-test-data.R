@@ -40,7 +40,14 @@ generate_gh_data <- function(n){
   S.1[Z == 0] <- NA
   S.0[Z == 1] <- NA
 
-  data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, Y.obs, Y.0, Y.1)
+  ## make categorical variables
+  qwantz <- c(-Inf, quantile(c(S.0, S.1), c(.25, .5, .75), na.rm = TRUE), Inf)
+  S.1.cat <- cut(S.1, qwantz)
+  S.0.cat <- cut(S.0, qwantz)
+
+  BIP.cat <- cut(X, c(-Inf, quantile(X, c(.25, .5, .75)), Inf))
+
+  data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, Y.obs, Y.0, Y.1, S.1.cat, S.0.cat, BIP.cat)
 
 }
 

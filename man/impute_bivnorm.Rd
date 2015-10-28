@@ -2,7 +2,7 @@
 % Please edit documentation in R/impute.R
 \name{impute_bivnorm}
 \alias{impute_bivnorm}
-\title{Imputation models for the missing S(1)}
+\title{Bivariate normal imputation models for the missing S(1)}
 \usage{
 impute_bivnorm(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = 0.2)
 }
@@ -16,7 +16,7 @@ impute_bivnorm(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = 0.2)
 \item{rho,}{the correlation between X1 and X2}
 }
 \description{
-This model assumes that the pair [S(1), W] are bivariate normal, where W is
+This model assumes that the pair [S(1), W] is bivariate normal, where W is
 the BIP. The means, standard deviations, and correlation are estimated or
 fixed before calling this function. Then the conditional normal formula is
 applied in order to get the distribution of S(1) | W. That distribution is

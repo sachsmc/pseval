@@ -56,10 +56,92 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
 
 }
 
-
-#' Imputation models for the missing S(1)
+#' Nonparametric imputation model for the missing S(1)
 #'
-#' This model assumes that the pair [S(1), W] are bivariate normal, where W is
+#' Both S(1) and the BIP or set of BIPs must be categorical. This model imputes
+#' missing S(1)s based on the empirical probability of S(1) | BIP
+#'
+#' @param formula Formula specifying the imputation model for the surrogate
+#'   under treatment. Generally the candidate surrogate will be on the left side
+#'   in the formula, and the BIP or BIPs will be on the right side. In this case
+#'   the BIP and the S(1) must be categorical.
+#' @param ... Arguments passed to
+#'
+#' @export
+
+impute_nonparametric <- function(formula, ...){
+
+  arglist <- as.list(match.call())
+  rval <- function(psdesign){
+
+    if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
+    outname <- paste(formula[[2]])
+
+    missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
+
+    groups <- model.frame(formula, data = psdesign$augdata)
+    mindelta <- subset(psdesign$augdata, !missdex)
+
+    tab.nomiss <- table(model.frame(formula[-2], data = subset(psdesign$augdata, missdex)))
+    tab.miss <- table(model.frame(formula[-2], data = mindelta))
+
+    d.nomiss <- do.call("c", dimnames(tab.nomiss))
+    d.miss <- do.call("c", dimnames(tab.miss))
+
+    if(!all.equal(d.nomiss, d.miss)){
+
+      missinglevels <- lapply(d.miss, function(d) {
+        if(d %in% d.nomiss) return("") else return(d)
+      })
+      stop("Too many categories. ", paste("Cannot impute for levels: ", paste(missinglevels, collapse = ", ")))
+
+    }
+
+    lookup <- prop.table(table(groups), margin = (1:length(dim(table(groups))))[-1]) # conditional probability
+    impwith <- model.frame(formula[-2], mindelta)
+    outvect <- sort(unique(psdesign$augdata[[outname]]))
+
+    psdesign$imputation.models[[outname]]$model <- list(model = "nonparametric", args = arglist)
+
+    psdesign$imputation.models[[outname]]$cdf_sbarw <-
+      function(S.1){
+
+        sapply(S.1, function(s){
+
+          dex <- c(list(lookup), list(s), as.list(impwith))
+          res <- do.call("[", dex)
+
+        })
+
+      }
+    psdesign$imputation.models[[outname]]$icdf_sbarw <-
+      function(U.1){
+
+        dex <- c(list(lookup), list(TRUE), as.list(impwith))
+        res <- do.call("[", dex)
+
+        t(sapply(1:ncol(res), function(i){
+
+          sample(outvect, size = length(U.1), prob = res[, i], replace = TRUE)
+
+        }))
+
+      }
+
+    psdesign
+  }
+
+  class(rval) <- c("ps", "imputation")
+  rval
+
+}
+
+
+
+
+#' Bivariate normal imputation models for the missing S(1)
+#'
+#' This model assumes that the pair [S(1), W] is bivariate normal, where W is
 #' the BIP. The means, standard deviations, and correlation are estimated or
 #' fixed before calling this function. Then the conditional normal formula is
 #' applied in order to get the distribution of S(1) | W. That distribution is
