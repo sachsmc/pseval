@@ -9,11 +9,13 @@ impute_nonparametric(formula, ...)
 \arguments{
 \item{formula}{Formula specifying the imputation model for the surrogate
 under treatment. Generally the candidate surrogate will be on the left side
-in the formula, and the BIP or BIPs will be on the right side. In this case the BIP and the S(1) must be categorical.}
+in the formula, and the BIP or BIPs will be on the right side. In this case
+the BIP and the S(1) must be categorical.}
 
 \item{...}{Arguments passed to}
 }
 \description{
-Nonparametric imputation model for the missing S(1)
+Both S(1) and the BIP or set of BIPs must be categorical. This model imputes
+missing S(1)s based on the empirical probability of S(1) | BIP
 }
 

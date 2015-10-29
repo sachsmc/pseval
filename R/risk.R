@@ -12,9 +12,6 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
-    # refactor to include possible CPV and/or BSM
-    # break of into separate function called expand_augdata
-
     expanded <- expand_augdata(model, psdesign, D = D)
 
     trtmat <- expanded$noimp
@@ -34,6 +31,12 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
         (1 - risk(untrt.expand %*% beta))^(1 - Y.untrt), nrow = D, byrow = TRUE)
 
       -1 * (sum(log(trted)) + sum(log(colMeans(untrted))))
+
+    }
+
+    psdesign$risk.function <- function(data, beta){  ## P(D = 1 | S, Z)
+
+      risk(as.vector(model.matrix(model[-2], data) %*% beta))
 
     }
 
@@ -98,6 +101,18 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 
     }
 
+    psdesign$risk.function <- function(data, beta, t){  #P(Y < t | S, Z)
+
+      mat <- model.matrix(model[-2], data)
+      shape <- exp(beta[1])
+      beta0 <- beta[-1]
+
+      scale <- as.vector(exp(mat %*% beta0))
+
+      1 - exp(-(t / scale)^shape)
+
+    }
+
     psdesign$likelihood <- likelihood
     psdesign$risk.model <- list(model = "weibull", args = arglist )
     psdesign$nparam <- ncol(trtmat) + 1
@@ -153,6 +168,14 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
       untrted <- matrix(scale.untrt^delt.untrt * exp(-scale.untrt * Y.untrt), nrow = D, byrow = TRUE)
 
       -1 * (sum(log(trtlike)) + sum(log(colMeans(untrted))))
+
+    }
+
+    psdesign$risk.function <- function(data, beta, t){ # P(T < t | S, Z)
+
+      scale <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
+
+      1 - exp(-scale * t)
 
     }
 

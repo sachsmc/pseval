@@ -20,7 +20,9 @@ ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
   est1 <- optim(start, fn = psdesign$likelihood, control = control, ...)
   names(est1$par) <- psdesign$param.names
 
-  est1
+  psdesign$estimates <- est1
+  psdesign
+
 
 }
 
@@ -76,6 +78,8 @@ ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = N
 
   if(progress.bar) close(pb)
 
-  as.data.frame(do.call(rbind, bootpar))
+  bootpar <- as.data.frame(do.call(rbind, bootpar))
+  psdesign$bootstraps <- bootpar
+  psdesign
 
 }

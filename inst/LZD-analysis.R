@@ -67,7 +67,9 @@ swank.one <- function(dat){
 }
 
 
-system.time(orig.fit <- swank.one(dat.out))
+plot(VE ~ S.1, data = VE(est1), type = 'l')
+
+system.time(orig.fit <- swank.one(dat.out)$estimates)
 rownames(dat.out) <- paste(dat.out$PID)
 
 resample <- function(){
@@ -83,7 +85,7 @@ resample <- function(){
 boots <- vector(mode = "list", length = 200)
 for(i in 1:length(boots)){
 
-  boots[[i]] <- swank.one(resample())
+  boots[[i]] <- swank.one(resample())$estimates
 
 }
 
