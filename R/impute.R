@@ -158,13 +158,14 @@ impute_nonparametric <- function(formula, ...){
 impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
 
   outname <- as.character(substitute(x))
+  arglist <- as.list(match.call())
 
   rval <- function(psdesign){
 
 
     if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
 
-    psdesign$imputation.models[[outname]]$impute.model <- "bivnorm"
+    psdesign$imputation.models[[outname]]$model <- list(model = "bivnorm", args = arglist)
 
     missdex <- !is.na(get(outname, psdesign$augdata))
     mindelta <- subset(psdesign$augdata, !missdex)

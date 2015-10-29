@@ -38,33 +38,28 @@ likelihood <- function(beta){
 start <- c(.856, 6.376, -.326, -.528, .134)
 optim(start, likelihood)$par
 
+mu <- sapply(dat[, c("S_I1", "S_D1")], mean, na.rm = TRUE)
+sd <- sapply(dat[, c("S_I1", "S_D1")], sd, na.rm = TRUE)
+rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
 
-swank.one <- function(dat){
-    mu <- sapply(dat[, c("S_I1", "S_D1")], mean, na.rm = TRUE)
-    sd <- sapply(dat[, c("S_I1", "S_D1")], sd, na.rm = TRUE)
-    rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
+ghdes <- psdesign(dat, Z = Z, Y = Surv(Time_AE, event_AE), S = S_I1, BIP = S_D1)
+ghdes2 <- ghdes + impute_bivnorm(x = S.1, mu = mu, sd = sd, rho = rho.init)
+ghdes3 <- ghdes2 + risk_weibull(Y ~ S.1 * Z)
+ghdes3b <- ghdes2 + risk_exponential(Y ~ S.1 * Z)
 
-    ghdes <- psdesign(dat, Z = Z, Y = Surv(Time_AE, event_AE), S = S_I1, BIP = S_D1)
-    ghdes2 <- ghdes + impute_bivnorm(x = S.1, mu = mu, sd = sd, rho = rho.init)
-    ghdes3 <- ghdes2 + risk_weibull(Y ~ S.1 * Z)
-    ghdes3b <- ghdes2 + risk_exponential(Y ~ S.1 * Z)
+start <- c(.856, 6.376, -.326, -.528, .134)
+
+est1 <- ps_estimate(ghdes3, start = rep(0, 5), method = "BFGS")
+est1.boot <- ps_bootstrap(est1, start = est1$estimates$par, method = "BFGS")
+
+est1.boot <- ps_estimate(est1.boot, start = rep(0, 5), method = "BFGS")
 
 
+est1b <- ps_estimate(ghdes3b, start = rep(0, 4), method = "BFGS")
 
-    start <- c(.856, 6.376, -.326, -.528, .134)
+ghdes2.lower <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = .2)
+ghdes3.lower <- ghdes2.lower + risk_weibull(Time_AE ~ S_I1 * Z, cens = "event_AE")
 
-    est1 <- ps_estimate(ghdes3, start = rep(0, 5), method = "BFGS")
-    est1b <- ps_estimate(ghdes3b, start = rep(0, 4), method = "BFGS")
-
-    ghdes2.lower <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = .2)
-    ghdes3.lower <- ghdes2.lower + risk_weibull(Time_AE ~ S_I1 * Z, cens = "event_AE")
-
-    est1.lower <- optim(start, fn = ghdes3.lower$likelihood, method = "BFGS",
-                  control = list(fnscale = -1, maxit = 2000))
-
-    list(est.rho = est1, rho.2 = est1.lower)
-
-}
 
 
 plot(VE ~ S.1, data = VE(est1), type = 'l')

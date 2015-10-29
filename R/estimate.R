@@ -5,6 +5,8 @@
 #' @param control List of control parameters for passed to \link{optim}
 #' @param ... Arguments passed to \link{optim}
 #'
+#' @export
+#'
 ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 
   if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
@@ -35,17 +37,21 @@ ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 #' @param start Vector of starting values, if NULL, will come up with starting values
 #' @param control List of control parameters for passed to \link{optim}
 #' @param ... Arguments passed to \link{optim}
+#'
+#' @export
 #
 
 
 ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL, control = list(), ...){
 
-  stopifnot("impute.model" %in% names(psdesign) && "risk.model" %in% names(psdesign))
+  if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
+  if(!"imputation.models" %in% names(psdesign)) stop("No imputation models specified")
 
   bootpar <- vector(mode = "list", length = n.boots)
 
   if(progress.bar){
-     pb <- txtProgressBar(min = 1, max = n.boots, title = paste("Bootstrapping", n.boots, "replicates"))
+     cat(paste("Bootstrapping", n.boots, "replicates:\n"))
+     pb <- txtProgressBar(min = 1, max = n.boots)
   }
 
   psdesign.0 <- psdesign
@@ -55,9 +61,12 @@ ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = N
     sampdex <- sample(1:nrow(psdesign$augdata), nrow(psdesign$augdata), replace = TRUE)
     psdesign.0$augdata <- psdesign$augdata[sampdex, ]
 
-    ## re-call imputation model
+    ## re-call imputation models
 
-    psdesign2 <- psdesign.0 + do.call(as.character(psdesign$impute.model$args[[1]]), psdesign$impute.model$args[-1])
+    psdesign2 <- psdesign.0
+    for(impj in psdesign$imputation.models){
+      psdesign2 <- psdesign2 + do.call(as.character(impj$model$args[[1]]), impj$model$args[-1])
+    }
 
     ## re-call risk model
 
@@ -67,7 +76,7 @@ ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = N
 
     bpar <- ps_estimate(psdesign3, start = start, control = control, ...)
 
-    bootpar[[i]] <- c(bpar$par, convergence = bpar$convergence)
+    bootpar[[i]] <- c(bpar$estimates$par, convergence = bpar$estimates$convergence)
 
     if(progress.bar){
       setTxtProgressBar(pb, value = i)
@@ -83,3 +92,4 @@ ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = N
   psdesign
 
 }
+

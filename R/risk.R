@@ -195,6 +195,7 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 }
 
 
+#' @export
 
 risk.expit <- function(x) {
 
@@ -202,7 +203,7 @@ risk.expit <- function(x) {
 
 }
 
-
+#' @export
 risk.probit <- function(x) {
 
   pnorm(x)
