@@ -11,7 +11,7 @@ expit <- function(x) exp(x)/(1 + exp(x))
 #'
 #' @export
 
-generate_gh_data <- function(n){
+generate_example_data <- function(n){
 
   Z <- rbinom(n, 1, .5)
   X <- rnorm(n)  ## pre-treatment covariate
@@ -21,12 +21,23 @@ generate_gh_data <- function(n){
   S.0 <- X + rnorm(n, sd = .1)
   S.1 <- 2 + X + rnorm(n, sd = .1)
 
-  risk.obs <- expit(-1 + 0 * Z + 2 * S.1 - 1 * S.1 * Z)
-  risk.0 <- expit(-1 + 2 * S.1 )
-  risk.1 <- expit(-1 + 2 * S.1 - 1 * S.1 * 1)
+  risk.obs <- exp(-1 + 0 * Z + 2 * S.1 - 1 * S.1 * Z)
+  risk.0 <- exp(-1 + 2 * S.1 )
+  risk.1 <- exp(-1 + 2 * S.1 - 1 * S.1 * 1)
 
-  Y.0 <- rbinom(n, 1, trunc01(risk.0))
-  Y.1 <- rbinom(n, 1, trunc01(risk.1))
+  time.0 <- rexp(n, 1/risk.0)
+  time.1 <- rexp(n, 1/risk.1)
+  time.obs <- ifelse(Z == 1, time.1, time.0)
+
+  event.0 <- rbinom(n, 1, .8)
+  event.1 <- rbinom(n, 1, .8)
+
+  event.0[time.0 > 150] <- 0
+  event.1[time.1 > 150] <- 0
+  event.obs <- ifelse(Z == 1, event.1, event.0)
+
+  Y.0 <- as.numeric(time.0 < 2)
+  Y.1 <- as.numeric(time.1 < 2)
   Y.obs <- ifelse(Z == 1, Y.1, Y.0)
 
   ## CPV measure noisy S.1 at the end of the study for placebo subjects non-event
@@ -47,12 +58,11 @@ generate_gh_data <- function(n){
 
   BIP.cat <- cut(X, c(-Inf, quantile(X, c(.25, .5, .75)), Inf))
 
-  data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, Y.obs, Y.0, Y.1, S.1.cat, S.0.cat, BIP.cat)
+  data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, time.obs, event.obs, time.0, time.1, event.0, event.1, Y.obs, Y.0, Y.1, S.1.cat, S.0.cat, BIP.cat)
 
 }
 
 
-test <- generate_gh_data(1000)
 
 
 

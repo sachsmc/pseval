@@ -27,8 +27,12 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
 
       # for each W in untrted, sample a bunch from cdf_sbarw and take the mean
 
-      untrted <- matrix(risk(untrt.expand %*% beta)^Y.untrt *
-        (1 - risk(untrt.expand %*% beta))^(1 - Y.untrt), nrow = D, byrow = TRUE)
+      if(!is.null(untrt.expand) & !is.null(Y.untrt)){
+
+        untrted <- matrix(risk(untrt.expand %*% beta)^Y.untrt *
+          (1 - risk(untrt.expand %*% beta))^(1 - Y.untrt), nrow = D, byrow = TRUE)
+
+      } else untrted <- matrix(1)
 
       -1 * (sum(log(trted)) + sum(log(colMeans(untrted))))
 
@@ -88,16 +92,18 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
       shapepram<-exp(gamma0)
       scalepram<-exp(trtmat %*% beta0)
 
-      trtlike <- ((shapepram/scalepram)*(Y.trt/scalepram)^(shapepram-1))^delt.trt*exp(-(Y.trt/scalepram)^shapepram)
+      trtlike <- (log(shapepram) - log(scalepram)  +  (log(Y.trt) - log(scalepram)) * (shapepram-1)) * delt.trt - (Y.trt/scalepram)^shapepram
 
-      # for each W in untrted, sample a bunch from cdf_sbarw and take the mean
 
-      scale.untrt <- exp(untrt.expand %*% beta0)
+      if(!is.null(untrt.expand) & !is.null(Y.untrt)){
 
-      untrted <- matrix(((shapepram/scale.untrt)*(Y.untrt/scale.untrt)^(shapepram-1))^delt.untrt *
-                          exp(-(Y.untrt/scale.untrt)^shapepram), nrow = D, byrow = TRUE)
+        scale.untrt <- exp(untrt.expand %*% beta0)
+        untrted <- matrix((log(shapepram) - log(scale.untrt)  +
+                             (log(Y.untrt) - log(scale.untrt)) * (shapepram-1)) * delt.untrt -
+                            (Y.untrt/scale.untrt)^shapepram, nrow = D, byrow = TRUE)
+      } else untrted <- matrix(1)
 
-      -1 * (sum(log(trtlike)) + sum(log(colMeans(untrted))))
+      -1 * (sum(trtlike) + sum(colMeans(untrted)))
 
     }
 
@@ -159,15 +165,15 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 
       scalepram <- 1/exp(trtmat %*% beta)
 
-      trtlike <- scalepram^delt.trt * exp(-scalepram * Y.trt)
+      trtlike <- log(scalepram) * delt.trt - scalepram * Y.trt
 
-      # for each W in untrted, sample a bunch from cdf_sbarw and take the mean
+      if(!is.null(untrt.expand) & !is.null(Y.untrt)){
 
-      scale.untrt <- 1/exp(untrt.expand %*% beta)
+        scale.untrt <- 1/exp(untrt.expand %*% beta)
+        untrted <- matrix(log(scale.untrt) * delt.untrt - scale.untrt * Y.untrt, nrow = D, byrow = TRUE)
+      } else untrted <- matrix(1)
 
-      untrted <- matrix(scale.untrt^delt.untrt * exp(-scale.untrt * Y.untrt), nrow = D, byrow = TRUE)
-
-      -1 * (sum(log(trtlike)) + sum(log(colMeans(untrted))))
+      -1 * (sum(trtlike) + sum(colMeans(untrted)))
 
     }
 
@@ -214,22 +220,37 @@ risk.probit <- function(x) {
 expand_augdata <- function(model, psdesign, D = 500){
 
 
-  vars <- paste(attr(terms(model), "variables"))[-1]
-  stopifnot("S.1" %in% vars)
-  noimpdex <- !is.na(psdesign$augdata["S.1"])
+  vars <- rownames(attr(terms(model), "factors"))[-1]
+  noimpdex <- rowSums(is.na(psdesign$augdata[, vars, drop = FALSE])) == 0
 
   trtmat <- model.matrix(model, psdesign$augdata[noimpdex, ])
   Y.trt <- psdesign$augdata[noimpdex, ]$Y
 
-  untrtsamp <- c(psdesign$imputation.models$S.1$icdf_sbarw(runif(D)))
-  dex <- (1:nrow(psdesign$augdata))[!noimpdex]
-  untrtobs <- psdesign$augdata[rep(dex, D), ]
-  untrtobs$S.1 <- untrtsamp
+  if(all(noimpdex)){
 
-  untrt.expand <- model.matrix(model, untrtobs)
-  Y.untrt <- untrtobs$Y
+    return(list(noimp = trtmat, noimp.Y = Y.trt, imp = NULL, imp.Y = NULL))
 
-  list(noimp = trtmat, noimp.Y = Y.trt, imp = untrt.expand, imp.Y = Y.untrt)
+  } else {
+
+    misvars <- vars[apply(is.na(psdesign$augdata[, vars, drop = FALSE]), MAR = 2, any)]
+    impdex <- rowSums(is.na(psdesign$augdata[, misvars, drop = FALSE])) > 0
+    dex <- (1:nrow(psdesign$augdata))[impdex]
+    untrtobs <- psdesign$augdata[rep(dex, D), ]
+
+    for(j in misvars){
+
+      if(!j %in% names(psdesign$imputation.models)) stop(paste("Missing values in", j, "but no imputation model present."))
+
+      untrtsamp <- c(psdesign$imputation.models[[j]]$icdf_sbarw(runif(D)))
+      untrtobs[, j] <- untrtsamp
+
+      untrt.expand <- model.matrix(model, untrtobs)
+      Y.untrt <- untrtobs$Y
+
+    }
+
+    list(noimp = trtmat, noimp.Y = Y.trt, imp = untrt.expand, imp.Y = Y.untrt)
+  }
 
 }
 
