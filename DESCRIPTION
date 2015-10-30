@@ -8,4 +8,6 @@ Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: MIT + file LICENSE
 LazyData: TRUE
-Suggests: testthat, survival
+Suggests: testthat, survival,
+    knitr
+VignetteBuilder: knitr

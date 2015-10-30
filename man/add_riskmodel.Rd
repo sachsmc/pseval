@@ -9,9 +9,23 @@ add_riskmodel(psdesign, riskmodel)
 \arguments{
 \item{psdesign}{A psdesign object}
 
-\item{risk}{A risk model object, such as \link{risk_logistic}}
+\item{risk}{A risk model object}
 }
 \description{
 Add risk model to a psdesign object
+}
+\details{
+The risk model component specifies the likelihood for the data. This involves specifying the distribution of the outcome variable, whether it is binary or time-to-event, and specifying how the surrogate S(1) and the treatment Z interact and affect the outcome. We use the formula notation to be consistent with other regression type models in R. Below is a list of available risk models.
+
+\itemize{
+\item \link{risk_binary} This is a generic risk model for binary outcomes. The user can specify the formula, and link function using either \link{risk.expit} for the logistic link, or \link{risk.probit} for the probit link. Custom link functions may also be specified, which take a single numeric vector argument, and returns a vector of corresponding probabilities.
+\item \link{risk_weibull} This is a parameterization of the Weibull model for time-to-event outcomes that is consistent with that of \link{rweibull}. The user specifies the formula for the linear predictor of the scale parameter.
+\item \link{risk_exponential} This is a simple exponential model for a time-to-event outcome.
+}
+}
+\examples{
+test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.1, BIP = X)
+add_riskmodel(test, risk_binary())
+test + risk_binary() # same as above
 }
 

@@ -72,7 +72,7 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
   cat("\nImputation models: \n")
   if(!"imputation.models" %in% objs) {
 
-    cat("\tNone present, see ?impute for information on adding imputation models.\n")
+    cat("\tNone present, see ?add_imputation for information on imputation models.\n")
 
   } else {
 
@@ -87,7 +87,7 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
   cat("\nRisk models: \n")
   if(!"risk.model" %in% objs) {
-    cat("\tNone present, see ?risk for information on adding a risk model.\n")
+    cat("\tNone present, see ?add_riskmodel for information on risk models.\n")
   } else {
 
     tyj <- psdesign$risk.model

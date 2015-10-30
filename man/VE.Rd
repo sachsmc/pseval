@@ -4,7 +4,7 @@
 \alias{VE}
 \title{Calculate the vaccine efficacy}
 \usage{
-VE(psdesign, t, sig.level = 0.05)
+VE(psdesign, t, sig.level = 0.05, n.samps = 5000)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an

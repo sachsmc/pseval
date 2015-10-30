@@ -19,17 +19,17 @@
 #'
 #' @export
 #'
-VE <- function(psdesign, t, sig.level = .05){
+VE <- function(psdesign, t, sig.level = .05, n.samps = 5000){
 
   stopifnot("estimates" %in% names(psdesign))
 
-  impped <- psdesign$imputation.models$S.1$icdf_sbarw(runif(1000))
+  impped <- psdesign$imputation.models$S.1$icdf_sbarw(runif(n.samps))
   randrows <- sample(1:nrow(impped), ncol(impped), replace = TRUE)
-  imputed <- impped[cbind(randrows, 1:1000)]
+  imputed <- impped[cbind(randrows, 1:n.samps)]
   obss <- psdesign$augdata$S.1
 
   trueobs <- sample(obss[!is.na(obss)],
-                    floor(2000 * mean(!is.na(obss))), replace = TRUE)
+                    floor(n.samps * mean(!is.na(obss))), replace = TRUE)
 
   Splot <- sort(c(imputed, trueobs))
   if(is.factor(psdesign$augdata$S.1)){

@@ -1,0 +1,32 @@
+---
+title: "Introduction to Principal Surrogate Evaluation in R"
+author: "Michael C Sachs"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Installation
+
+`pseval` is an R package aimed at implementing existing methods for surrogate evaluation using a flexible and common interface. It is still in active development and testing. Development will take place on [the Github page](https://github.com/sachsmc/pseval), and the current version of the package can be installed as shown below. First you must install the `devtools` package, if you haven't already `install.packages("devtools")`. 
+
+```{r eval = FALSE}
+devtools::install_github("sachsmc/pseval")
+```
+
+# Usage
+
+Here we will walk through some basic analyses from the point of view of a new R user. Along the way we will highlight the main features of `pseval`. `pseval` supports both binary outcomes and time-to-event, thus we will also need to load the `survival` package. Throughout this tutorial, we will also make use of the pipe operator `%>%` from the `magrittr` package. This allows you to pipe a value forward into a function; something along the lines of `x %>% f`, rather than `f(x)`. For more information on the pipe, see [here](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html).
+
+```{r setup}
+library(pseval)
+library(survival)
+library(magrittr)
+```
+
+## Example dataset
+
+First
