@@ -15,22 +15,29 @@
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
+#'  @param sig.level Significance level for bootstrap confidence intervals
 #'
 #' @export
 #'
-VE <- function(psdesign, t){
+VE <- function(psdesign, t, sig.level = .05){
 
-  stopifnot("estimates" %in% names(psdesign) | "bootstraps" %in% names(psdesign))
+  stopifnot("estimates" %in% names(psdesign))
 
   impped <- psdesign$imputation.models$S.1$icdf_sbarw(runif(1000))
   randrows <- sample(1:nrow(impped), ncol(impped), replace = TRUE)
-  Splot <- sort(impped[cbind(randrows, 1:1000)])
+  imputed <- impped[cbind(randrows, 1:1000)]
+  obss <- psdesign$augdata$S.1
+
+  trueobs <- sample(obss[!is.na(obss)],
+                    floor(2000 * mean(!is.na(obss))), replace = TRUE)
+
+  Splot <- sort(c(imputed, trueobs))
   if(is.factor(psdesign$augdata$S.1)){
     Splot <- factor(Splot, levels = levels(psdesign$augdata$S.1))
   }
 
-  dat1 <- data.frame(S.1 = Splot, Z = rep(1, 1000))
-  dat0 <- data.frame(S.1 = Splot, Z = rep(0, 1000))
+  dat1 <- data.frame(S.1 = Splot, Z = 1)
+  dat0 <- data.frame(S.1 = Splot, Z = 0)
 
 
   if(is.null(psdesign$risk.model$args$model)){
@@ -77,114 +84,49 @@ VE <- function(psdesign, t){
 
   }
 
-  data.frame(S.1 = Splot, VE = 1 - R1/R0)
+  obsVE <- data.frame(S.1 = Splot, VE = 1 - R1/R0)
 
-}
+  if("bootstraps" %in% names(psdesign)){
 
+    bsests <- psdesign$bootstraps
+    bootVEs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    for(i in 1:nrow(bsests)){
 
-#' Plot summary statistics for a psdesign object
-#'
-#' Plot the vaccine efficacy versus S.1 for an estimated psdesign object
-#'
-#' @param psdesign A psdesign object that contains a risk model, imputation model, and valid estimates
-#' @param t For time to event outcomes, a fixed time \code{t} may be provided to
-#'   compute the cumulative distribution function. If not, the restricted mean
-#'   survival time is used. Omit for binary outcomes.
-#'   @param summary Summary statistic to plot. Currently only \link{VE} is supported.
-#'  @param ... Other arguments passes to \link{plot}
-#'
-#'  @export
+      thispar <- as.numeric(bsests[i, -ncol(bsests)])
+      if(inherits(psdesign$augdata$Y, "Surv") && missing(t)){
 
-plot.psdesign <- function(psdesign, t, summary = "VE", ...){
-
-  if(summary == "VE"){
-    plot(VE ~ S.1, data = VE(psdesign, t), type = 'l', ...)
-  } else {
-    stop(paste("Plots of type", summary, "are not supported"))
-  }
-
-}
+        ttt <- summary(survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+        R1 <- psdesign$risk.function(dat1, thispar, t = ttt)
+        R0 <- psdesign$risk.function(dat0, thispar, t = ttt)
 
 
-#' Concisely print information about a psdesign object
-#'
-#' @param psdesign A \link{psdesign} object
-#' @param digits Number of significant digits to display
-#' @param sig.level Significance level to use for computing bootstrapped confidence intervals
-#'
-#' @export
-#'
-print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
+      } else if(inherits(psdesign$augdata$Y, "Surv")) {
 
-  objs <- names(psdesign)
+        R1 <- psdesign$risk.function(dat1, thispar, t)
+        R0 <- psdesign$risk.function(dat0, thispar, t)
 
-  cat("Augmented data frame: ", nrow(psdesign$augdata), " obs. by ", ncol(psdesign$augdata), " variables. \n")
-  print(head(psdesign$augdata), digits = digits)
+      } else {
 
-  cat("\nMapped variables: \n")
-  temp <- lapply(names(psdesign$mapping), function(ln){
+        R1 <- psdesign$risk.function(dat1, thispar)
+        R0 <- psdesign$risk.function(dat0, thispar)
 
-    lnm <- psdesign$mapping[[ln]]
+      }
 
-    if(length(lnm) == 1){
-      cat("\t", ln, " -> ", lnm, "\n")
-      } else if(lnm[1] == "Surv") {
+      bootVEs[i, ] <- c(1 - R1/R0, bsests[i, "convergence"])
 
-       cat("\t", ln, " -> ", paste0(lnm[1], "(", lnm[2], ", ", lnm[3], ")"), "\n")
-      } else cat("\t", ln, " -> ", paste0(lnm, collapse = ", "), "\n")
-
-  })
-
-  cat("\nImputation models: \n")
-  if(!"imputation.models" %in% objs) {
-
-    cat("\tNone present, see ?impute for information on adding imputation models.\n")
-
-  } else {
-
-    for(j in names(psdesign$imputation.models)){
-      cat("\t Imputation model for ", j, ":\n")
-      tyj <- psdesign$imputation.models[[j]]$model
-      cat("\t\t", paste0("impute_", tyj$model, "("))
-      cat(paste(sapply(names(tyj$args[-1]), function(nj) paste0(nj, " = ", tyj$args[-1][nj])), collapse = ", "), ")\n")
     }
 
-  }
-
-  cat("\nRisk models: \n")
-  if(!"risk.model" %in% objs) {
-    cat("\tNone present, see ?risk for information on adding a risk model.\n")
-  } else {
-
-    tyj <- psdesign$risk.model
-    cat("\t", paste0("risk_", tyj$model, "("))
-    cat(paste(sapply(names(tyj$args[-1]), function(nj) paste0(nj, " = ", tyj$args[-1][nj])), collapse = ", "), ")\n\n")
+    bootVEs <- as.data.frame(bootVEs)
+    colnames(bootVEs)[ncol(bootVEs)] <- "convergence"
+    addon <- as.data.frame(summarize_bs(bootVEs, sig.level = sig.level)$table)
+    obsVE <- cbind(obsVE, addon)
 
   }
 
-  if(!"estimates" %in% objs){
-
-    cat("\tNo estimates present, see ?ps_estimate.\n")
-  } else {
-    cat("Estimated parameters:\n")
-    print(psdesign$estimates$par, digits = digits)
-    cat("\tConvergence: ", psdesign$estimates$convergence == 0, "\n\n")
-
-  }
-
-  if(!"bootstraps" %in% objs){
-
-    cat("\tNo bootstraps present, see ?ps_bootstrap.\n")
-  } else {
-
-    cat("Bootstrap replicates:\n")
-    sbs <- summarize_bs(psdesign$bootstraps, sig.level = sig.level)
-    print(sbs$table, digits = digits)
-    cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
-
-  }
+  obsVE
 
 }
+
 
 
 #' Summarize bootstrap samples
@@ -217,6 +159,7 @@ summarize_bs <- function(bootdf, sig.level = .05) {
 #' @param psdesign
 #' @param t Fixed time for time to event outcomes to compute VE. If missing, uses restricted mean survival.
 #'
+#' @export
 empirical_VE <- function(psdesign, t){
 
   pd <- psdesign$augdata

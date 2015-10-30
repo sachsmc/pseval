@@ -17,7 +17,7 @@ test_that("Gilbert Hudgens estimates work", {
     ghdes2 <- ghdes + impute_parametric(S.1 ~ BIP)
     ghdes2b <- ghdes + impute_semiparametric(S.1 ~ BIP, S.1 ~ 1)
 
-    ghdes3 <- ghdes2 + risk_binary(Y ~ Z, D = 1000, risk = risk.expit)
+    ghdes3 <- ghdes2 + risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.expit)
     ghdes3b <- ghdes2b + risk_binary(D = 1000, risk = risk.expit)
 
 

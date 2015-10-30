@@ -4,7 +4,7 @@
 \alias{VE}
 \title{Calculate the vaccine efficacy}
 \usage{
-VE(psdesign, t)
+VE(psdesign, t, sig.level = 0.05)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
@@ -12,8 +12,10 @@ imputation model, and estimated parameters. Bootstrapped parameters are
 optional}
 
 \item{t}{For time to event outcomes, a fixed time \code{t} may be provided to
-  compute the cumulative distribution function. If not, the restricted mean
-  survival time is used. Omit for binary outcomes.}
+ compute the cumulative distribution function. If not, the restricted mean
+ survival time is used. Omit for binary outcomes.}
+
+\item{sig.level}{Significance level for bootstrap confidence intervals}
 }
 \value{
 A data frame containing columns for the S values, the VE at those S
