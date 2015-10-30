@@ -22,11 +22,9 @@ VE <- function(psdesign, t){
 
   stopifnot("estimates" %in% names(psdesign) | "bootstraps" %in% names(psdesign))
 
-  Sin <- psdesign$augdata$S.1
-  Sin <- Sin[!is.na(Sin)]
-
-
-  Splot <- seq(min(Sin), max(Sin), length.out = 1000) ## redo sampling from imputation model
+  impped <- psdesign$imputation.models$S.1$icdf_sbarw(runif(1000))
+  randrows <- sample(1:nrow(impped), ncol(impped), replace = TRUE)
+  Splot <- sort(impped[cbind(randrows, 1:1000)])
 
   dat1 <- data.frame(S.1 = Splot, Z = rep(1, 1000))
   dat0 <- data.frame(S.1 = Splot, Z = rep(0, 1000))
@@ -39,7 +37,12 @@ VE <- function(psdesign, t){
   } else {
 
     mod <- eval(psdesign$risk.model$args$model)
-    mterms <- rownames(attr(terms(mod), "factors"))[-1]
+    mterms0 <- rownames(attr(terms(mod), "factors"))[-1]
+    mterms <- unlist(lapply(colnames(psdesign$augdata), function(x){
+      if(length(grep(x, mterms0, fixed = TRUE) > 0)){
+        return(x)
+      } else return(NULL)
+    }))
 
     others <- mterms[!mterms %in% c("S.1", "Z")]
     for(j in others){

@@ -220,7 +220,13 @@ risk.probit <- function(x) {
 expand_augdata <- function(model, psdesign, D = 500){
 
 
-  vars <- rownames(attr(terms(model), "factors"))[-1]
+  vars0 <- sapply(attr(terms(model), "variables"), deparse)[-c(1,2)]
+  vars <- unlist(lapply(colnames(psdesign$augdata), function(x){
+    if(length(grep(x, vars0, fixed = TRUE) > 0)){
+      return(x)
+    } else return(NULL)
+  }))
+
   noimpdex <- rowSums(is.na(psdesign$augdata[, vars, drop = FALSE])) == 0
 
   trtmat <- model.matrix(model, psdesign$augdata[noimpdex, ])
