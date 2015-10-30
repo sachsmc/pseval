@@ -210,3 +210,35 @@ summarize_bs <- function(bootdf, sig.level = .05) {
   list(table = table, conv = conv)
 
 }
+
+
+#' Compute the empirical Vaccine Efficacy
+#'
+#' @param psdesign
+#' @param t Fixed time for time to event outcomes to compute VE. If missing, uses restricted mean survival.
+#'
+empirical_VE <- function(psdesign, t){
+
+  pd <- psdesign$augdata
+  if(inherits(pd$Y, "Surv")){
+
+    if(missing(t)){
+
+      ttt <- summary(survival::survfit(pd$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+
+    } else ttt <- t
+
+    sf <- survival::survfit(pd$Y ~ pd$Z)
+    sfs <- 1 - summary(sf, times = ttt, extend = TRUE)$surv
+
+    1 - sfs[2]/sfs[1]
+
+  } else {
+
+    1 - mean(pd$Y[pd$Z == 1])/mean(pd$Y[pd$Z == 0])
+
+  }
+
+}
+
+
