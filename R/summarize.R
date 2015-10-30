@@ -25,6 +25,9 @@ VE <- function(psdesign, t){
   impped <- psdesign$imputation.models$S.1$icdf_sbarw(runif(1000))
   randrows <- sample(1:nrow(impped), ncol(impped), replace = TRUE)
   Splot <- sort(impped[cbind(randrows, 1:1000)])
+  if(is.factor(psdesign$augdata$S.1)){
+    Splot <- factor(Splot, levels = levels(psdesign$augdata$S.1))
+  }
 
   dat1 <- data.frame(S.1 = Splot, Z = rep(1, 1000))
   dat0 <- data.frame(S.1 = Splot, Z = rep(0, 1000))
