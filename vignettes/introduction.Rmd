@@ -13,6 +13,7 @@ vignette: >
 ```{r knitup, include = FALSE}
 library(knitr)
 library(printr)
+set.seed(205)
 ```
 
 # Methods
@@ -160,7 +161,32 @@ Let's see how to add a risk model:
 ?add_riskmodel
 ```
 
+Let's add a simple binary risk model using the logit link. The argument `D` specifies the number of samples to use for the simulated annealing aka empirical integration in the EML procedure. 
 
+```{r riskbin}
+binary.ps <- binary.ps + risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit)
+binary.ps
+```
+
+### Estimation and Bootstrap
+
+```{r est, cache = TRUE}
+binary.est <- ps_estimate(binary.ps, method = "BFGS")
+binary.boot <- ps_bootstrap(binary.est, n.boots = 100, progress.bar = FALSE, 
+                            start = binary.est$estimates$par, method = "BFGS")
+
+binary.boot
+```
+### Plots and summaries
+
+```{r plot1}
+plot(binary.boot, summary = "VE")
+```
+
+
+```{r summary}
+summary(binary.boot)
+```
 
 
 
