@@ -25,7 +25,7 @@ This is a list of the available imputation models. The fundamental problem in su
 }
 }
 \examples{
-test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.1, BIP = X)
+test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 
 add_imputation(test, impute_parametric())
 test + impute_parametric()  # same as above

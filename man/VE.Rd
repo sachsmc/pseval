@@ -4,7 +4,7 @@
 \alias{VE}
 \title{Calculate the vaccine efficacy}
 \usage{
-VE(psdesign, t, sig.level = 0.05, n.samps = 5000)
+VE(psdesign, t, sig.level = 0.05, n.samps = 5000, bootstraps = TRUE)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
@@ -16,6 +16,8 @@ optional}
  survival time is used. Omit for binary outcomes.}
 
 \item{sig.level}{Significance level for bootstrap confidence intervals}
+
+\item{bootstraps}{If true, will calculate bootstrap standard errors and confidence bands.}
 }
 \value{
 A data frame containing columns for the S values, the VE at those S

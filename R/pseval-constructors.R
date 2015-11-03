@@ -19,7 +19,7 @@
 #'
 #' @examples
 #'
-#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.1, BIP = X)
+#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 #'
 #' add_imputation(test, impute_parametric())
 #' test + impute_parametric()  # same as above
@@ -51,7 +51,7 @@ add_imputation <- function(psdesign, imputation){
 #' @export
 #'
 #' @examples
-#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.1, BIP = X)
+#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 #' add_riskmodel(test, risk_binary())
 #' test + risk_binary() # same as above
 
@@ -72,11 +72,13 @@ add_riskmodel <- function(psdesign, riskmodel){
 #'
 #' If the first object is an object of class \code{psdesign}, you can add
 #' the following types of objects, and it will return a modified psdesign
-#' object.
+#' object. Users will generally add them in the order that they appear.
 #'
 #' \itemize{
 #'   \item \code{imputation}: Add or replace imputation model
 #'   \item \code{riskmodel}: Add or replace risk model
+#'   \item \code{estimate}: Estimate parameters
+#'   \item \code{bootstrap}: Bootstrap estimates
 #' }
 #'
 #' @export

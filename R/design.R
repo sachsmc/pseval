@@ -64,7 +64,7 @@ psdesign <- function(data, Z, Y, S,
   rval <- NULL
 
   rval$augdata <- data.frame(Z = trt, Y = oot, S.1 = S.1, S.0 = S.0,
-                             cdfweights = weights, cdfind.1 = is.na(S.1), cdfind.0 = is.na(S.0))
+                             cdfweights = weights)
 
   if(!is.null(bip)) rval$augdata <- data.frame(rval$augdata, BIP = bip)
   if(!is.null(cpv)) rval$augdata <- data.frame(rval$augdata, CPV = cpv)

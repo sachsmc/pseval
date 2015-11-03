@@ -16,10 +16,11 @@
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
 #'  @param sig.level Significance level for bootstrap confidence intervals
+#'  @param bootstraps If true, will calculate bootstrap standard errors and confidence bands.
 #'
 #' @export
 #'
-VE <- function(psdesign, t, sig.level = .05, n.samps = 5000){
+VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -31,10 +32,11 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000){
   trueobs <- sample(obss[!is.na(obss)],
                     floor(n.samps * mean(!is.na(obss))), replace = TRUE)
 
-  Splot <- sort(c(imputed, trueobs))
-  if(is.factor(psdesign$augdata$S.1)){
-    Splot <- factor(Splot, levels = levels(psdesign$augdata$S.1))
+
+  if(is.factor(obss)){
+    imputed <- factor(imputed, levels = levels(obss))
   }
+  Splot <- sort(unlist(list(imputed, trueobs)))
 
   dat1 <- data.frame(S.1 = Splot, Z = 1)
   dat0 <- data.frame(S.1 = Splot, Z = 0)
@@ -86,7 +88,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000){
 
   obsVE <- data.frame(S.1 = Splot, VE = 1 - R1/R0)
 
-  if("bootstraps" %in% names(psdesign)){
+  if("bootstraps" %in% names(psdesign) & bootstraps){
 
     bsests <- psdesign$bootstraps
     bootVEs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))

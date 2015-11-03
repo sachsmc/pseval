@@ -25,8 +25,8 @@ generate_example_data <- function(n){
   risk.0 <- exp(-1 + 2 * S.1 )
   risk.1 <- exp(-1 + 2 * S.1 - 1 * S.1 * 1)
 
-  time.0 <- rexp(n, 1/risk.0)
-  time.1 <- rexp(n, 1/risk.1)
+  time.0 <- rexp(n, 1/risk.0)^.3
+  time.1 <- rexp(n, 1/risk.1)^.3
   time.obs <- ifelse(Z == 1, time.1, time.0)
 
   event.0 <- rbinom(n, 1, .8)
@@ -50,15 +50,17 @@ generate_example_data <- function(n){
   BSM <- S.0 + rnorm(n, sd = .1)
   S.1[Z == 0] <- NA
   S.0[Z == 1] <- NA
+  S.obs <- ifelse(Z == 1, S.1, S.0)
 
   ## make categorical variables
   qwantz <- c(-Inf, quantile(c(S.0, S.1), c(.25, .5, .75), na.rm = TRUE), Inf)
   S.1.cat <- cut(S.1, qwantz)
   S.0.cat <- cut(S.0, qwantz)
+  S.obs.cat <- ifelse(Z == 1, S.1.cat, S.0.cat)
 
   BIP.cat <- cut(X, c(-Inf, quantile(X, c(.25, .5, .75)), Inf))
 
-  data.frame(Z, X, CPV, BSM, S.0, S.1, risk.obs, risk.0, risk.1, time.obs, event.obs, time.0, time.1, event.0, event.1, Y.obs, Y.0, Y.1, S.1.cat, S.0.cat, BIP.cat)
+  data.frame(Z, BIP = X, CPV, BSM, S.obs, time.obs, event.obs, Y.obs, S.obs.cat,  BIP.cat)
 
 }
 

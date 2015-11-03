@@ -24,7 +24,7 @@ The risk model component specifies the likelihood for the data. This involves sp
 }
 }
 \examples{
-test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.1, BIP = X)
+test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 add_riskmodel(test, risk_binary())
 test + risk_binary() # same as above
 }

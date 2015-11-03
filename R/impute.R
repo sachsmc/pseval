@@ -99,8 +99,12 @@ impute_nonparametric <- function(formula, ...){
 
     lookup <- prop.table(table(groups), margin = (1:length(dim(table(groups))))[-1]) # conditional probability
     impwith <- model.frame(formula[-2], mindelta)
-    outvect <- sort(unique(psdesign$augdata[[outname]]))
 
+    if(is.factor(psdesign$augdata[[outname]])){
+      outvect <- levels(psdesign$augdata[[outname]])
+      } else {
+      outvect <- sort(unique(psdesign$augdata[[outname]]))
+    }
     psdesign$imputation.models[[outname]]$model <- list(model = "nonparametric", args = arglist)
 
     psdesign$imputation.models[[outname]]$cdf_sbarw <-

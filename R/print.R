@@ -22,13 +22,25 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
 
     VE.me <- VE(psdesign, t, sig.level = sig.level)
     plot(VE ~ S.1, data = VE.me, type = 'l', ...)
+
     if("boot.se" %in% colnames(VE.me)){
 
       lnme <- grep("lower.", colnames(VE.me), fixed = TRUE)
       unme <- grep("upper.", colnames(VE.me), fixed = TRUE)
-      lines(VE.me[, lnme] ~ VE.me$S.1, lty = 2, ...)
-      lines(VE.me[, unme] ~ VE.me$S.1, lty = 2, ...)
 
+      if(is.factor(VE.me[, 1])){
+
+        subVE <- unique(VE.me)
+        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 2, ...)
+
+        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 2, ...)
+
+      } else {
+        lines(VE.me[, lnme] ~ VE.me$S.1, lty = 2, ...)
+        lines(VE.me[, unme] ~ VE.me$S.1, lty = 2, ...)
+        }
     }
 
   } else {
@@ -140,7 +152,7 @@ summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
     psdesign2 <- psdesign + do.call(as.character(pdat[[1]]), pdat[-1])
     marg.est <- ps_estimate(psdesign2)
-    marg.VE <- colMeans(VE(marg.est))[2]
+    marg.VE <- colMeans(VE(marg.est, bootstraps = FALSE))[2]
     emp.VE <- empirical_VE(psdesign)
     cond.VE <- VE(psdesign)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = mean(cond.VE[, 2]))
