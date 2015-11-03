@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Michael C Sachs" />
+
+<meta name="date" content="2015-11-03" />
+
+<title>Introduction to Principal Surrogate Evaluation in R</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<link href="data:text/css,body%20%7B%0A%20%20background%2Dcolor%3A%20%23fff%3B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20max%2Dwidth%3A%20700px%3B%0A%20%20overflow%3A%20visible%3B%0A%20%20padding%2Dleft%3A%202em%3B%0A%20%20padding%2Dright%3A%202em%3B%0A%20%20font%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0A%20%20font%2Dsize%3A%2014px%3B%0A%20%20line%2Dheight%3A%201%2E35%3B%0A%7D%0A%0A%23header%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0A%0A%23TOC%20%7B%0A%20%20clear%3A%20both%3B%0A%20%20margin%3A%200%200%2010px%2010px%3B%0A%20%20padding%3A%204px%3B%0A%20%20width%3A%20400px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20border%2Dradius%3A%205px%3B%0A%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20font%2Dsize%3A%2013px%3B%0A%20%20line%2Dheight%3A%201%2E3%3B%0A%7D%0A%20%20%23TOC%20%2Etoctitle%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%20%20font%2Dsize%3A%2015px%3B%0A%20%20%20%20margin%2Dleft%3A%205px%3B%0A%20%20%7D%0A%0A%20%20%23TOC%20ul%20%7B%0A%20%20%20%20padding%2Dleft%3A%2040px%3B%0A%20%20%20%20margin%2Dleft%3A%20%2D1%2E5em%3B%0A%20%20%20%20margin%2Dtop%3A%205px%3B%0A%20%20%20%20margin%2Dbottom%3A%205px%3B%0A%20%20%7D%0A%20%20%23TOC%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dleft%3A%20%2D2em%3B%0A%20%20%7D%0A%20%20%23TOC%20li%20%7B%0A%20%20%20%20line%2Dheight%3A%2016px%3B%0A%20%20%7D%0A%0Atable%20%7B%0A%20%20margin%3A%201em%20auto%3B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dcolor%3A%20%23DDDDDD%3B%0A%20%20border%2Dstyle%3A%20outset%3B%0A%20%20border%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0A%20%20border%2Dwidth%3A%202px%3B%0A%20%20padding%3A%205px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0A%20%20border%2Dwidth%3A%201px%3B%0A%20%20border%2Dstyle%3A%20inset%3B%0A%20%20line%2Dheight%3A%2018px%3B%0A%20%20padding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0A%20%20border%2Dleft%2Dstyle%3A%20none%3B%0A%20%20border%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Ap%20%7B%0A%20%20margin%3A%200%2E5em%200%3B%0A%7D%0A%0Ablockquote%20%7B%0A%20%20background%2Dcolor%3A%20%23f6f6f6%3B%0A%20%20padding%3A%200%2E25em%200%2E75em%3B%0A%7D%0A%0Ahr%20%7B%0A%20%20border%2Dstyle%3A%20solid%3B%0A%20%20border%3A%20none%3B%0A%20%20border%2Dtop%3A%201px%20solid%20%23777%3B%0A%20%20margin%3A%2028px%200%3B%0A%7D%0A%0Adl%20%7B%0A%20%20margin%2Dleft%3A%200%3B%0A%7D%0A%20%20dl%20dd%20%7B%0A%20%20%20%20margin%2Dbottom%3A%2013px%3B%0A%20%20%20%20margin%2Dleft%3A%2013px%3B%0A%20%20%7D%0A%20%20dl%20dt%20%7B%0A%20%20%20%20font%2Dweight%3A%20bold%3B%0A%20%20%7D%0A%0Aul%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%7D%0A%20%20ul%20li%20%7B%0A%20%20%20%20list%2Dstyle%3A%20circle%20outside%3B%0A%20%20%7D%0A%20%20ul%20ul%20%7B%0A%20%20%20%20margin%2Dbottom%3A%200%3B%0A%20%20%7D%0A%0Apre%2C%20code%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20color%3A%20%23333%3B%0A%7D%0Apre%20%7B%0A%20%20white%2Dspace%3A%20pre%2Dwrap%3B%20%20%20%20%2F%2A%20Wrap%20long%20lines%20%2A%2F%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20margin%3A%205px%200px%2010px%200px%3B%0A%20%20padding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0A%20%20background%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0A%0Acode%20%7B%0A%20%20font%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0A%20%20font%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0A%20%20padding%3A%202px%200px%3B%0A%7D%0A%0Adiv%2Efigure%20%7B%0A%20%20text%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0A%20%20background%2Dcolor%3A%20%23FFFFFF%3B%0A%20%20padding%3A%202px%3B%0A%20%20border%3A%201px%20solid%20%23DDDDDD%3B%0A%20%20border%2Dradius%3A%203px%3B%0A%20%20border%3A%201px%20solid%20%23CCCCCC%3B%0A%20%20margin%3A%200%205px%3B%0A%7D%0A%0Ah1%20%7B%0A%20%20margin%2Dtop%3A%200%3B%0A%20%20font%2Dsize%3A%2035px%3B%0A%20%20line%2Dheight%3A%2040px%3B%0A%7D%0A%0Ah2%20%7B%0A%20%20border%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20padding%2Dbottom%3A%202px%3B%0A%20%20font%2Dsize%3A%20145%25%3B%0A%7D%0A%0Ah3%20%7B%0A%20%20border%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0A%20%20padding%2Dtop%3A%2010px%3B%0A%20%20font%2Dsize%3A%20120%25%3B%0A%7D%0A%0Ah4%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0A%20%20margin%2Dleft%3A%208px%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Ah5%2C%20h6%20%7B%0A%20%20border%2Dbottom%3A%201px%20solid%20%23ccc%3B%0A%20%20font%2Dsize%3A%20105%25%3B%0A%7D%0A%0Aa%20%7B%0A%20%20color%3A%20%230033dd%3B%0A%20%20text%2Ddecoration%3A%20none%3B%0A%7D%0A%20%20a%3Ahover%20%7B%0A%20%20%20%20color%3A%20%236666ff%3B%20%7D%0A%20%20a%3Avisited%20%7B%0A%20%20%20%20color%3A%20%23800080%3B%20%7D%0A%20%20a%3Avisited%3Ahover%20%7B%0A%20%20%20%20color%3A%20%23BB00BB%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%20%20a%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0A%20%20%20%20text%2Ddecoration%3A%20underline%3B%20%7D%0A%0A%2F%2A%20Class%20described%20in%20https%3A%2F%2Fbenjeffrey%2Ecom%2Fposts%2Fpandoc%2Dsyntax%2Dhighlighting%2Dcss%0A%20%20%20Colours%20from%20https%3A%2F%2Fgist%2Egithub%2Ecom%2Frobsimmons%2F1172277%20%2A%2F%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Keyword%20%2A%2F%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%2F%2A%20DataType%20%2A%2F%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%2F%2A%20DecVal%20%28decimal%20values%29%20%2A%2F%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20BaseN%20%2A%2F%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Float%20%2A%2F%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20Char%20%2A%2F%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%2F%2A%20String%20%2A%2F%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%2F%2A%20Comment%20%2A%2F%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%2F%2A%20OtherToken%20%2A%2F%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20AlertToken%20%2A%2F%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%2F%2A%20Function%20calls%20%2A%2F%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%2F%2A%20ErrorTok%20%2A%2F%0A%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+<div id="header">
+<h1 class="title">Introduction to Principal Surrogate Evaluation in R</h1>
+<h4 class="author"><em>Michael C Sachs</em></h4>
+<h4 class="date"><em>November 03, 2015</em></h4>
+</div>
+
+
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>A valid surrogate endpoint can be used as a primary endpoint for evaluating treatments in phase I-II clinical trials and for predicting phase III treatment effects without requiring large and costly efficacy trials. A surrogate is considered to be valid if it provides reliable predictions of treatment effects on the clinical endpoint of interest. <span class="citation">Frangakis and Rubin (2002)</span> introduced the concept of principal stratification and the definition of a principal surrogate (PS). Informally, a post-treatment intermediate response variable is a principal surrogate if causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist.</p>
+<p>The goal of PS evaluation is to compare and predict the clinical outcomes conditional on all possible treatment and surrogate combinations of interest. The combinations of interest are called the principal strata and they include a set of unobservable counterfactual responses: responses that would have occured under a set of condtions counter to the observed conditions. To finesse this problem of unobservable responses, a variety of clever trial designs and estimation approaches have been proposed. Several of these have been implemented in the <code>pseval</code> package.</p>
+</div>
+<div id="notation" class="section level2">
+<h2>Notation</h2>
+<p>Let <span class="math">\(Z_i\)</span> be the treatment indicator for subject <span class="math">\(i\)</span>, where 0 indicates the control or standard treatment, and 1 indicates the experimental treatment. We currently only allow for two levels of treatment and assume that the treatment assigments are randomized. Let <span class="math">\(S_i\)</span> be the observed value of the intermediate response for subject <span class="math">\(i\)</span>. Since <span class="math">\(S_i\)</span> can be affected by treatment, there are two naturally occuring counterfactual values of <span class="math">\(S_i\)</span>: <span class="math">\(S_i(1)\)</span> under treatment, and <span class="math">\(S_i(0)\)</span> under control. Let <span class="math">\(s_z\)</span> be the realization of the random variable <span class="math">\(S(z)\)</span>. The outcome of interest is denoted <span class="math">\(Y_i\)</span>. We consider the counterfactual values of <span class="math">\(Y_i(0)\)</span> and <span class="math">\(Y_i(1)\)</span>. We allow for both binary and time-to-event outcomes, thus <span class="math">\(Y_i\)</span> may be a vector containing a time variable and an event/censoring indicator, i.e. <span class="math">\(Y_i = (T_i, C_i)\)</span> where <span class="math">\(C_i = 1\)</span> if <span class="math">\(T_i\)</span> is an event time, and <span class="math">\(C_i = 0\)</span> if <span class="math">\(T_i\)</span> is a censoring time.</p>
+</div>
+<div id="estimands" class="section level2">
+<h2>Estimands</h2>
+<p>Criteria for <span class="math">\(S\)</span> to be a good surrogate are based on risk estimands that condition on the potential intermediate responses. The risk is defined as a mapping <span class="math">\(g\)</span> of the cumulative distribution function of <span class="math">\(Y(z)\)</span> condtional on the intermediate responses. Currently we focus only on marginal risk estimands which condition only on <span class="math">\(S(1)\)</span>:</p>
+<p><span class="math">\[
+risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
+risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
+\]</span></p>
+<p>For instance, for a binary outcome, the risk function may simply be the probability <span class="math">\(risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)\)</span>, or for a time-to-event outcome the risk function may be the cumulative distribution function <span class="math">\(risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)\)</span>. Specification of the distributions of <span class="math">\(Y(z) | S(1)\)</span> determines the likelihood, we will denote this as <span class="math">\(f(y | \beta, s_1, z)\)</span>. If <span class="math">\(S(1)\)</span> were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves imputing missing values based on some models and/or set of assumptions. Namely, <span class="math">\(S(1)\)</span> is unobserved for all subjects who received treatment 0.</p>
+</div>
+<div id="augmentation-and-assumptions" class="section level2">
+<h2>Augmentation and Assumptions</h2>
+<p>We first make two standard assumptions:</p>
+<ul>
+<li>Stable Unit Treatment Value Assumption (SUTVA): Observations on the independent units in the trial should be unaffected by the treatment assignment of other units.</li>
+<li>Ignorable Treatment Assignment: The observed treatment assignment does not change the counterfactual clinical outcome.</li>
+</ul>
+<p>Now to estimate the missing <span class="math">\(S(1)\)</span> values among those with <span class="math">\(Z = 0\)</span>, we focus on three trial augmentations: Baseline immunogenicity predictor (BIP), closeout placebo vaccination (CPV), and baseline surrogate measurement (BSM). For details on these augmentations, we refer you to <span class="citation">D. Follmann (2006)</span>, <span class="citation">P. Gilbert and Hudgens (2008)</span>, <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>, and <span class="citation">Erin E Gabriel and Follmann (2015)</span>.</p>
+<div id="bip" class="section level3">
+<h3>BIP</h3>
+<p>Briefly, a BIP <span class="math">\(W\)</span> is any baseline measurement or set of measurements that is highly correlated with <span class="math">\(S\)</span>, and is unlikely to be associated with the clinical outcome after conditioning on <span class="math">\(S\)</span>, i.e. <span class="math">\(Y \perp W | S(1)\)</span>. The BIP <span class="math">\(W\)</span> is used to impute the missing <span class="math">\(S(1)\)</span> among those with <span class="math">\(Z = 0\)</span> based on a model for <span class="math">\(S(1) | W\)</span> that is estimated among those with <span class="math">\(Z = 1\)</span>. We describe how this model is used in the next section.</p>
+</div>
+<div id="cpv" class="section level3">
+<h3>CPV</h3>
+<p>Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing <span class="math">\(S(1)\)</span>.</p>
+</div>
+<div id="bsm" class="section level3">
+<h3>BSM</h3>
+<p><span class="citation">Erin E. Gabriel and Gilbert (2014)</span> suggested the baseline augmentation BSM, which is a pre-treatment measurement of the candidate PS, denoted <span class="math">\(S_B\)</span>. The BSM may be a good predictor of <span class="math">\(S(1)\)</span> without any further assumptions. It can be used in the same way as a BIP. Alternatively you transform <span class="math">\(S(1) - S_B\)</span> as the candidate surrogate, further increasing the assocation with the BSM/BIP.</p>
+</div>
+</div>
+<div id="estimated-maximum-likelihood" class="section level2">
+<h2>Estimated Maximum Likelihood</h2>
+<p>Let <span class="math">\(f(y | \beta, s_1, z)\)</span> denote the density of <span class="math">\(Y | S(1), Z\)</span> with parameters <span class="math">\(\beta\)</span>. Further let <span class="math">\(R_i\)</span> denote the indicator for missingness in <span class="math">\(S_i(1)\)</span>. We proceed to estimate <span class="math">\(\beta\)</span> by maximizing</p>
+<p><span class="math">\[
+\prod_{i = 1}^n \left\{f(Y_i | \beta, S_i(1), Z_i)\right\}^R_i \left\{\int f(Y_i | \beta, s, Z_i) \, d \hat{F}_{S(1) | W}(s | W_i)\right\}^{1 - R_i}
+\]</span></p>
+<p>with respect to <span class="math">\(\beta\)</span>.</p>
+<p>This procedure is called estimated maximum likelihood (EML) and was developed in <span class="citation">Pepe and Fleming (1991)</span>. The key idea is that we are averaging the likelihood contributions for subjects missing <span class="math">\(S(1)\)</span> with respect to the estimated distribution of <span class="math">\(S(1) | W\)</span>. A BIP <span class="math">\(W\)</span> that is strongly associated with <span class="math">\(S(1)\)</span> is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors.</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>The <code>pseval</code> package allows users to specify the type of augmented design that suits their data, specify the form of the risk model along with the distribution of <span class="math">\(Y | S(1)\)</span>, and specify different imputation models to estimate the distribution of <span class="math">\(S(1) | W\)</span>. Then the likelihood can be maximized and bootstraps run. Post-estimation summaries are available to display and analyze the treatment efficacy as a function of <span class="math">\(S(1)\)</span>. All of this is implemented with a flexible and familiar interface.</p>
+</div>
+</div>
+<div id="package-information" class="section level1">
+<h1>Package information</h1>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p><code>pseval</code> is an R package aimed at implementing existing methods for surrogate evaluation using a flexible and common interface. It is still in active development and testing. Development will take place on <a href="https://github.com/sachsmc/pseval">the Github page</a>, and the current version of the package can be installed as shown below. First you must install the <code>devtools</code> package, if you haven’t already <code>install.packages(&quot;devtools&quot;)</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;sachsmc/pseval&quot;</span>)</code></pre>
+</div>
+<div id="usage" class="section level2">
+<h2>Usage</h2>
+<p>Here we will walk through some basic analyses from the point of view of a new R user. Along the way we will highlight the main features of <code>pseval</code>. <code>pseval</code> supports both binary outcomes and time-to-event, thus we will also need to load the <code>survival</code> package.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pseval)
+<span class="kw">library</span>(survival)</code></pre>
+<div id="example-dataset" class="section level3">
+<h3>Example dataset</h3>
+<p>First let’s create an example dataset. The pseval package provides the function <code>generate_example_data</code> which takes a single argument: the sample size.</p>
+<pre class="sourceCode r"><code class="sourceCode r">fakedata &lt;-<span class="st"> </span><span class="kw">generate_example_data</span>(<span class="dt">n =</span> <span class="dv">500</span>)
+<span class="kw">head</span>(fakedata)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Z</th>
+<th align="right">BIP</th>
+<th align="right">CPV</th>
+<th align="right">BSM</th>
+<th align="right">S.obs</th>
+<th align="right">time.obs</th>
+<th align="right">event.obs</th>
+<th align="right">Y.obs</th>
+<th align="right">S.obs.cat</th>
+<th align="left">BIP.cat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1.7174622</td>
+<td align="right">NA</td>
+<td align="right">1.7270215</td>
+<td align="right">3.7306079</td>
+<td align="right">2.110340</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="left">(0.776, Inf]</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">-0.3586040</td>
+<td align="right">NA</td>
+<td align="right">-0.0188679</td>
+<td align="right">-0.2157875</td>
+<td align="right">1.920144</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">(-0.659,0.056]</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1.4747656</td>
+<td align="right">NA</td>
+<td align="right">1.5651221</td>
+<td align="right">3.4339067</td>
+<td align="right">2.853942</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">4</td>
+<td align="left">(0.776, Inf]</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">-0.4788192</td>
+<td align="right">NA</td>
+<td align="right">-0.4029483</td>
+<td align="right">1.5185808</td>
+<td align="right">1.420952</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">(-0.659,0.056]</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">-0.3245397</td>
+<td align="right">NA</td>
+<td align="right">-0.3977423</td>
+<td align="right">1.7690982</td>
+<td align="right">1.183464</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">(-0.659,0.056]</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">-0.6000949</td>
+<td align="right">1.559164</td>
+<td align="right">-0.4318074</td>
+<td align="right">-0.4300346</td>
+<td align="right">2.133359</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">(-0.659,0.056]</td>
+</tr>
+</tbody>
+</table>
+<p>The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model is exponential, with parameters (intercept) = -1, S(1) = 2, Z = 0, S(1):Z = -1.</p>
+</div>
+<div id="the-psdesign-object" class="section level3">
+<h3>The <code>psdesign</code> object</h3>
+<p>We begin by creating a <code>psdesign</code> object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the <code>svydesign</code> function in the <a href="https://cran.r-project.org/web/packages/survey/">survey</a> package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous <span class="math">\(S.1\)</span> and the BIP <span class="math">\(X\)</span>. The object has a print method, so we can inspect the result.</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP)
+binary.ps</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##  None present, see ?add_imputation for information on imputation models.
+## 
+## Risk models: 
+##  None present, see ?add_riskmodel for information on risk models.
+##  No estimates present, see ?ps_estimate.
+##  No bootstraps present, see ?ps_bootstrap.</code></pre>
+<p>The printout displays a brief description of the data, including the empirical vaccine efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for <code>add_imputation</code>, in order to add an imputation model to the psdesign object, the next step in the analysis.</p>
+</div>
+<div id="imputation-models" class="section level3">
+<h3>Imputation models</h3>
+<p>The EML procedure requires an estimate of <span class="math">\(F_{S(1) | W}\)</span>, this is referred to as the imputation model. Let’s see the help page for <code>add_imputation</code>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">?add_imputation</code></pre>
+<div class="r-help-page">
+<table width="100%" summary="page for add_imputation">
+<tr>
+<td>
+add_imputation
+</td>
+<td style="text-align: right;">
+R Documentation
+</td>
+</tr>
+</table>
+<h2>
+Imputation models
+</h2>
+<h3>
+Description
+</h3>
+<p>
+Add imputation model to a psdesign object
+</p>
+<h3>
+Usage
+</h3>
+<pre class="r">
+add_imputation(psdesign, imputation)
+</pre>
+<h3>
+Arguments
+</h3>
+<table summary="R argblock">
+<tr valign="top">
+<td>
+<code>psdesign</code>
+</td>
+<td>
+<p>
+A psdesign object
+</p>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<code>imputation</code>
+</td>
+<td>
+<p>
+An imputation object
+</p>
+</td>
+</tr>
+</table>
+<h3>
+Details
+</h3>
+<p>
+This is a list of the available imputation models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we impute likelihood contributions for each non-missing S(1) given their value of W, and average over the contributions.
+</p>
+<ul>
+<li>
+<p>
+impute_parametric This is a parametric imputation model that fits a linear model for the mean of S(1) | W and assumes a Gaussian distribution.
+</p>
+</li>
+<li>
+<p>
+impute_bivnorm This is another parametric imputation model that assumes that S(1) and W are jointly normally distributed. The user must specify their mean, variances and correlation.
+</p>
+</li>
+<li>
+<p>
+impute_nonparametric This is a non-parametric imputation model that is only valid for categorical S(1) and W. It uses the observed proportions to estimate the joint distribution of S(1), W.
+</p>
+</li>
+<li>
+<p>
+impute_semiparametric This is a semi-parametric model that uses the semi-parametric location scale model of Heagerty and Pepe (1999). Models are specified for the location of S(1) | W and the scale of S(1) | W. Then imputations are drawn from the empirical distribution of the residuals from that model, which are then transformed to the appropriate location and scale.
+</p>
+</li>
+</ul>
+<h3>
+Examples
+</h3>
+<pre class="r">
+test &lt;- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
+
+add_imputation(test, impute_parametric())
+test + impute_parametric()  # same as above
+</pre>
+</div>
+<p>For this first example, let’s use the parametric imputation model. We specify the mean model for <span class="math">\(S(1) | W\)</span> as a formula. We can add the imputation model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset.</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP)
+binary.ps</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ BIP )
+## 
+## Risk models: 
+##  None present, see ?add_riskmodel for information on risk models.
+##  No estimates present, see ?ps_estimate.
+##  No bootstraps present, see ?ps_bootstrap.</code></pre>
+<p>We can add multiple imputation models to a psdesign object, say we want a model for <span class="math">\(S(0) | W\)</span>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.0</span> ~<span class="st"> </span>BIP)</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ BIP )
+##   Imputation model for  S.0 :
+##       impute_parametric(formula = S.0 ~ BIP )
+## 
+## Risk models: 
+##  None present, see ?add_riskmodel for information on risk models.
+##  No estimates present, see ?ps_estimate.
+##  No bootstraps present, see ?ps_bootstrap.</code></pre>
+<p>In a future version of the package, we will allow for imputation of the joint risk estimands that depend on both <span class="math">\(S(0)\)</span> and <span class="math">\(S(1)\)</span>. We can also use splines or other transformations in the formula:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(splines)
+binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP^<span class="dv">2</span>)</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ BIP^2 )
+## 
+## Risk models: 
+##  None present, see ?add_riskmodel for information on risk models.
+##  No estimates present, see ?ps_estimate.
+##  No bootstraps present, see ?ps_bootstrap.</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span><span class="kw">bs</span>(BIP, <span class="dt">df =</span> <span class="dv">3</span>))</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ bs(BIP, df = 3) )
+## 
+## Risk models: 
+##  None present, see ?add_riskmodel for information on risk models.
+##  No estimates present, see ?ps_estimate.
+##  No bootstraps present, see ?ps_bootstrap.</code></pre>
+<p>These are shown as examples, we will proceed with the simple linear model for imputation.</p>
+<p>The next step is to define the risk model.</p>
+</div>
+<div id="risk-models-and-likelihoods" class="section level3">
+<h3>Risk models and likelihoods</h3>
+<p>Let’s see how to add a risk model:</p>
+<pre class="sourceCode r"><code class="sourceCode r">?add_riskmodel</code></pre>
+<div class="r-help-page">
+<table width="100%" summary="page for add_riskmodel">
+<tr>
+<td>
+add_riskmodel
+</td>
+<td style="text-align: right;">
+R Documentation
+</td>
+</tr>
+</table>
+<h2>
+Add risk model to a psdesign object
+</h2>
+<h3>
+Description
+</h3>
+<p>
+Add risk model to a psdesign object
+</p>
+<h3>
+Usage
+</h3>
+<pre class="r">
+add_riskmodel(psdesign, riskmodel)
+</pre>
+<h3>
+Arguments
+</h3>
+<table summary="R argblock">
+<tr valign="top">
+<td>
+<code>psdesign</code>
+</td>
+<td>
+<p>
+A psdesign object
+</p>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<code>risk</code>
+</td>
+<td>
+<p>
+A risk model object
+</p>
+</td>
+</tr>
+</table>
+<h3>
+Details
+</h3>
+<p>
+The risk model component specifies the likelihood for the data. This involves specifying the distribution of the outcome variable, whether it is binary or time-to-event, and specifying how the surrogate S(1) and the treatment Z interact and affect the outcome. We use the formula notation to be consistent with other regression type models in R. Below is a list of available risk models.
+</p>
+<ul>
+<li>
+<p>
+risk_binary This is a generic risk model for binary outcomes. The user can specify the formula, and link function using either risk.expit for the logistic link, or risk.probit for the probit link. Custom link functions may also be specified, which take a single numeric vector argument, and returns a vector of corresponding probabilities.
+</p>
+</li>
+<li>
+<p>
+risk_weibull This is a parameterization of the Weibull model for time-to-event outcomes that is consistent with that of rweibull. The user specifies the formula for the linear predictor of the scale parameter.
+</p>
+</li>
+<li>
+<p>
+risk_exponential This is a simple exponential model for a time-to-event outcome.
+</p>
+</li>
+</ul>
+<h3>
+Examples
+</h3>
+<pre class="r">
+test &lt;- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
+add_riskmodel(test, risk_binary())
+test + risk_binary() # same as above
+</pre>
+</div>
+<p>Let’s add a simple binary risk model using the logit link. The argument <code>D</code> specifies the number of samples to use for the simulated annealing aka empirical integration in the EML procedure.</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y ~<span class="st"> </span>S<span class="fl">.1</span> *<span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">2000</span>, <span class="dt">risk =</span> risk.expit)
+binary.ps</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ BIP )
+## 
+## Risk models: 
+##   risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit )
+## 
+##  No estimates present, see ?ps_estimate.
+##  No bootstraps present, see ?ps_bootstrap.</code></pre>
+</div>
+<div id="estimation-and-bootstrap" class="section level3">
+<h3>Estimation and Bootstrap</h3>
+<pre class="sourceCode r"><code class="sourceCode r">binary.est &lt;-<span class="st"> </span><span class="kw">ps_estimate</span>(binary.ps, <span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)
+binary.boot &lt;-<span class="st"> </span><span class="kw">ps_bootstrap</span>(binary.est, <span class="dt">n.boots =</span> <span class="dv">100</span>, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>, 
+                            <span class="dt">start =</span> binary.est$estimates$par, <span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)
+
+binary.boot</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ BIP )
+## 
+## Risk models: 
+##   risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit )
+## 
+## Estimated parameters:
+## (Intercept)         S.1           Z       S.1:Z 
+##       5.393      -2.828       0.788       1.173 
+##  Convergence:  TRUE 
+## 
+## Bootstrap replicates:
+##             median   mean boot.se lower.CL.2.5% upper.CL.97.5%
+## (Intercept)  5.309  5.409   0.685         4.124           6.94
+## S.1         -2.808 -2.840   0.333        -3.482          -2.24
+## Z            0.698  0.798   0.949        -0.829           3.17
+## S.1:Z        1.190  1.172   0.402         0.290           1.85
+## 
+##   Out of 100 bootstraps,  100 converged ( 100 %)</code></pre>
+</div>
+<div id="plots-and-summaries" class="section level3">
+<h3>Plots and summaries</h3>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(binary.boot, <span class="dt">summary =</span> <span class="st">&quot;VE&quot;</span>)</code></pre>
+<p><img src="data:image/png;base64,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" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(binary.boot)</code></pre>
+<pre><code>## Augmented data frame:  500  obs. by  6  variables. 
+##   Z Y  S.1    S.0 cdfweights    BIP
+## 1 1 0 3.73     NA          1  1.717
+## 2 0 1   NA -0.216          1 -0.359
+## 3 1 0 3.43     NA          1  1.475
+## 4 1 1 1.52     NA          1 -0.479
+## 5 1 1 1.77     NA          1 -0.325
+## 6 0 0   NA -0.430          1 -0.600
+## 
+## Empirical VE:  -0.879 
+## 
+## Mapped variables: 
+##   Z  -&gt;  Z 
+##   Y  -&gt;  Y.obs 
+##   S  -&gt;  S.obs 
+##   BIP  -&gt;  BIP 
+## 
+## Imputation models: 
+##   Imputation model for  S.1 :
+##       impute_parametric(formula = S.1 ~ BIP )
+## 
+## Risk models: 
+##   risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit )
+## 
+## Estimated parameters:
+## (Intercept)         S.1           Z       S.1:Z 
+##       5.393      -2.828       0.788       1.173 
+##  Convergence:  TRUE 
+## 
+## Bootstrap replicates:
+##             median   mean boot.se lower.CL.2.5% upper.CL.97.5%
+## (Intercept)  5.309  5.409   0.685         4.124           6.94
+## S.1         -2.808 -2.840   0.333        -3.482          -2.24
+## Z            0.698  0.798   0.949        -0.829           3.17
+## S.1:Z        1.190  1.172   0.402         0.290           1.85
+## 
+##   Out of 100 bootstraps,  100 converged ( 100 %)
+##   empirical marginal.VE       model 
+##      -0.879      -0.879     -16.618 
+## Model-based average VE is -1789.6 % different from the empirical and -1789.7 % different from the marginal.</code></pre>
+<pre><code>## Warning in summary.psdesign(binary.boot): Check model and results
+## carefully!</code></pre>
+<div class="references">
+<h1 id="references" class="unnumbered">References</h1>
+<p>Follmann, D. 2006. “Augmented Designs to Assess Immune Response in Vaccine Trials.” <em>Biometrics</em> 62 (4): 1161–69.</p>
+<p>Frangakis, CE, and DB Rubin. 2002. “Principal Stratification in Causal Inference.” <em>Biometrics</em> 58 (1): 21–29.</p>
+<p>Gabriel, Erin E, and Dean Follmann. 2015. “Augmented Trial Designs for Evaluation of Principal Surrogates.” <em>Biostatistics</em> 0 (0): 1–25.</p>
+<p>Gabriel, Erin E., and Peter B. Gilbert. 2014. “Evaluating Principal Surrogate Endpoints with Time-to-Event Data Accounting for Time-Varying Treatment Efficacy.” <em>Biostatistics</em> 15 (2): 251–65.</p>
+<p>Gilbert, PB, and MG Hudgens. 2008. “Evaluating Candidate Principal Surrogate Endpoints.” <em>Biometrics</em> 64 (4): 1146–54.</p>
+<p>Pepe, MS, and TR Fleming. 1991. “A Nonparametric Method for Dealing with Mismeasured Covariate Data.” <em>Journal of the American Statistical Association</em> 86 (413): 108–13.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
