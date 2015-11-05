@@ -86,7 +86,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
   }
 
-  obsVE <- data.frame(S.1 = Splot, VE = 1 - R1/R0)
+  obsVE <- data.frame(S.1 = Splot, VE = 1 - R1/R0, R1 = R1, R0 = R0)
 
   if("bootstraps" %in% names(psdesign) & bootstraps){
 

@@ -3,11 +3,11 @@
 #' @param model Formula specifying the risk model
 #' @param D number of samples for the simulated annealing integration
 #' @param risk Function for transforming a linear predictor into a probability.
-#'   E.g., risk.expit for the logistic model, risk.probit for the probit model
+#'   E.g., risk.logit for the logistic model, risk.probit for the probit model
 #'   @export
 
 
-risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...){
+risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit, ...){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
@@ -203,7 +203,7 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 
 #' @export
 
-risk.expit <- function(x) {
+risk.logit <- function(x) {
 
   exp(x)/(1 + exp(x))
 

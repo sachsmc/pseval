@@ -32,14 +32,14 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
 
         subVE <- unique(VE.me)
         segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 2, ...)
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
 
         segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 2, ...)
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
 
       } else {
-        lines(VE.me[, lnme] ~ VE.me$S.1, lty = 2, ...)
-        lines(VE.me[, unme] ~ VE.me$S.1, lty = 2, ...)
+        lines(VE.me[, lnme] ~ VE.me$S.1, lty = 3, ...)
+        lines(VE.me[, unme] ~ VE.me$S.1, lty = 3, ...)
         }
     }
 
@@ -61,6 +61,7 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
 print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
   objs <- names(psdesign)
+  pout <- NULL
 
   cat("Augmented data frame: ", nrow(psdesign$augdata), " obs. by ", ncol(psdesign$augdata), " variables. \n")
   print(head(psdesign$augdata), digits = digits)
@@ -128,7 +129,12 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     print(sbs$table, digits = digits)
     cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
 
+    pout$boot.table <- sbs
+
   }
+
+  invisible(pout)
+
 
 }
 
@@ -142,7 +148,7 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 #'
 summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
-  print(psdesign, digits = digits, sig.level = sig.level)
+  pout <- print(psdesign, digits = digits, sig.level = sig.level)
 
   ## compute marginal model and summarize VE
 
@@ -155,14 +161,17 @@ summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     marg.VE <- colMeans(VE(marg.est, bootstraps = FALSE))[2]
     emp.VE <- empirical_VE(psdesign)
     cond.VE <- VE(psdesign)
-    VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = mean(cond.VE[, 2]))
+    cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
+    VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
     print(VEtab, digits = digits)
 
-    empdiff <- 100 - 100 * VEtab[3]/VEtab[1]
-    mardiff <- 100 - 100 * VEtab[3]/VEtab[2]
+    empdiff <- 100 * VEtab[3]/VEtab[1] - 100
+    mardiff <- 100 * VEtab[3]/VEtab[2] - 100
 
     cat(sprintf("Model-based average VE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
     if(abs(mardiff) > 100) warning("Check model and results carefully!")
+
+    invisible(list(print = pout, VE.estimates = VEtab))
 
   }
 }

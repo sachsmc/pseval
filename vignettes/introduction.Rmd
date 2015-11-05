@@ -106,7 +106,7 @@ fakedata <- generate_example_data(n = 500)
 head(fakedata)
 ```
 
-The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model is exponential, with parameters (intercept) = -1, S(1) = 2, Z = 0, S(1):Z = -1.
+The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = 1, S(1) = 0, Z = -0.5, S(1):Z = -1. The true model for binary is logistic, with the same parameter values. 
 
 ### The `psdesign` object
 
@@ -164,7 +164,7 @@ Let's see how to add a risk model:
 Let's add a simple binary risk model using the logit link. The argument `D` specifies the number of samples to use for the simulated annealing aka empirical integration in the EML procedure. 
 
 ```{r riskbin}
-binary.ps <- binary.ps + risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit)
+binary.ps <- binary.ps + risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.logit)
 binary.ps
 ```
 

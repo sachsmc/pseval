@@ -21,12 +21,12 @@ generate_example_data <- function(n){
   S.0 <- X + rnorm(n, sd = .1)
   S.1 <- 2 + X + rnorm(n, sd = .1)
 
-  risk.obs <- exp(-1 + 0 * Z + 2 * S.1 - 1 * S.1 * Z)
-  risk.0 <- exp(-1 + 2 * S.1 )
-  risk.1 <- exp(-1 + 2 * S.1 - 1 * S.1 * 1)
+  risk.obs <- (1 + 0 * S.1 - 0.5 * Z - 1 * S.1 * Z)
+  risk.0 <- (1)
+  risk.1 <- (1 - 0.5 - 1 * S.1)
 
-  time.0 <- rexp(n, 1/risk.0)^.3
-  time.1 <- rexp(n, 1/risk.1)^.3
+  time.0 <- rexp(n, exp(risk.0))
+  time.1 <- rexp(n, exp(risk.1))
   time.obs <- ifelse(Z == 1, time.1, time.0)
 
   event.0 <- rbinom(n, 1, .8)
@@ -36,8 +36,8 @@ generate_example_data <- function(n){
   event.1[time.1 > 150] <- 0
   event.obs <- ifelse(Z == 1, event.1, event.0)
 
-  Y.0 <- as.numeric(time.0 < 2)
-  Y.1 <- as.numeric(time.1 < 2)
+  Y.0 <- rbinom(n, 1, expit(risk.0))
+  Y.1 <- rbinom(n, 1, expit(risk.1))
   Y.obs <- ifelse(Z == 1, Y.1, Y.0)
 
   ## CPV measure noisy S.1 at the end of the study for placebo subjects non-event
