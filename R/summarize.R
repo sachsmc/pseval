@@ -30,7 +30,8 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
   obss <- psdesign$augdata$S.1
 
   trueobs <- sample(obss[!is.na(obss)],
-                    floor(n.samps * mean(!is.na(obss))), replace = TRUE)
+                    floor(n.samps * mean(!is.na(obss))),
+                    prob = psdesign$augdata$cdfweights[!is.na(obss)], replace = TRUE)
 
 
   if(is.factor(obss)){

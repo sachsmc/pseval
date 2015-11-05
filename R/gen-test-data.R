@@ -25,8 +25,8 @@ generate_example_data <- function(n){
   risk.0 <- (1 - 0.5 * S.1)
   risk.1 <- (1 - 1.5 * S.1)
 
-  time.0 <- rexp(n, exp(risk.0))
-  time.1 <- rexp(n, exp(risk.1))
+  time.0 <- rexp(n, 1/exp(risk.0))
+  time.1 <- rexp(n, 1/exp(risk.1))
   time.obs <- ifelse(Z == 1, time.1, time.0)
 
   event.0 <- rbinom(n, 1, .8)
@@ -56,7 +56,7 @@ generate_example_data <- function(n){
   qwantz <- c(-Inf, quantile(c(S.0, S.1), c(.25, .5, .75), na.rm = TRUE), Inf)
   S.1.cat <- cut(S.1, qwantz)
   S.0.cat <- cut(S.0, qwantz)
-  S.obs.cat <- ifelse(Z == 1, S.1.cat, S.0.cat)
+  S.obs.cat <- cut(S.obs, qwantz)
 
   BIP.cat <- cut(X, c(-Inf, quantile(X, c(.25, .5, .75)), Inf))
 

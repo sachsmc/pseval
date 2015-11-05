@@ -2,7 +2,10 @@
 title: "Introduction to Principal Surrogate Evaluation in R"
 author: "Michael C Sachs"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
-output: rmarkdown::html_vignette
+output: 
+    rmarkdown::html_vignette:
+        fig_width: 7
+        fig_height: 5
 bibliography: psreferences.bib
 vignette: >
   %\VignetteIndexEntry{introduction}
@@ -202,7 +205,7 @@ smary <- summary(binary.boot)
 ```
 
 
-```{r plot1, fig.width = 7, fig.height = 5}
+```{r plot1}
 plot(binary.boot, summary = "VE", lwd = 2)
 abline(h = smary$VE.estimates[2], lty = 2)
 
@@ -232,6 +235,36 @@ legend("bottomright", legend = c("estimated VE", "marginal VE", "true VE"),
 - Estimation via pseudo-score [@Huang12]
 
 File additional suggestions here as a [github issue](https://github.com/sachsmc/pseval/issues)
+
+## Additional examples
+
+### Survival outcome
+
+```{r surv1}
+surv.fit <- psdesign(fakedata, Z = Z, Y = Surv(time.obs, event.obs), 
+                     S = S.obs, BIP = BIP, CPV = CPV) + 
+  integrate_semiparametric(formula.location = S.1 ~ BIP, formula.scale = S.1 ~ 1) + 
+  risk_exponential(D = 1000) + ps_estimate(method = "BFGS")
+surv.fit
+plot(surv.fit)
+```
+
+### Categorical S
+
+`S.obs.cat` and `BIP.cat` are factors:
+
+```{r}
+with(fakedata, table(S.obs.cat, BIP.cat))
+```
+
+```{r catfit}
+cat.fit <- psdesign(fakedata, Z = Z, Y = Y.obs, 
+                     S = S.obs.cat, BIP = BIP.cat) + 
+  integrate_nonparametric(formula = S.1 ~ BIP) + 
+  risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.probit) + ps_estimate(method = "BFGS")
+cat.fit
+plot(cat.fit)
+```
 
 
 # References

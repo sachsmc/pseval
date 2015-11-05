@@ -17,6 +17,7 @@ test_that("Gilbert Hudgens estimates work", {
     ghdes.surv <- psdesign(ghdat, Z = Z, Y = Surv(time.obs, event.obs), S = S.obs, BIP = BIP)
     ghdes.cat <- psdesign(ghdat, Z = Z, Y = Y.obs, S = S.obs.cat, BIP = BIP.cat)
 
+    check <- ghdes.surv + integrate_parametric(S.1 ~ BIP) + risk_exponential(D = 1000) + ps_estimate()
 
     truepar <- c(-1, 2, 0, -1)
 
