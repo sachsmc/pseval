@@ -4,10 +4,11 @@
 \alias{plot.psdesign}
 \title{Plot summary statistics for a psdesign object}
 \usage{
-\method{plot}{psdesign}(psdesign, t, summary = "VE", sig.level = 0.05, ...)
+\method{plot}{psdesign}(psdesign, t, summary = "VE", sig.level = 0.05,
+  n.samps = 500, ...)
 }
 \arguments{
-\item{psdesign}{A psdesign object that contains a risk model, imputation
+\item{psdesign}{A psdesign object that contains a risk model, integration
 model, and valid estimates}
 
 \item{t}{For time to event outcomes, a fixed time \code{t} may be provided to
@@ -19,6 +20,8 @@ supported.}
 
 \item{sig.level}{Significance level used for confidence bands on the VE
 curve. This is only used if bootstrapped estimates are available.}
+
+\item{n.samps}{Number of samples to use over the range of S.1 for plotting the curve}
 
 \item{...}{Other arguments passes to \link{plot}}
 }

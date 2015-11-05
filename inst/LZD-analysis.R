@@ -17,7 +17,7 @@ sd <- sapply(dat[, c("S_I1", "S_D1")], sd, na.rm = TRUE)
 rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
 
 ghdes <- psdesign(dat, Z, Time_AE, surrogate = S_I1, BIP = SImp)
-ghdes2 <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = rho.init)
+ghdes2 <- ghdes + integrate_bivnorm(mu = mu, sd = sd, rho = rho.init)
 
 dat$SImp[dat$Z == 0] <- rowMeans(ghdes2$icdf_sbarw(runif(500)))
 
@@ -43,7 +43,7 @@ sd <- sapply(dat[, c("S_I1", "S_D1")], sd, na.rm = TRUE)
 rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
 
 ghdes <- psdesign(dat, Z = Z, Y = Surv(Time_AE, event_AE), S = S_I1, BIP = S_D1)
-ghdes2 <- ghdes + impute_bivnorm(x = S.1, mu = mu, sd = sd, rho = rho.init)
+ghdes2 <- ghdes + integrate_bivnorm(x = S.1, mu = mu, sd = sd, rho = rho.init)
 ghdes3 <- ghdes2 + risk_weibull(Y ~ S.1 * Z)
 ghdes3b <- ghdes2 + risk_exponential(Y ~ S.1 * Z)
 
@@ -57,7 +57,7 @@ est1.boot <- ps_estimate(est1.boot, start = rep(0, 5), method = "BFGS")
 
 est1b <- ps_estimate(ghdes3b, start = rep(0, 4), method = "BFGS")
 
-ghdes2.lower <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = .2)
+ghdes2.lower <- ghdes + integrate_bivnorm(mu = mu, sd = sd, rho = .2)
 ghdes3.lower <- ghdes2.lower + risk_weibull(Time_AE ~ S_I1 * Z, cens = "event_AE")
 
 
@@ -117,7 +117,7 @@ swank.one <- function(dat){
   rho.init <- cor(dat[, c("M1", "M2")], use = "pairwise")[1, 2]
 
   ghdes <- psdesign(dat, Z, Ogawa_time, surrogate = S_I1, BIP = S_D1)
-  ghdes2 <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = rho.init)
+  ghdes2 <- ghdes + integrate_bivnorm(mu = mu, sd = sd, rho = rho.init)
   ghdes3 <- ghdes2 + risk_weibull(Time_AE ~ S_I1 * Z, cens = "Ogawa_convert")
 
   start <- c(.8892, 5.16, -.085, -.9288, .3473)
@@ -125,7 +125,7 @@ swank.one <- function(dat){
                 control = list(fnscale = -1, maxit = 2000))
 
 
-  ghdes2.lower <- ghdes + impute_bivnorm(mu = mu, sd = sd, rho = .2)
+  ghdes2.lower <- ghdes + integrate_bivnorm(mu = mu, sd = sd, rho = .2)
   ghdes3.lower <- ghdes2.lower + risk_weibull(Ogawa_time ~ S_I1 * Z, cens = "Ogawa_convert")
 
   est1.lower <- optim(start, fn = ghdes3.lower$likelihood, method = "BFGS",

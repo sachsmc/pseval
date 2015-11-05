@@ -4,11 +4,9 @@
 \alias{ps_estimate}
 \title{Estimate parameters from a specified model using estimated maximum likelihood}
 \usage{
-ps_estimate(psdesign, start = NULL, control = list(), ...)
+ps_estimate(start = NULL, control = list(), ...)
 }
 \arguments{
-\item{psdesign}{A psdesign object with a risk model and imputation model specified}
-
 \item{start}{Vector of starting values, if NULL, will come up with starting values}
 
 \item{control}{List of control parameters for passed to \link{optim}}

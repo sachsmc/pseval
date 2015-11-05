@@ -3,7 +3,7 @@
 #'
 #' Plot the vaccine efficacy versus S.1 for an estimated psdesign object
 #'
-#' @param psdesign A psdesign object that contains a risk model, imputation
+#' @param psdesign A psdesign object that contains a risk model, integration
 #'   model, and valid estimates
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
@@ -12,15 +12,16 @@
 #'   supported.
 #' @param sig.level Significance level used for confidence bands on the VE
 #'   curve. This is only used if bootstrapped estimates are available.
+#'   @param n.samps Number of samples to use over the range of S.1 for plotting the curve
 #' @param ... Other arguments passes to \link{plot}
 #'
 #' @export
 
-plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
+plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps = 500, ...){
 
   if(summary == "VE"){
 
-    VE.me <- VE(psdesign, t, sig.level = sig.level)
+    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
     plot(VE ~ S.1, data = VE.me, type = 'l', ...)
 
     if("boot.se" %in% colnames(VE.me)){
@@ -32,14 +33,14 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
 
         subVE <- unique(VE.me)
         segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 2, ...)
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
 
         segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 2, ...)
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
 
       } else {
-        lines(VE.me[, lnme] ~ VE.me$S.1, lty = 2, ...)
-        lines(VE.me[, unme] ~ VE.me$S.1, lty = 2, ...)
+        lines(VE.me[, lnme] ~ VE.me$S.1, lty = 3, ...)
+        lines(VE.me[, unme] ~ VE.me$S.1, lty = 3, ...)
         }
     }
 
@@ -61,6 +62,7 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
 print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
   objs <- names(psdesign)
+  pout <- NULL
 
   cat("Augmented data frame: ", nrow(psdesign$augdata), " obs. by ", ncol(psdesign$augdata), " variables. \n")
   print(head(psdesign$augdata), digits = digits)
@@ -81,17 +83,17 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
   })
 
-  cat("\nImputation models: \n")
-  if(!"imputation.models" %in% objs) {
+  cat("\nIntegration models: \n")
+  if(!"integration.models" %in% objs) {
 
-    cat("\tNone present, see ?add_imputation for information on imputation models.\n")
+    cat("\tNone present, see ?add_integration for information on integration models.\n")
 
   } else {
 
-    for(j in names(psdesign$imputation.models)){
-      cat("\t Imputation model for ", j, ":\n")
-      tyj <- psdesign$imputation.models[[j]]$model
-      cat("\t\t", paste0("impute_", tyj$model, "("))
+    for(j in names(psdesign$integration.models)){
+      cat("\t integration model for ", j, ":\n")
+      tyj <- psdesign$integration.models[[j]]$model
+      cat("\t\t", paste0("integrate_", tyj$model, "("))
       cat(paste(sapply(names(tyj$args[-1]), function(nj) paste0(nj, " = ", tyj$args[-1][nj])), collapse = ", "), ")\n")
     }
 
@@ -128,7 +130,12 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     print(sbs$table, digits = digits)
     cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
 
+    pout$boot.table <- sbs
+
   }
+
+  invisible(pout)
+
 
 }
 
@@ -142,7 +149,7 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 #'
 summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
-  print(psdesign, digits = digits, sig.level = sig.level)
+  pout <- print(psdesign, digits = digits, sig.level = sig.level)
 
   ## compute marginal model and summarize VE
 
@@ -151,18 +158,21 @@ summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     pdat$model <- Y ~ Z
 
     psdesign2 <- psdesign + do.call(as.character(pdat[[1]]), pdat[-1])
-    marg.est <- ps_estimate(psdesign2)
+    marg.est <- psdesign2 + ps_estimate()
     marg.VE <- colMeans(VE(marg.est, bootstraps = FALSE))[2]
     emp.VE <- empirical_VE(psdesign)
-    cond.VE <- VE(psdesign)
-    VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = mean(cond.VE[, 2]))
+    cond.VE <- VE(psdesign, bootstraps = FALSE)
+    cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
+    VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
     print(VEtab, digits = digits)
 
-    empdiff <- 100 - 100 * VEtab[3]/VEtab[1]
-    mardiff <- 100 - 100 * VEtab[3]/VEtab[2]
+    empdiff <- 100 * VEtab[3]/VEtab[1] - 100
+    mardiff <- 100 * VEtab[3]/VEtab[2] - 100
 
     cat(sprintf("Model-based average VE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
     if(abs(mardiff) > 100) warning("Check model and results carefully!")
+
+    invisible(list(print = pout, VE.estimates = VEtab))
 
   }
 }

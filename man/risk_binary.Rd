@@ -4,7 +4,7 @@
 \alias{risk_binary}
 \title{Risk model for binary outcome}
 \usage{
-risk_binary(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...)
+risk_binary(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit, ...)
 }
 \arguments{
 \item{model}{Formula specifying the risk model}
@@ -12,7 +12,7 @@ risk_binary(model = Y ~ S.1 * Z, D = 5000, risk = risk.expit, ...)
 \item{D}{number of samples for the simulated annealing integration}
 
 \item{risk}{Function for transforming a linear predictor into a probability.
-E.g., risk.expit for the logistic model, risk.probit for the probit model}
+E.g., risk.logit for the logistic model, risk.probit for the probit model}
 }
 \description{
 Risk model for binary outcome

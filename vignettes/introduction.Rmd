@@ -39,7 +39,7 @@ risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
 risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 $$
 
-For instance, for a binary outcome, the risk function may simply be the probability $risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)$, or for a time-to-event outcome the risk function may be the cumulative distribution function $risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)$. Specification of the distributions of $Y(z) | S(1)$ determines the likelihood, we will denote this as $f(y | \beta, s_1, z)$. If $S(1)$ were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves imputing missing values based on some models and/or set of assumptions. Namely, $S(1)$ is unobserved for all subjects who received treatment 0. 
+For instance, for a binary outcome, the risk function may simply be the probability $risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)$, or for a time-to-event outcome the risk function may be the cumulative distribution function $risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)$. Specification of the distributions of $Y(z) | S(1)$ determines the likelihood, we will denote this as $f(y | \beta, s_1, z)$. If $S(1)$ were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves integrating out missing values based on some models and/or set of assumptions. Namely, $S(1)$ is unobserved for all subjects who received treatment 0. 
 
 ## Augmentation and Assumptions
 
@@ -52,11 +52,11 @@ Now to estimate the missing $S(1)$ values among those with $Z = 0$, we focus on 
 
 ### BIP
 
-Briefly, a BIP $W$ is any baseline measurement or set of measurements that is highly correlated with $S$, and is unlikely to be associated with the clinical outcome after conditioning on $S$, i.e. $Y \perp W | S(1)$. The BIP $W$ is used to impute the missing $S(1)$ among those with $Z = 0$ based on a model for $S(1) | W$ that is estimated among those with $Z = 1$. We describe how this model is used in the next section. 
+Briefly, a BIP $W$ is any baseline measurement or set of measurements that is highly correlated with $S$, and is unlikely to be associated with the clinical outcome after conditioning on $S$, i.e. $Y \perp W | S(1)$. The BIP $W$ is used to integrate out the missing $S(1)$ among those with $Z = 0$ based on a model for $S(1) | W$ that is estimated among those with $Z = 1$. We describe how this model is used in the next section. 
 
 ### CPV
 
-Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing $S(1)$. 
+Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct integration for the missing $S(1)$. 
 
 ### BSM
 
@@ -72,11 +72,11 @@ $$
 
 with respect to $\beta$. 
 
-This procedure is called estimated maximum likelihood (EML) and was developed in @Pepe91. The key idea is that we are averaging the likelihood contributions for subjects missing $S(1)$ with respect to the estimated distribution of $S(1) | W$. A BIP $W$ that is strongly associated with $S(1)$ is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors. 
+This procedure is called estimated maximum likelihood (EML) and was developed in @Pepe91. The key idea is that we are averaging the likelihood contributions for subjects missing $S(1)$ with respect to the estimated distribution of $S(1) | W$. A BIP $W$ that is strongly associated with $S(1)$ is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors. It was suggested as an approach to prinicipal surrogate evaluation by @Gilbert08 and @Huang11.
 
 ## Conclusion 
 
-The `pseval` package allows users to specify the type of augmented design that suits their data, specify the form of the risk model along with the distribution of $Y | S(1)$, and specify different imputation models to estimate the distribution of $S(1) | W$. Then the likelihood can be maximized and bootstraps run. Post-estimation summaries are available to display and analyze the treatment efficacy as a function of $S(1)$. All of this is implemented with a flexible and familiar interface. 
+The `pseval` package allows users to specify the type of augmented design that suits their data, specify the form of the risk model along with the distribution of $Y | S(1)$, and specify different integration models to estimate the distribution of $S(1) | W$. Then the likelihood can be maximized and bootstraps run. Post-estimation summaries are available to display and analyze the treatment efficacy as a function of $S(1)$. All of this is implemented with a flexible and familiar interface. 
 
 # Package information
 
@@ -106,7 +106,7 @@ fakedata <- generate_example_data(n = 500)
 head(fakedata)
 ```
 
-The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model is exponential, with parameters (intercept) = -1, S(1) = 2, Z = 0, S(1):Z = -1.
+The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = 1, S(1) = 0, Z = -0.5, S(1):Z = -1. The true model for binary is logistic, with the same parameter values. 
 
 ### The `psdesign` object
 
@@ -117,38 +117,38 @@ binary.ps <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 binary.ps
 ```
 
-The printout displays a brief description of the data, including the empirical vaccine efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for `add_imputation`, in order to add an imputation model to the psdesign object, the next step in the analysis. 
+The printout displays a brief description of the data, including the empirical vaccine efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for `add_integration`, in order to add an integration model to the psdesign object, the next step in the analysis. 
 
-### Imputation models
+### Integration models
 
-The EML procedure requires an estimate of $F_{S(1) | W}$, this is referred to as the imputation model. Let's see the help page for `add_imputation`:
+The EML procedure requires an estimate of $F_{S(1) | W}$, this is referred to as the integration model. Let's see the help page for `add_integration`:
 
 ```{r helpimp}
-?add_imputation
+?add_integration
 ```
 
-For this first example, let's use the parametric imputation model. We specify the mean model for $S(1) | W$ as a formula. We can add the imputation model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset. 
+For this first example, let's use the parametric integration model. We specify the mean model for $S(1) | W$ as a formula. We can add the integration model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset. 
 
 ```{r impp}
-binary.ps <- binary.ps + impute_parametric(S.1 ~ BIP)
+binary.ps <- binary.ps + integrate_parametric(S.1 ~ BIP)
 binary.ps
 ```
 
-We can add multiple imputation models to a psdesign object, say we want a model for $S(0) | W$: 
+We can add multiple integration models to a psdesign object, say we want a model for $S(0) | W$: 
 
 ```{r imp2}
-binary.ps + impute_parametric(S.0 ~ BIP)
+binary.ps + integrate_parametric(S.0 ~ BIP)
 ```
 
-In a future version of the package, we will allow for imputation of the joint risk estimands that depend on both $S(0)$ and $S(1)$. We can also use splines or other transformations in the formula: 
+In a future version of the package, we will allow for estimation of the joint risk estimands that depend on both $S(0)$ and $S(1)$. We can also use splines or other transformations in the formula: 
 
 ```{r imp3}
 library(splines)
-binary.ps + impute_parametric(S.1 ~ BIP^2)
-binary.ps + impute_parametric(S.1 ~ bs(BIP, df = 3))
+binary.ps + integrate_parametric(S.1 ~ BIP^2)
+binary.ps + integrate_parametric(S.1 ~ bs(BIP, df = 3))
 ```
 
-These are shown as examples, we will proceed with the simple linear model for imputation. 
+These are shown as examples, we will proceed with the simple linear model for integration. 
 
 
 The next step is to define the risk model. 
@@ -164,30 +164,61 @@ Let's see how to add a risk model:
 Let's add a simple binary risk model using the logit link. The argument `D` specifies the number of samples to use for the simulated annealing aka empirical integration in the EML procedure. 
 
 ```{r riskbin}
-binary.ps <- binary.ps + risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit)
+binary.ps <- binary.ps + risk_binary(model = Y ~ S.1 * Z, D = 1000, risk = risk.logit)
 binary.ps
 ```
 
 ### Estimation and Bootstrap
 
+We estimate the parameters and bootstrap using the same type of syntax. We can add a `ps_estimate` object, which takes optional arguments `start` for starting values, and other arguments that are passed to the `optim` function. The `method = "BFGS"` determines the optimization method, we have found that "BFGS" works well in these types of problems. 
+
+The `ps_bootstrap` function takes the additional arguments `n.boots` for the number of bootstrap replicates, and `progress.bar` which is a logical that displays a progress bar in the R console if true. It is helpful to pass the estimates as starting values in the bootstrap resampling. 
+
 ```{r est, cache = TRUE}
-binary.est <- ps_estimate(binary.ps, method = "BFGS")
-binary.boot <- ps_bootstrap(binary.est, n.boots = 100, progress.bar = FALSE, 
+binary.est <- binary.ps + ps_estimate(method = "BFGS")
+binary.boot <- binary.est + ps_bootstrap(n.boots = 100, progress.bar = FALSE, 
                             start = binary.est$estimates$par, method = "BFGS")
 
 binary.boot
 ```
+
+### Do it all at once
+
+The next code chunk shows how the model can be defined and estimated all at once. 
+
+```{r alltog, eval = FALSE}
+binary.est <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) + 
+  integrate_parametric(S.1 ~ BIP) + 
+  risk_binary(model = Y ~ S.1 * Z, D = 1000, risk = risk.logit) + 
+  ps_estimate(method = "BFGS")
+```
+
+
 ### Plots and summaries
 
-```{r plot1}
-plot(binary.boot, summary = "VE")
-```
-
+We provide summary and plotting methods for the psdesign object. The summary method computes the marginal vaccine efficacy and compares it to the average conditional vaccine efficacy. This is an indication of model fit. A warning will be given if the two estimates are dramatically different. 
 
 ```{r summary}
-summary(binary.boot)
+smary <- summary(binary.boot)
 ```
 
+
+```{r plot1, fig.width = 7, fig.height = 5}
+plot(binary.boot, summary = "VE")
+abline(h = smary$VE.estimates[2], lty = 2)
+```
+
+## Next steps
+
+- Detail assumptions
+- Post estimation summaries 
+  + other plotting methods, risk difference, risk by treatment
+  + total gain, true and false positive fractions [@Gabriel15]
+- VE surface, depending on both S.1 and S.0
+- Allow poisson and binomial distributions in `integrate_parametric`
+- Estimation via pseudo-score [@Huang12]
+
+File additional suggestions here as a [github issue](https://github.com/sachsmc/pseval/issues)
 
 
 # References

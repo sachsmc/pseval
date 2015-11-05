@@ -8,7 +8,7 @@ VE(psdesign, t, sig.level = 0.05, n.samps = 5000, bootstraps = TRUE)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
-imputation model, and estimated parameters. Bootstrapped parameters are
+integration model, and estimated parameters. Bootstrapped parameters are
 optional}
 
 \item{t}{For time to event outcomes, a fixed time \code{t} may be provided to

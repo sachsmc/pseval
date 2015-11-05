@@ -5,8 +5,8 @@ utils
 grDevices
 graphics
 stats
-survival
 pseval
 knitr
 printr
+survival
 splines
