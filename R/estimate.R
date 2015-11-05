@@ -83,7 +83,7 @@ ps_bootstrap <- function(n.boots = 200, progress.bar = TRUE, start = NULL, contr
 
       # estimate
 
-      bpar <- ps_estimate(psdesign3, start = start, control = control, ...)
+      bpar <- psdesign3 + ps_estimate(start = start, control = control, ...)
 
       bootpar[[i]] <- c(bpar$estimates$par, convergence = bpar$estimates$convergence)
 

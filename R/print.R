@@ -12,15 +12,16 @@
 #'   supported.
 #' @param sig.level Significance level used for confidence bands on the VE
 #'   curve. This is only used if bootstrapped estimates are available.
+#'   @param n.samps Number of samples to use over the range of S.1 for plotting the curve
 #' @param ... Other arguments passes to \link{plot}
 #'
 #' @export
 
-plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, ...){
+plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps = 500, ...){
 
   if(summary == "VE"){
 
-    VE.me <- VE(psdesign, t, sig.level = sig.level)
+    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
     plot(VE ~ S.1, data = VE.me, type = 'l', ...)
 
     if("boot.se" %in% colnames(VE.me)){
@@ -157,10 +158,10 @@ summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     pdat$model <- Y ~ Z
 
     psdesign2 <- psdesign + do.call(as.character(pdat[[1]]), pdat[-1])
-    marg.est <- ps_estimate(psdesign2)
+    marg.est <- psdesign2 + ps_estimate()
     marg.VE <- colMeans(VE(marg.est, bootstraps = FALSE))[2]
     emp.VE <- empirical_VE(psdesign)
-    cond.VE <- VE(psdesign)
+    cond.VE <- VE(psdesign, bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
     print(VEtab, digits = digits)
