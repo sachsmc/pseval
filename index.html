@@ -10,7 +10,7 @@
 
 <meta name="author" content="Michael C Sachs" />
 
-<meta name="date" content="2015-11-03" />
+<meta name="date" content="2015-11-05" />
 
 <title>Introduction to Principal Surrogate Evaluation in R</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Introduction to Principal Surrogate Evaluation in R</h1>
 <h4 class="author"><em>Michael C Sachs</em></h4>
-<h4 class="date"><em>November 03, 2015</em></h4>
+<h4 class="date"><em>November 05, 2015</em></h4>
 </div>
 
 
@@ -76,7 +76,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
 risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 \]</span></p>
-<p>For instance, for a binary outcome, the risk function may simply be the probability <span class="math">\(risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)\)</span>, or for a time-to-event outcome the risk function may be the cumulative distribution function <span class="math">\(risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)\)</span>. Specification of the distributions of <span class="math">\(Y(z) | S(1)\)</span> determines the likelihood, we will denote this as <span class="math">\(f(y | \beta, s_1, z)\)</span>. If <span class="math">\(S(1)\)</span> were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves imputing missing values based on some models and/or set of assumptions. Namely, <span class="math">\(S(1)\)</span> is unobserved for all subjects who received treatment 0.</p>
+<p>For instance, for a binary outcome, the risk function may simply be the probability <span class="math">\(risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)\)</span>, or for a time-to-event outcome the risk function may be the cumulative distribution function <span class="math">\(risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)\)</span>. Specification of the distributions of <span class="math">\(Y(z) | S(1)\)</span> determines the likelihood, we will denote this as <span class="math">\(f(y | \beta, s_1, z)\)</span>. If <span class="math">\(S(1)\)</span> were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves integrating out missing values based on some models and/or set of assumptions. Namely, <span class="math">\(S(1)\)</span> is unobserved for all subjects who received treatment 0.</p>
 </div>
 <div id="augmentation-and-assumptions" class="section level2">
 <h2>Augmentation and Assumptions</h2>
@@ -88,11 +88,11 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <p>Now to estimate the missing <span class="math">\(S(1)\)</span> values among those with <span class="math">\(Z = 0\)</span>, we focus on three trial augmentations: Baseline immunogenicity predictor (BIP), closeout placebo vaccination (CPV), and baseline surrogate measurement (BSM). For details on these augmentations, we refer you to <span class="citation">D. Follmann (2006)</span>, <span class="citation">P. Gilbert and Hudgens (2008)</span>, <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>, and <span class="citation">Erin E Gabriel and Follmann (2015)</span>.</p>
 <div id="bip" class="section level3">
 <h3>BIP</h3>
-<p>Briefly, a BIP <span class="math">\(W\)</span> is any baseline measurement or set of measurements that is highly correlated with <span class="math">\(S\)</span>, and is unlikely to be associated with the clinical outcome after conditioning on <span class="math">\(S\)</span>, i.e. <span class="math">\(Y \perp W | S(1)\)</span>. The BIP <span class="math">\(W\)</span> is used to impute the missing <span class="math">\(S(1)\)</span> among those with <span class="math">\(Z = 0\)</span> based on a model for <span class="math">\(S(1) | W\)</span> that is estimated among those with <span class="math">\(Z = 1\)</span>. We describe how this model is used in the next section.</p>
+<p>Briefly, a BIP <span class="math">\(W\)</span> is any baseline measurement or set of measurements that is highly correlated with <span class="math">\(S\)</span>, and is unlikely to be associated with the clinical outcome after conditioning on <span class="math">\(S\)</span>, i.e. <span class="math">\(Y \perp W | S(1)\)</span>. The BIP <span class="math">\(W\)</span> is used to integrate out the missing <span class="math">\(S(1)\)</span> among those with <span class="math">\(Z = 0\)</span> based on a model for <span class="math">\(S(1) | W\)</span> that is estimated among those with <span class="math">\(Z = 1\)</span>. We describe how this model is used in the next section.</p>
 </div>
 <div id="cpv" class="section level3">
 <h3>CPV</h3>
-<p>Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing <span class="math">\(S(1)\)</span>.</p>
+<p>Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct integration for the missing <span class="math">\(S(1)\)</span>.</p>
 </div>
 <div id="bsm" class="section level3">
 <h3>BSM</h3>
@@ -106,11 +106,11 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 \prod_{i = 1}^n \left\{f(Y_i | \beta, S_i(1), Z_i)\right\}^R_i \left\{\int f(Y_i | \beta, s, Z_i) \, d \hat{F}_{S(1) | W}(s | W_i)\right\}^{1 - R_i}
 \]</span></p>
 <p>with respect to <span class="math">\(\beta\)</span>.</p>
-<p>This procedure is called estimated maximum likelihood (EML) and was developed in <span class="citation">Pepe and Fleming (1991)</span>. The key idea is that we are averaging the likelihood contributions for subjects missing <span class="math">\(S(1)\)</span> with respect to the estimated distribution of <span class="math">\(S(1) | W\)</span>. A BIP <span class="math">\(W\)</span> that is strongly associated with <span class="math">\(S(1)\)</span> is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors.</p>
+<p>This procedure is called estimated maximum likelihood (EML) and was developed in <span class="citation">Pepe and Fleming (1991)</span>. The key idea is that we are averaging the likelihood contributions for subjects missing <span class="math">\(S(1)\)</span> with respect to the estimated distribution of <span class="math">\(S(1) | W\)</span>. A BIP <span class="math">\(W\)</span> that is strongly associated with <span class="math">\(S(1)\)</span> is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors. It was suggested as an approach to prinicipal surrogate evaluation by <span class="citation">P. Gilbert and Hudgens (2008)</span> and <span class="citation">Y Huang and Gilbert (2011)</span>.</p>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>The <code>pseval</code> package allows users to specify the type of augmented design that suits their data, specify the form of the risk model along with the distribution of <span class="math">\(Y | S(1)\)</span>, and specify different imputation models to estimate the distribution of <span class="math">\(S(1) | W\)</span>. Then the likelihood can be maximized and bootstraps run. Post-estimation summaries are available to display and analyze the treatment efficacy as a function of <span class="math">\(S(1)\)</span>. All of this is implemented with a flexible and familiar interface.</p>
+<p>The <code>pseval</code> package allows users to specify the type of augmented design that suits their data, specify the form of the risk model along with the distribution of <span class="math">\(Y | S(1)\)</span>, and specify different integration models to estimate the distribution of <span class="math">\(S(1) | W\)</span>. Then the likelihood can be maximized and bootstraps run. Post-estimation summaries are available to display and analyze the treatment efficacy as a function of <span class="math">\(S(1)\)</span>. All of this is implemented with a flexible and familiar interface.</p>
 </div>
 </div>
 <div id="package-information" class="section level1">
@@ -150,9 +150,9 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <td align="right">1</td>
 <td align="right">1.7174622</td>
 <td align="right">NA</td>
-<td align="right">1.7270215</td>
+<td align="right">1.7519956</td>
 <td align="right">3.7306079</td>
-<td align="right">2.110340</td>
+<td align="right">19.8756822</td>
 <td align="right">1</td>
 <td align="right">0</td>
 <td align="right">4</td>
@@ -162,9 +162,9 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <td align="right">0</td>
 <td align="right">-0.3586040</td>
 <td align="right">NA</td>
-<td align="right">-0.0188679</td>
+<td align="right">-0.2650956</td>
 <td align="right">-0.2157875</td>
-<td align="right">1.920144</td>
+<td align="right">0.2121062</td>
 <td align="right">1</td>
 <td align="right">1</td>
 <td align="right">1</td>
@@ -174,9 +174,9 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <td align="right">1</td>
 <td align="right">1.4747656</td>
 <td align="right">NA</td>
-<td align="right">1.5651221</td>
+<td align="right">1.5059343</td>
 <td align="right">3.4339067</td>
-<td align="right">2.853942</td>
+<td align="right">54.3622946</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">4</td>
@@ -186,11 +186,11 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <td align="right">1</td>
 <td align="right">-0.4788192</td>
 <td align="right">NA</td>
-<td align="right">-0.4029483</td>
+<td align="right">-0.5474232</td>
 <td align="right">1.5185808</td>
-<td align="right">1.420952</td>
+<td align="right">5.3179630</td>
 <td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">3</td>
 <td align="left">(-0.659,0.056]</td>
 </tr>
@@ -198,29 +198,29 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <td align="right">1</td>
 <td align="right">-0.3245397</td>
 <td align="right">NA</td>
-<td align="right">-0.3977423</td>
+<td align="right">-0.3361716</td>
 <td align="right">1.7690982</td>
-<td align="right">1.183464</td>
+<td align="right">2.8906600</td>
 <td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">3</td>
 <td align="left">(-0.659,0.056]</td>
 </tr>
 <tr class="even">
 <td align="right">0</td>
 <td align="right">-0.6000949</td>
-<td align="right">1.559164</td>
-<td align="right">-0.4318074</td>
+<td align="right">NA</td>
+<td align="right">-0.4669590</td>
 <td align="right">-0.4300346</td>
-<td align="right">2.133359</td>
+<td align="right">0.5723580</td>
 <td align="right">1</td>
-<td align="right">0</td>
+<td align="right">1</td>
 <td align="right">1</td>
 <td align="left">(-0.659,0.056]</td>
 </tr>
 </tbody>
 </table>
-<p>The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model is exponential, with parameters (intercept) = -1, S(1) = 2, Z = 0, S(1):Z = -1.</p>
+<p>The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = 1, S(1) = 0, Z = -0.5, S(1):Z = -1. The true model for binary is logistic, with the same parameter values.</p>
 </div>
 <div id="the-psdesign-object" class="section level3">
 <h3>The <code>psdesign</code> object</h3>
@@ -232,11 +232,11 @@ binary.ps</code></pre>
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -244,24 +244,24 @@ binary.ps</code></pre>
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##  None present, see ?add_imputation for information on imputation models.
+## Integration models: 
+##  None present, see ?add_integration for information on integration models.
 ## 
 ## Risk models: 
 ##  None present, see ?add_riskmodel for information on risk models.
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
-<p>The printout displays a brief description of the data, including the empirical vaccine efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for <code>add_imputation</code>, in order to add an imputation model to the psdesign object, the next step in the analysis.</p>
+<p>The printout displays a brief description of the data, including the empirical vaccine efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for <code>add_integration</code>, in order to add an integration model to the psdesign object, the next step in the analysis.</p>
 </div>
-<div id="imputation-models" class="section level3">
-<h3>Imputation models</h3>
-<p>The EML procedure requires an estimate of <span class="math">\(F_{S(1) | W}\)</span>, this is referred to as the imputation model. Let’s see the help page for <code>add_imputation</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">?add_imputation</code></pre>
+<div id="integration-models" class="section level3">
+<h3>Integration models</h3>
+<p>The EML procedure requires an estimate of <span class="math">\(F_{S(1) | W}\)</span>, this is referred to as the integration model. Let’s see the help page for <code>add_integration</code>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">?add_integration</code></pre>
 <div class="r-help-page">
-<table width="100%" summary="page for add_imputation">
+<table width="100%" summary="page for add_integration">
 <tr>
 <td>
-add_imputation
+add_integration
 </td>
 <td style="text-align: right;">
 R Documentation
@@ -269,19 +269,19 @@ R Documentation
 </tr>
 </table>
 <h2>
-Imputation models
+Integration models
 </h2>
 <h3>
 Description
 </h3>
 <p>
-Add imputation model to a psdesign object
+Add integration model to a psdesign object
 </p>
 <h3>
 Usage
 </h3>
 <pre class="r">
-add_imputation(psdesign, imputation)
+add_integration(psdesign, integration)
 </pre>
 <h3>
 Arguments
@@ -299,11 +299,11 @@ A psdesign object
 </tr>
 <tr valign="top">
 <td>
-<code>imputation</code>
+<code>integration</code>
 </td>
 <td>
 <p>
-An imputation object
+An integration object
 </p>
 </td>
 </tr>
@@ -312,27 +312,27 @@ An imputation object
 Details
 </h3>
 <p>
-This is a list of the available imputation models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we impute likelihood contributions for each non-missing S(1) given their value of W, and average over the contributions.
+This is a list of the available integration models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we integrate likelihood contributions over each non-missing S(1) given their value of W, and average over the contributions.
 </p>
 <ul>
 <li>
 <p>
-impute_parametric This is a parametric imputation model that fits a linear model for the mean of S(1) | W and assumes a Gaussian distribution.
+integrate_parametric This is a parametric integration model that fits a linear model for the mean of S(1) | W and assumes a Gaussian distribution.
 </p>
 </li>
 <li>
 <p>
-impute_bivnorm This is another parametric imputation model that assumes that S(1) and W are jointly normally distributed. The user must specify their mean, variances and correlation.
+integrate_bivnorm This is another parametric integration model that assumes that S(1) and W are jointly normally distributed. The user must specify their mean, variances and correlation.
 </p>
 </li>
 <li>
 <p>
-impute_nonparametric This is a non-parametric imputation model that is only valid for categorical S(1) and W. It uses the observed proportions to estimate the joint distribution of S(1), W.
+integrate_nonparametric This is a non-parametric integration model that is only valid for categorical S(1) and W. It uses the observed proportions to estimate the joint distribution of S(1), W.
 </p>
 </li>
 <li>
 <p>
-impute_semiparametric This is a semi-parametric model that uses the semi-parametric location scale model of Heagerty and Pepe (1999). Models are specified for the location of S(1) | W and the scale of S(1) | W. Then imputations are drawn from the empirical distribution of the residuals from that model, which are then transformed to the appropriate location and scale.
+integrate_semiparametric This is a semi-parametric model that uses the semi-parametric location scale model of Heagerty and Pepe (1999). Models are specified for the location of S(1) | W and the scale of S(1) | W. Then integrations are drawn from the empirical distribution of the residuals from that model, which are then transformed to the appropriate location and scale.
 </p>
 </li>
 </ul>
@@ -341,24 +341,23 @@ Examples
 </h3>
 <pre class="r">
 test &lt;- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
-
-add_imputation(test, impute_parametric())
-test + impute_parametric()  # same as above
+add_integration(test, integrate_parametric())
+test + integrate_parametric(S.1 ~ BIP)  # same as above
 </pre>
 </div>
-<p>For this first example, let’s use the parametric imputation model. We specify the mean model for <span class="math">\(S(1) | W\)</span> as a formula. We can add the imputation model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset.</p>
-<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP)
+<p>For this first example, let’s use the parametric integration model. We specify the mean model for <span class="math">\(S(1) | W\)</span> as a formula. We can add the integration model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset.</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP)
 binary.ps</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
 ##   Z Y  S.1    S.0 cdfweights    BIP
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -366,26 +365,26 @@ binary.ps</code></pre>
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ BIP )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ BIP )
 ## 
 ## Risk models: 
 ##  None present, see ?add_riskmodel for information on risk models.
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
-<p>We can add multiple imputation models to a psdesign object, say we want a model for <span class="math">\(S(0) | W\)</span>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.0</span> ~<span class="st"> </span>BIP)</code></pre>
+<p>We can add multiple integration models to a psdesign object, say we want a model for <span class="math">\(S(0) | W\)</span>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps +<span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.0</span> ~<span class="st"> </span>BIP)</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
 ##   Z Y  S.1    S.0 cdfweights    BIP
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -393,29 +392,29 @@ binary.ps</code></pre>
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ BIP )
-##   Imputation model for  S.0 :
-##       impute_parametric(formula = S.0 ~ BIP )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ BIP )
+##   integration model for  S.0 :
+##       integrate_parametric(formula = S.0 ~ BIP )
 ## 
 ## Risk models: 
 ##  None present, see ?add_riskmodel for information on risk models.
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
-<p>In a future version of the package, we will allow for imputation of the joint risk estimands that depend on both <span class="math">\(S(0)\)</span> and <span class="math">\(S(1)\)</span>. We can also use splines or other transformations in the formula:</p>
+<p>In a future version of the package, we will allow for estimation of the joint risk estimands that depend on both <span class="math">\(S(0)\)</span> and <span class="math">\(S(1)\)</span>. We can also use splines or other transformations in the formula:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(splines)
-binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP^<span class="dv">2</span>)</code></pre>
+binary.ps +<span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP^<span class="dv">2</span>)</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
 ##   Z Y  S.1    S.0 cdfweights    BIP
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -423,25 +422,25 @@ binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ BIP^2 )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ BIP^2 )
 ## 
 ## Risk models: 
 ##  None present, see ?add_riskmodel for information on risk models.
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span><span class="kw">bs</span>(BIP, <span class="dt">df =</span> <span class="dv">3</span>))</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps +<span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span><span class="kw">bs</span>(BIP, <span class="dt">df =</span> <span class="dv">3</span>))</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
 ##   Z Y  S.1    S.0 cdfweights    BIP
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -449,15 +448,15 @@ binary.ps +<span class="st"> </span><span class="kw">impute_parametric</span>(S<
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ bs(BIP, df = 3) )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ bs(BIP, df = 3) )
 ## 
 ## Risk models: 
 ##  None present, see ?add_riskmodel for information on risk models.
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
-<p>These are shown as examples, we will proceed with the simple linear model for imputation.</p>
+<p>These are shown as examples, we will proceed with the simple linear model for integration.</p>
 <p>The next step is to define the risk model.</p>
 </div>
 <div id="risk-models-and-likelihoods" class="section level3">
@@ -548,18 +547,18 @@ test + risk_binary() # same as above
 </pre>
 </div>
 <p>Let’s add a simple binary risk model using the logit link. The argument <code>D</code> specifies the number of samples to use for the simulated annealing aka empirical integration in the EML procedure.</p>
-<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y ~<span class="st"> </span>S<span class="fl">.1</span> *<span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">2000</span>, <span class="dt">risk =</span> risk.expit)
+<pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y ~<span class="st"> </span>S<span class="fl">.1</span> *<span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">1000</span>, <span class="dt">risk =</span> risk.logit)
 binary.ps</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
 ##   Z Y  S.1    S.0 cdfweights    BIP
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -567,20 +566,22 @@ binary.ps</code></pre>
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ BIP )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ BIP )
 ## 
 ## Risk models: 
-##   risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit )
+##   risk_binary(model = Y ~ S.1 * Z, D = 1000, risk = risk.logit )
 ## 
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
 </div>
 <div id="estimation-and-bootstrap" class="section level3">
 <h3>Estimation and Bootstrap</h3>
-<pre class="sourceCode r"><code class="sourceCode r">binary.est &lt;-<span class="st"> </span><span class="kw">ps_estimate</span>(binary.ps, <span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)
-binary.boot &lt;-<span class="st"> </span><span class="kw">ps_bootstrap</span>(binary.est, <span class="dt">n.boots =</span> <span class="dv">100</span>, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>, 
+<p>We estimate the parameters and bootstrap using the same type of syntax. We can add a <code>ps_estimate</code> object, which takes optional arguments <code>start</code> for starting values, and other arguments that are passed to the <code>optim</code> function. The <code>method = &quot;BFGS&quot;</code> determines the optimization method, we have found that “BFGS” works well in these types of problems.</p>
+<p>The <code>ps_bootstrap</code> function takes the additional arguments <code>n.boots</code> for the number of bootstrap replicates, and <code>progress.bar</code> which is a logical that displays a progress bar in the R console if true. It is helpful to pass the estimates as starting values in the bootstrap resampling.</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.est &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)
+binary.boot &lt;-<span class="st"> </span>binary.est +<span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">100</span>, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>, 
                             <span class="dt">start =</span> binary.est$estimates$par, <span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)
 
 binary.boot</code></pre>
@@ -589,11 +590,11 @@ binary.boot</code></pre>
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -601,42 +602,49 @@ binary.boot</code></pre>
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ BIP )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ BIP )
 ## 
 ## Risk models: 
-##   risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit )
+##   risk_binary(model = Y ~ S.1 * Z, D = 1000, risk = risk.logit )
 ## 
 ## Estimated parameters:
 ## (Intercept)         S.1           Z       S.1:Z 
-##       5.393      -2.828       0.788       1.173 
+##      0.7066      0.1488      0.0697     -1.3251 
 ##  Convergence:  TRUE 
 ## 
 ## Bootstrap replicates:
 ##             median   mean boot.se lower.CL.2.5% upper.CL.97.5%
-## (Intercept)  5.309  5.409   0.685         4.124           6.94
-## S.1         -2.808 -2.840   0.333        -3.482          -2.24
-## Z            0.698  0.798   0.949        -0.829           3.17
-## S.1:Z        1.190  1.172   0.402         0.290           1.85
+## (Intercept)  0.751  0.745   0.289         0.247          1.376
+## S.1          0.149  0.138   0.129        -0.148          0.339
+## Z            0.116  0.142   0.488        -0.807          0.994
+## S.1:Z       -1.351 -1.373   0.263        -1.835         -0.957
 ## 
 ##   Out of 100 bootstraps,  100 converged ( 100 %)</code></pre>
 </div>
+<div id="do-it-all-at-once" class="section level3">
+<h3>Do it all at once</h3>
+<p>The next code chunk shows how the model can be defined and estimated all at once.</p>
+<pre class="sourceCode r"><code class="sourceCode r">binary.est &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y ~<span class="st"> </span>S<span class="fl">.1</span> *<span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">1000</span>, <span class="dt">risk =</span> risk.logit) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</code></pre>
+</div>
 <div id="plots-and-summaries" class="section level3">
 <h3>Plots and summaries</h3>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(binary.boot, <span class="dt">summary =</span> <span class="st">&quot;VE&quot;</span>)</code></pre>
-<p><img src="data:image/png;base64,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" /></p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(binary.boot)</code></pre>
+<p>We provide summary and plotting methods for the psdesign object. The summary method computes the marginal vaccine efficacy and compares it to the average conditional vaccine efficacy. This is an indication of model fit. A warning will be given if the two estimates are dramatically different.</p>
+<pre class="sourceCode r"><code class="sourceCode r">smary &lt;-<span class="st"> </span><span class="kw">summary</span>(binary.boot)</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
 ##   Z Y  S.1    S.0 cdfweights    BIP
 ## 1 1 0 3.73     NA          1  1.717
 ## 2 0 1   NA -0.216          1 -0.359
 ## 3 1 0 3.43     NA          1  1.475
-## 4 1 1 1.52     NA          1 -0.479
-## 5 1 1 1.77     NA          1 -0.325
-## 6 0 0   NA -0.430          1 -0.600
+## 4 1 0 1.52     NA          1 -0.479
+## 5 1 0 1.77     NA          1 -0.325
+## 6 0 1   NA -0.430          1 -0.600
 ## 
-## Empirical VE:  -0.879 
+## Empirical VE:  0.715 
 ## 
 ## Mapped variables: 
 ##   Z  -&gt;  Z 
@@ -644,40 +652,57 @@ binary.boot</code></pre>
 ##   S  -&gt;  S.obs 
 ##   BIP  -&gt;  BIP 
 ## 
-## Imputation models: 
-##   Imputation model for  S.1 :
-##       impute_parametric(formula = S.1 ~ BIP )
+## Integration models: 
+##   integration model for  S.1 :
+##       integrate_parametric(formula = S.1 ~ BIP )
 ## 
 ## Risk models: 
-##   risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.expit )
+##   risk_binary(model = Y ~ S.1 * Z, D = 1000, risk = risk.logit )
 ## 
 ## Estimated parameters:
 ## (Intercept)         S.1           Z       S.1:Z 
-##       5.393      -2.828       0.788       1.173 
+##      0.7066      0.1488      0.0697     -1.3251 
 ##  Convergence:  TRUE 
 ## 
 ## Bootstrap replicates:
 ##             median   mean boot.se lower.CL.2.5% upper.CL.97.5%
-## (Intercept)  5.309  5.409   0.685         4.124           6.94
-## S.1         -2.808 -2.840   0.333        -3.482          -2.24
-## Z            0.698  0.798   0.949        -0.829           3.17
-## S.1:Z        1.190  1.172   0.402         0.290           1.85
+## (Intercept)  0.751  0.745   0.289         0.247          1.376
+## S.1          0.149  0.138   0.129        -0.148          0.339
+## Z            0.116  0.142   0.488        -0.807          0.994
+## S.1:Z       -1.351 -1.373   0.263        -1.835         -0.957
 ## 
 ##   Out of 100 bootstraps,  100 converged ( 100 %)
 ##   empirical marginal.VE       model 
-##      -0.879      -0.879     -16.618 
-## Model-based average VE is -1789.6 % different from the empirical and -1789.7 % different from the marginal.</code></pre>
-<pre><code>## Warning in summary.psdesign(binary.boot): Check model and results
-## carefully!</code></pre>
+##       0.715       0.715       0.707 
+## Model-based average VE is -1.2 % different from the empirical and -1.2 % different from the marginal.</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(binary.boot, <span class="dt">summary =</span> <span class="st">&quot;VE&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h =</span> smary$VE.estimates[<span class="dv">2</span>], <span class="dt">lty =</span> <span class="dv">2</span>)</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAYAAAB6jN80AAAD8GlDQ1BJQ0MgUHJvZmlsZQAAOI2NVd1v21QUP4lvXKQWP6Cxjg4Vi69VU1u5GxqtxgZJk6XpQhq5zdgqpMl1bhpT1za2021Vn/YCbwz4A4CyBx6QeEIaDMT2su0BtElTQRXVJKQ9dNpAaJP2gqpwrq9Tu13GuJGvfznndz7v0TVAx1ea45hJGWDe8l01n5GPn5iWO1YhCc9BJ/RAp6Z7TrpcLgIuxoVH1sNfIcHeNwfa6/9zdVappwMknkJsVz19HvFpgJSpO64PIN5G+fAp30Hc8TziHS4miFhheJbjLMMzHB8POFPqKGKWi6TXtSriJcT9MzH5bAzzHIK1I08t6hq6zHpRdu2aYdJYuk9Q/881bzZa8Xrx6fLmJo/iu4/VXnfH1BB/rmu5ScQvI77m+BkmfxXxvcZcJY14L0DymZp7pML5yTcW61PvIN6JuGr4halQvmjNlCa4bXJ5zj6qhpxrujeKPYMXEd+q00KR5yNAlWZzrF+Ie+uNsdC/MO4tTOZafhbroyXuR3Df08bLiHsQf+ja6gTPWVimZl7l/oUrjl8OcxDWLbNU5D6JRL2gxkDu16fGuC054OMhclsyXTOOFEL+kmMGs4i5kfNuQ62EnBuam8tzP+Q+tSqhz9SuqpZlvR1EfBiOJTSgYMMM7jpYsAEyqJCHDL4dcFFTAwNMlFDUUpQYiadhDmXteeWAw3HEmA2s15k1RmnP4RHuhBybdBOF7MfnICmSQ2SYjIBM3iRvkcMki9IRcnDTthyLz2Ld2fTzPjTQK+Mdg8y5nkZfFO+se9LQr3/09xZr+5GcaSufeAfAww60mAPx+q8u/bAr8rFCLrx7s+vqEkw8qb+p26n11Aruq6m1iJH6PbWGv1VIY25mkNE8PkaQhxfLIF7DZXx80HD/A3l2jLclYs061xNpWCfoB6WHJTjbH0mV35Q/lRXlC+W8cndbl9t2SfhU+Fb4UfhO+F74GWThknBZ+Em4InwjXIyd1ePnY/Psg3pb1TJNu15TMKWMtFt6ScpKL0ivSMXIn9QtDUlj0h7U7N48t3i8eC0GnMC91dX2sTivgloDTgUVeEGHLTizbf5Da9JLhkhh29QOs1luMcScmBXTIIt7xRFxSBxnuJWfuAd1I7jntkyd/pgKaIwVr3MgmDo2q8x6IdB5QH162mcX7ajtnHGN2bov71OU1+U0fqqoXLD0wX5ZM005UHmySz3qLtDqILDvIL+iH6jB9y2x83ok898GOPQX3lk3Itl0A+BrD6D7tUjWh3fis58BXDigN9yF8M5PJH4B8Gr79/F/XRm8m241mw/wvur4BGDj42bzn+Vmc+NL9L8GcMn8F1kAcXgSteGGAABAAElEQVR4AezdCbxN1f//8Y85KkTJlMwNhAwNUhrwTfo2S5Eh36IJDZqTCN+QKM2lJCrSKJIxoTQhJdU3GUqSuQwh/L3X739u5957uNM5++y9z2s9Hvdxztlnn73Xeu7j+ty11/qsfHv3FaMggAACCCCAAAIIIOCRQH6PzsNpEEAAAQQQQAABBBBwAgSgfBEQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVIAA1FNuToYAAggggAACCCBAAMp3AAEEEEAAAQQQQMBTAQJQT7k5GQIIIIAAAggggAABKN8BBBBAAAEEEEAAAU8FCEA95eZkCCCAAAIIIIAAAgSgfAcQQAABBBBAAAEEPBUgAPWUm5MhgAACCCCAAAIIEIDyHUAAAQQQQAABBBDwVCDwAejevXtt7dq1tmHDBk/hOBkCCCCAAAIIIIBA7gQK5u5jyf3UqlWr7LHHHrOxY8eanv/999+uQsWLF7fKlStbs2bNrE+fPnbIIYckrKI6/1NPPWUlSpRI2Dk4MAIIIIAAAgggkFOBgw46yCZMmGCHHnpoTj/q2f759vUg7vXsbHE40YoVK6xJkyaWL18+a926tVWtWtVKlSrlXqsXdNmyZTZ+/HhTs6ZPn27VqlWLw1kzH6JRo0bWr18/AtDMNGxBAAEEEEAAgSQKnHXWWTZv3jyrW7duEmtx4FMHrgd08ODBrpdz2rRpVqRIkZitGzBggLVs2dJGjRrlekJj7pTHjQULFjT1uJ5yyil5PBIfRwABBBBAAAEE4idQs2bN+B0sQUcK3BjQhQsXWocOHfYbfMqpUKFC1qlTJ5s8eXKC2DgsAggggAACCCCAQG4FAheANm7c2ObOnZtle2fMmGEVKlTIcj92QAABBBBAAAEEEPBWIHC34Nu2bWsKQtesWWPt2rVzYzxLly5t+fPndzPhly9fbmPGjLFJkyaZbtNTEEAAAQQQQAABBPwlELgAtF69erZo0SLr2rWrdezY0fbs2ZNJVLPgp0yZYk2bNs30HhsQQAABBBBAAAEEkisQuABUXNWrV3cz3Hfu3GkrV6409Xru2rXLypcvbxUrVjT1iFIQQAABBBBAAAEE/CkQyAA0Qlm4cGEXjCogpSCAAAIIIIAAAggEQyDQAeiBiP/8809TqqSiRYseaLdM733yySf20ksvZdqeccM333xjCxYssFNPPTXjW7xGAAEEEEAAgZAI6G6r4gnNNYkUxRjKN650jJGydetW+/33361KlSqRTW4fDRvUtuh9v//+e3e8GjVqpO2bak/+0QxZyytVquTGiOa0WUpqf+KJJ2b5o1v+27dvz+nh2R8BBBBAAIGUEtCk4Yz/X3777bemjpzoooVkXnzxxehNbp5Hr169bPHixem2P/744/bMM8+k2/bCCy/Y+eefn26b/q/W/+kffvhhuu3XXnutde/ePd22u+66yw477LB02xR8alXFjGkdr7/+ervnnnvS7Tt16lRr1apVum1aqVGpI5VCMrqMGDHCreYYvS3VngduJaTsXqD777/f9JdF+/bts/uRHO2n5a0eeeQR05eYggACCCCAQJAEdu/e7YLC6CWrFShq9ZwLL7wwXVMUbF133XXpVtXRctcbN260YcOGpe379ttvW5cuXVwvYGSjzqP5GS+//LK1aNEistnuvfdet0ykgr5I0R1ILSCjZa4jRZ/X4jKXX365HXPMMZHNLsuNlpvUyoiR8t1339kvv/ziluOObFMvpYI/DdWLXpZy/fr1VqBAAStZsmRkVzeXROfTcXNSFKT+9ddfzjPWo7bt2LEj7X09j2yLPN5www1uDktOznugfbUCkixZCelASgl6r2/fvgk6ModFAAEEEEAgeQIKqrZt22YHH3xwWiU0GVf5rzt37py2Tb2OWrJagaI6Zf71r3+lvafOGQ1RU09cpOi2sIKW6ABU5zriiCPSBW/a/+KLL3a3pSOf1eO5555rP/zwQ/QmF+QpsM1Y+vfvn3GTG9KWcVibgkT1gGYsynaTsRx77LGmn+iiZbuPO+4427Jli61bt8656fa5/PSo7bp1LqvIc73W+3pUgKjtel/bMj5qm+qoa6F5KQpe5Rr9qOfFihVLe1+rOGpb5FF/BOizqVZCOwY01S4k7UUAAQQQCK6Agh2NFYwOwJRmUAGleiBPPvnktMYp+FPGF92GjhQFoF999VXkpXvUqoDqudRt5dq1a6d775VXXkn3Wi/OOOMM9xP9hgK4WB06derUid7NPVdQpZ94FZls2rTJ/WzevNkiP3/88Ufa899++810mzsSTGofPY/86Bgau1miRAkXBKoXVMGgXquuCv4UPOox8nPkkUe6fbRdPwoo9aPPZXzUNgWglJwLEIDm3IxPIIAAAgggkC0B3RZWsFOuXLm0/bt16+bGNKrHMlI++ugjd1t6/vz5kU3u8ZxzzrHKlSun2/bWW2+ZAsPocuaZZ5p+oosmzmQcExn9vhfPFRzqdrd+1AMZeb5hwwa3eIwCRm1ToKme2kjAqUf1CuoWuX40P0MBoiw1mUeP+tGa52XKlHE9tHqtfRRkRn60LwGiF1c65+cgAM25GZ9AAAEEEEhxAfVORs+KVuCosYuaGxA91lC3ujWGMToAVVB41VVXpRNs2bKl6Se66Pix5jFkDD6jP5Po5woYV69e7YLGtWvXuqBSM78jzzMGmrp9rdzc+jn88MPdowJGBYsKKqtWrZoWZKqnNhJw6lE9uJTwCgQuAG3YsKFp9lx2yiWXXGKjR4/Ozq7sgwACCCCAQCYBLeusICl6bOEdd9xhI0eOTDfZRgHpKaec4m7RRh/k888/j37pnkePxcz0ZhI2aKb4qlWr3I+CyV9//dUtdx15/Prrr91sdN3u1m1r9UxqQlDZsmVdUKmAUpln6tevny7QVNCpQJKCQCyBwAWgQ4cOtUsvvdQ06+y+++5L9xdoxgaqa56CAAIIIIDA/gQ0VlA9lppMMmjQIGvTpo2btBLZX2l1xo4dmy4Avf322+2hhx6K7OIe1TmiH78VjZf8+eef3Y9miCvQjDzquYJMGWjco4LFatWqucCyQoUKbtyptiuQ1JhTBZyaOEOJLaAhBpFxpZE9NFxCE5muvPLKyCZ799137eabb7affvopbVsqPglcAHr66afbnDlzTGvCK11Cz549U/G60WYEEEAAgRwIfPHFF+7/jOjJPB07djSl/tHMbQUJ6sXMmAdSs8AzFs0K90vR7XD1surOoG7Zr1ixwjQhSctUK9DUGEwFk0cffbQLItVT2ahRI7vooovcdqVIUg8mJbaAgkT9cRI9iUuTvfr162fjxo1LNxZXveSa3BWdbioyBCH66E2bNnXfu+htqfg8sHlAhwwZYg888ID7h6a/zrwu+ouZPKBeq3M+BBBA4MACCiKVj1K3iGvVqpW2s8ZN6tb5wIED07ZpPKPGIvq5KO2PVt378ssvXZ7KpUuXup4zJW1X2iT1UCrNkQJJjRdVoBn5Ua+l39uXDHsFlPqDREMmotMfKShX1oELLrggrVpKY6W7qdFpo2Svz+s9vxbygCbwyqj7WuNN1AtKQQABBBBIPQEFAur9U5LySNFt0FtvvdVef/31yCb3GKsn0y/BmXopNc5SvW360XP1ZP7vf/9z6YYUMOnWrpKVq5ftvPPOc0s76nY5t8T/uczq9VUvsALvSFFeU31Hhg8fHtnkfNWBNWHChHQB6E033eTiirQd9z3J+D3Se1pWM3q5zej9eZ59gcD2gGa/iYnZkx7QxLhyVAQQQCCWgNL2KFWReqkiRbeS1Ts1ZsyYyCZfP6oNS5YsMaVm+vDDD92qQ+rRVNCkH6VcUn5NpV1SoKnV/KKDKV83LoGV0ySp6Bnx+iNDyem1mlK0T+PGjU0prqLHW6r3WLZ+XhEoEXT0gCZClWMigAACCIRaQD1+uq0c3cv02GOPud7B6AA01gxzP8Ao+bnWLtdYQT1qfKYeNeFHY1A1NEDjMnv37u163BRsKkhK9fLxxx+7cbjRy2s+8cQT9uSTTzq/iI+GWZxwwgmZZtjr8xmL1oGn+FMgcJOQ/MlIrRBAAAEEciugCUC6xRwpWn1Gq/zceOONkU1uzH/aCx890a3yadOmuQk/Cjj1o+D5+OOPd+NQNWFWM+n1WkFnKhYNMVBS/EjRWuhXXHGFaR346Elh77zzjp100kmR3dyjJopFfw+0UZOmNByBEmyBf74RwW4HtUcAAQQQCKCAeqg08UO3TiNFE2+iA9LI9mQ/atKPJp/otq7GDypnpoZjaSJL27Zt3c9///tfNywgmcnik+WkYFwz70877bS0KkycONGN0VWvcKSot1eJ+BWUR5foCWKR7VrZiBJOAQLQcF5XWoUAAgj4SkC9Xprkcffdd7vE7pHKjRgxItPEDz8EnwoytbqRcn6qF1Oz0NXzpoBZ+T6VBUXrtms1n1Qsjz76qPOIHm/5wgsvuET80QHomfuWB1We0eii8ZzK501JbQEC0NS+/rQeAQQQSKiAegKfffZZu/DCC11vYfSSlDqxspkku2gIgCYFLVy40GbPnm1a/UhFwaYmudxzzz0u6EyFVX00vjJ6PKrGrWoIgVJbKb1TpKiXunr16pGX7rFPnz7pXuuFhlNQEIglQAAaS4VtCCCAAAI5FlAvp9YCV07KSFEPWbt27axYsWKu1zCyPZmPGqOpQFOTVubOnesmuCgw/ve//20ac6hJL9HBVjLrmqhzK0G61m+Pnuil5UUHDx6cbsKP0jwpsMw4flXjNykI5EWAaXd50eOzCCCAAAJpAkr+rtyc0UUrwyj4TGZRfkglaY+sYa6xhy+//LIp6NTyzkqPpJybuq2unKJhCj7VU6lJUkr3FF06dOjgVvKJ3qYAXEMPoosWelFi9uhJRNHv8xyB3ArQA5pbOT6HAAIIpLCA0gqpJ/Hss89OU1BaJD8sU6mJMAow33vvPdfLGamgZl7fd9996VZIirwX9EcF2VqrPXplH12Lp59+2mUUGDZsWLomvvnmm+le60UyVhXMVAk2pIwAPaApc6lpKAIIIBA/AfWWRScH15GTFXzqdrLGKGppROWHPOqoo9zKNwqO1aOnVZD08+qrrwY++FRSdqV6ii5qo3pt5RBd1KuryT4zZ85MuUTs0Q4896cAPaD+vC7UCgEEEPCNgMZJajJK9NrXWjIymUW9rRqvqHGMmkCkdb01+1oThsKSfFwr/sg5Ojem8qPqeowfPz6NX0F3rKVGU2HSVBoCTwInQAAauEtGhRFAAAFvBU4//XQX5Hl71vRnUyqfKVOm2Pvvv2/vvvuuabWk4447zvr16+dmrRctWjT9BwL2Suu/R8aoRqp+yy23mNZ7jw5Ab775ZtP26ML4zGgNngdFgAA0KFeKeiKAAAIeCKxevdqNnbz22mvTzqbUPMkoSvyuoPO1116zRYsWuUDskksuceM4tV56UIvWg9cwgegk68o1qjGrmsgVKRrHmrGkYoL7jAa8DocAY0DDcR1pBQIIIBAXAaVQil61Ji4HzcFB1BOo5RkbNGhgWiNd4xvV4/fbb7/Z9OnT3bKMQQo+NcM+uij41Hr2mp0eXXbv3m0tW7aM3sRzBEItQA9oqC8vjUMAAQQOLPDJJ5+4FX0ie23atMlKlCgReenJo8ZzKlm9JstoLKN6+UaNGmWNGzf25PyJOknfvn1dO3788ce0U9SsWdPUs0tBINUF6AFN9W8A7UcAgZQVeOCBB+z6669P136vgk8tc6nxjFWrVnVrqCvh+euvv+7yVSpgC1rw+dBDD7lE9tGYXbp0sejgU+8VKFAgeheeI5CyAgSgKXvpaTgCCKSawN9//52uyVpiUctPelW++eYbUy5O9XBqdSQt06gJRUoXpNndQZm9rrqqxza6NGvWzMaMGRO9yeXlTLeBFwggkCZAAJpGwRMEEEAgvAJa3zxj3s5GjRolvME//PCDDRw40AWbShek5TpnzZplGgvZv39/q127dsLrkJcTqI4Z827K8Zxzzkl32IYNG1rx4sXTbeMFAgjsX4AAdP82vIMAAggEWkDrnW/evNm1QYHgG2+84Ul7/vrrL9MSnOeee66b1f3dd9+51xrf+dZbb9kZZ5zhST1yehLV+48//kj3Ma2clDHNUdeuXV16pHQ78gIBBHIkEKpJSEoVonWItSJExl8YOVJhZwQQQCDgAr///rsL9JQ/U0XjLRNd5s2bZ0888YSNHj3adHv/P//5j1uh6KCDDkr0qfN8fCV9r1Klilu6Uz21kRIrwXvkPR4RQCD3AoHsAdU4ouuuu846d+7sbuWo+UOGDHHjbapXr26HHXZYpvE5uSfikwgggID/BZTWR2ugR4pyTO7cuTNdrsnIe/F8XL9+vQ0aNMilTOrQoYPVqFHDVq1a5XJaauUkvwafmiD0/PPPp1HIS6s9RQefaW/yBAEE4i4QuABUwafGLWlNX40jUt605557zjSb88ILL3TbW7Ro4WZ2Tp06Ne5gHBABBBDwo0CxYsVMwWCk6HXGMZ+R9+LxqNv7usV++OGHu1yd+j2s2/z333+/KZeon8rEiRNNwwCiS/Pmzd3s+8g2BcqHHnpo5CWPCCCQYIHABaBKdaGZkvpLVektbrzxRtNfsrfddpsLRDXDUuOc9IvxySefTDAfh0cAAQSSI6BexuiiST1169aN3hT35xofOXz4cBeo3XDDDXbWWWe5MabqENBynX4pSuoeXe644w63zGX0NvXOKkinIIBAcgQCF4DqL+y2bdu6GZVK5dG+fXsnp18m0eWyyy6zn376KXoTzxFAAIFQCKinTn9kRxetGpSoolRN+n2rHKFz5851E4m0YtGdd97pq5nfW7ZscUn1v/3223QUixcvdvlG023kBQIIJFUgcAGobu3MmDEjDS3y/MMPP0zbpie6VV+xYsV023iBAAIIhEFASdo14SeRRZNvdOtat6p116latWruzpPWZVfOSz8UDQOIXjZUPZ8DBgxgHKcfLg51QCALgcDNgtfkI4371DhQjT3S2sC33nqryyenJMv6xfj+++/bo48+ai+++GIWzedtBBBAwN8Cuu2tBOfRKxZ98MEHCav0tm3brHfv3m72eqlSpaxHjx7ud6rfMosoeb3SOUVm+QtEPbQaFkBBAAH/CwQuANVtp3HjxrkAU/nttBpFp06dbM2aNXbLLbekrSOs55Hb8/6/DNQQAQQQiC1wzTXXuAmWsd+N31albVLvof54r1Chgo0dO9ZOO+20+J0gD0dS54JWH1IHRGRWve5wkSIpD6h8FIEkCwQuAJWXxntmHPOpvHODBw82rS+slTWUC5SCAAIIBFFAt5Ija4b/97//TWjSc42X1MSiUaNG2SWXXGJ6fdxxx/mKTUOqNA61cOHCafUqWrRo2nOeIIBA8AQCGYDuj7lcuXIu+bHe120Z3TLK6S8pjSdSQuKsipLeZ1xXOavP8D4CCCCQlYCyd2goUc2aNd2uGnuZiKI/1rVEpu4oKY3dypUrrXTp0ok4VY6OqSEA6kBYsWJF2ix1ze4fOXJkjo7Dzggg4G+BUAWg0dSVKlVyg+f1yzUnResl33777Vl+REmflQqKggACCMRTQKnlFIQlquh3XJs2bdw5dNdIY+WTnY5It9I1y15F2Us0oz+68yDyXqJMOC4CCHgvENoAtFu3bm5FjpySxrq9H+sYSoOiIJeCAAIIxFNAd2+ig694HXvmzJl29tlnu8Ppj2yN90z2xCLdcVIeZ/X6agKRioZQaXY7BQEEwi0Q2gC0b9++4b5ytA4BBEIhoBWErr322rS2aEnIeJZ33nnHLVusXsUzzzzTpbFLZo+ihi/lz/9/GQBXr17tJjoVL148nk3mWAggEACB//stEICK7q+KunWzdu1a27Bhw/52YTsCCCDgO4FNmzaZEqQrQExE+eyzz9xt7YsuusitFDdnzhxTL2iygk+tS68sJtFDl6pXr25aUSlZdUqEO8dEAIHsCQQyANUSdFqBo3Llym5WZJkyZdzged3C0WB1LcupFTEoCCCAgB8FFHxqoo3GXsY7AFXgqfRJTZs2dT2fmlF/zz33JC3IU/5SDYlSJ4HqpRRPFAQQQCBwt+A1M7JJkybul6nGa1atWtWULFl/QesX3LJly2z8+PFuPXglqU/UDFK+OggggEBuBT799FM3+adKlSq5PUSmz2nyjsZPaoKkZrWrtzM6bVGmDyRog7KDRI8t1TrxH330kZUtW9Z69eqVoLNyWAQQCJpA4AJQzdpUz+e0adOsSJEiMb01uF6rJSmvXZ8+fWLuw0YEEEDASwHdgo4EhKeffnrcZp7rjtDQoUNtyJAhpiU6tRJcssZU3nvvvW5yZteuXdNo1dtLQQABBDIKBO4WvJIRd+jQYb/BpxpYqFAhtzrS5MmTM7aX1wgggIDnAlqpTctGRko80h7t2LHDLUGsFYH++usv++2332zu3LmeBp9aPSm6qAdWv58pCCCAQFYCgQtA9Re+fslmVWbMmMFYo6yQeB8BBDwRUJqhW2+9NW7n0phOLUk5a9Ys0+QiLVN55JFHxu342TmQZtQ/8cQT6Xa98sorE5JCKt1JeIEAAqEQCNwt+LZt27rbTOpRaNeunRvjqdU7lNZDY0CXL19uY8aMMSVb1m16CgIIIJAMgeh0QzfddJMdccQRea7Gu+++63oYN2/ebA899JCbjJnng2bzAJqxX6tWrbS9NbxJE50oCCCAQG4EAheA1qtXzxYtWmQaY9SxY0fTL/mMRcvYTZkyhV+OGWF4jQACngh8//33tnHjRjvllFPc+fIafOoP7rvvvttNXHr44Yddpg9PGvL/T6JFNzSbPToAJfj08gpwLgTCJxC4AFSXQLnjNMNdg/q1frF6PXft2mXly5c3jYfyw3rG4fuq0CIEEMiugFYc0lrreS1KoaSUcy+99JJLVv/HH3+YVmFLZFFu5ehVk3Qujac//vjjE3lajo0AAikmEMgANHKNNKNUwah+KAgggIBfBPQHcl7HZE6YMMF69uzphhcpbZNSznlRNJzpmmuuSVu2U+ck+PRCnnMgkFoCgZuElFqXh9YigEAQBEaMGJGumlr2Mrdl6dKl1qZNG7vkkkvs0UcftSVLliQ0+NSEzeiisZ5aHpSCAAIIJFKAADSRuhwbAQRCL6DJjtFruee2wbr1rYlFuqOjHket5qalKxNZrrvuuky5kuntTKQ4x0YAgYhAoG/BRxrBIwIIIJAsAa3wo9V/8lJmz55t5513npvko1zHWlI4EWXbtm3pEuArNVTNmjUTcSqOiQACCBxQgB7QA/LwJgIIIJBe4JNPPkmX01PJ1zVuMjdFk4qUoklJ6h955BGbN29ewoLPiRMn2sEHH5yumgSf6Th4gQACHgrk7remhxX066l0u+yGG25wyaCVEDryo9tmGYtuc0XejzxecMEFGXdzr8uUKZNpX82AzVh02y9yrOhHzo9/xu8K37/4/vvTYhgVKlTI87+/cePGWf369d3a7cphrNv4ifz3f+GFF7o12vX7gt8//P7N+HtCrxP5/Yv+f4rvn3ffv1jX2S/b8u0LpPb6pTJBqodSoQwcONA6d+6crtr6R5ax6PZcxlt0BQoUcEuGZtxXy+tlvCRaWlT7RxflP1UaqoyF8+Of8TvB9y++//6Uk1N5PXP772/dunUuj6cCUK1idNppp6Vdsnj++x85cqQdddRRLh8yv3/SD5Hg9y///+j/1Ywlnv/+IsdO1u9fDeMZNWpUwu6oRNqXl0fGgOZBT1/gWAFfxkMWLFjQ9Txk3B7rdZEiRWJtzrRNt/yyc259kPPjr+9Adgrfv/T//vTHYO/eva1v375pfJH0Srn59/fss8/a/fff71Yz0vrtGb0zvk47aYYn2fn3rzsnb775Jv/++f3L/z8p/Psvw68OX73M3v9KvqoylUEAAQS8EdCKRr/99lueT/b777+72/b6Q0C9ng0aNMjzMTMeIONSmUomT0EAAQT8KsAYUL9eGeqFAAJJEdDqQ5Gi1dXUa5mXopyaderUcbfCNekoEcHnLbfcQu7OvFwkPosAAp4L0APqOTknRAABvwp8++23NnTo0LRgrnjx4rmuqiYWlStXzn1eM+c14ShR5cwzz9zvxKJEnZPjIoAAAnkRoAc0L3p8FgEEQiXQtGlTu/zyy/PcJqU8OuGEE9wEgD///DOuwacmIJ544onp6qgZ7vny5Uu3jRcIIICAnwXoAfXz1aFuCCCQcAEFdJE8nkoCrxRLuS3bt293waEeNcs9eoZ7bo+Z8XOq408//ZRxM68RQACBQAnQAxqoy0VlEUAgngJDhgwxTRCKlLwEn7rNrqT0Ss+kW/nxDD6j0yhVrVrVNm/eHKkyjwgggEAgBQhAA3nZqDQCCORFQMHi6tWrberUqS6nZ16OpVRNWpRCCeoV0Kp3MuOKQ3k5vmbia1xqpJQsWTLylEcEEEAgsALcgg/spaPiCCCQGwH1Jl522WW2dOlSmzx5cm4OkfaZlStX2lVXXeWOtWrVKtOs+XgXLdUZHYDG+/gcDwEEEEiGAD2gyVDnnAggkFSBJUuWZHshh/1V9O233zbdDj///PMt3sFndCqosWPHulv7+6sH2xFAAIEgChCABvGqUWcEEMi2wMaNG61Lly5p+ysZfF7SK2m5vrPOOst69uxpc+fOtTvuuCPt2PF40r9/f9NynZFSqlSpyFMeEUAAgdAIhCoA1WSCLVu2hObi0BAEEMi7wIABA+yUU07J+4H2HWHBggWu51Trwev5ySefHJfjRh/kvvvus9KlS0dv4jkCCCAQOoFABqCfffaZu+2l/HoqEyZMsMqVK5vWaNYAfa00Mnv27NBdLBqEAALZE4ieNX7XXXdZ586ds/fBA+w1atQol89Ta7lrlvuhhx56gL1z/5b+iFYvLQUBBBAIs0DgAtBPP/3U9WZExkjNmzfPLr74YtdjMHjwYDdY/5BDDrEWLVoQhIb5m0vbENiPQJ8+fUyrEEVKXnsTdcv9pJNOsrvvvts0e17Hj2d5/fXX0x0unjPo0x2YFwgggICPBAL3Z/arr77qej/fffddx6h1msuWLWsKTCO9Bt26dbNmzZrZyJEj7fTTT/cRN1VBAIFECqjnU4naDz/88LicRimQrrjiCje0R8/1x228ihLg33777TZ//nxr3bp1vA7LcRBAAIFACASuB/SLL76wc889Nw1306ZNpmXoIsFn5I22bdu6/4gir3lEAIHwCxQoUMDeeuuttJWN8tLi0aNH27HHHusmMP3vf/+La/CpeunujW7lv//++3mpJp9FAAEEAikQuAC0Tp06pltWf/31lwM/88wzTb2hkVvy2qjE0PqlftxxxwXyolBpBBDIvoBujUdKPNZD1+8P5fZs3769zZkzx66//vrI4eP6WKlSJfd76qCDDorrcTkYAgggEASBwAWgd955p3399ddu9ulrr73mVh9RL0XTpk1txIgRbv3liy66yE1MuuWWW4JwDagjAgjkUmDXrl2msd/xKr/99pvpj9yPPvrILdEZz+U0VceJEyemVbVixYppz3mCAAIIpJpA4MaAHn300e4/h379+rleiuieT+XkUznxxBNdr6hm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1q9f73K7BqO22avl//73P9emp556yq2pnr1PsRcCCCCAAALBFyAADf41TIkWbNq0yT744IPQtFUrdqkH96GHHvLdLe6lS5faV199FRprGoIAAggg4D8BAlD/XRNq9P8FPv/88zQLpdvSClhhKEqYf84559i9995r7du391WT5s+fb126dLFKlSr5ql5UBgEEEEAgXAIEoOG6nqFpjZZc/frrr0PTnkhD1q5d64LPG264wa677rrIZt881q9f32WY0OQjCgIIIIAAAokSYBJSomQ5bp4EtOxjixYt8nQMv31448aNphy1V155pSlpPgUBBBBAAIFUFaAHNFWvvM/a/eOPP5qWe4yUsAWff/75p5to9K9//cutdBRpJ48IIIAAAgikogABaCpedZ+1eceOHW4N94IFw9khr8C6VatWLsen1qv3W9FqUrVq1bJvv/3Wb1WjPggggAACIRUI5//4Ib1YYW3W33//bZpwVKhQodA1Uat1Kc9nlSpV7IknnvBl+/bu3evWnmfcpy8vD5VCAAEEQilAD2goL6u/G7Vnzx7TuueRcvDBB7sALfI6LI+7d++2yy+/3IoXL24vvPCC5cuXz5dNU3YBgk9fXhoqhQACCIRWgAA0tJfWvw3r1auXrVmzxr8VjEPNFGQrxZJ6d1955RUrUKBAHI7KIRBAAAEEEAiHAAFoOK5joFpx9dVXW+fOnQNV55xWVimWlLv0jTfe8OXQgs2bN9utt95qSjpPQQABBBBAwGsBAlCvxVPsfL///rubgBPd7OrVq0e/DN3zbt262eLFi+2uu+6yIkWK+LJ977//vrVp08YFyb6sIJVCAAEEEAi1AJOQQn15k9+4JUuWWI8ePZJfEY9qcMcdd9i8efNcMneNbfVrueKKK/xaNeqFAAIIIJACAgSgKXCRvWziZ599ZhUqVHA/Om/Tpk29PH1Sz9W7d2+3Xv2HH37oJh4ltTKcHAEEEEAAAR8LcAvexxcnaFXbtWuXXXrppXbooYcGrep5ru/AgQNt3LhxNm3aNN/OKFdKKN1617AICgIIIIAAAskUIABNpn4Izq3JLJGSP39+04pGSjuUSmX48OH2/PPP28yZM+2II47wbdPvv/9++/nnn61MmTK+rSMVQwABBBBIDQFuwafGdU5IK7Wqz+GHH542o12phlIt3dBTTz1ljzzyiM2ePdvKli2b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AtDAXCr/VPTjjz92M70vvvhil1y+WLFi/qmcxzU566yzbOXKlSxK4LE7p0MAAQQQCLYAt+CDff08r73SDN1777320ksv2bnnnuv5+TkhAggggAACCARfgAA0+NfQkxbs2rXLzW7XLWelWKpRo4Yn5+UkCCCAAAIIIBA+AW7Bh++axr1F69ats7PPPttWrVpln332WcoHn6tXrzYNP1i+fHncrTkgAggggAACqSBAAJoKVzkPbZw7d641aNDAzjnnHLes5qGHHpqHowX/o3v37rVvv/3WBg8enLITr4J/FWkBAggggECyBbgFn+wr4NPzK9DSeu6PPPKIvfjii3beeef5tKbeVkuz3RWMUxBAAAEEEEAg9wIEoLm3C+0n169fb+3bt7fNmze7HJ8VK1YMbVtpGAIIIIAAAgh4L8AteO/NfX1G5fSsV6+enXDCCTZr1iwj+Py/y7Vz5057+eWX7ZdffvH19aNyCCCAAAIIBEGAHtAgXCUP6rhnzx53y33o0KHcco/hreVGjzjiCALyGDZsQgABBBBAIKcCBKA5FQvh/itWrLCrrrrKChQoYPPnz7cKFSqEsJV5a9Jtt92WtwPwaQQQQAABBBBIE+AWfBpFaj4ZPXq0m+V+4YUXmnJ8Enym5veAViOAAAIIIOClAD2gXmr76FybNm2yrl272jfffGMzZsywOnXq+Kh2/qnKxo0brWjRonbQQQf5p1LUBAEEEEAAgYAL0AMa8AuYm+qrp7N27dpWrlw5N8ud4DO24s0332zXX389wWdsHrYigAACCCCQawF6QHNNF7wPaia31nF/5ZVXbOTIkda8efPgNcLDGg8bNszDs3EqBBBAAAEEUkeAADRFrvXixYvtyiuvtOrVq9uiRYusdOnSKdJymokAAggggAACfhPgFrzfrkic66MVjR599FFr2rSp3XLLLfbmm28SfMbZmMMhgAACCCCAQM4E6AHNmVeg9v7111+tY8eOtmXLFvvss8+satWqgap/Mirbr18/W7p0qcuFmozzc04EEEAAAQRSQYAe0JBe5TfeeMOtaHTGGWfYnDlzCD6zcZ1XrVplxx57rD377LPZ2JtdEEAAAQQQQCC3AqHqAd26datt2LDBjjrqqNx6BP5z6u3s1q2bCzonTpxojRo1CnybvGqAcqBedtllXp2O8yCAAAIIIJCyAqHqAdX4xhNPPDFlL6bWcdca7oUKFbKFCxcSfKbsN4GGI4AAAggg4G+BwPWAPvzww7Z8+fKYqt9//72pF/Smm25y79evX986d+4cc98wbdyxY4f179/fnnnmGXvuuefsggsuCFPzEt4W/eGinuMOHTok/FycAAEEEEAAAQTMAheAfvnll/baa6/ZYYcdlmnZSK3us2vXLps1a5a7tkWKFAn9Nf7oo4/smmuusbp167r0SkceeWTo2xzPBn799df2888/u4Tz8Twux0IAAQQQQACB/QsELgAdM2aMWzZywIABrsfqtttus/z5/28kwcsvv+xSDSmoCHvZvHmz3X777TZp0iR78skn6fXM5QXXkAX9UBBAAAEEEEDAO4HAjQFVsHn33Xfbhx9+aCNGjLCzzjrLVqxY4Z2YD86kW8bHHXecG+u5ZMkSgk8fXBOqgAACCCCAAALZFwhcD2ikaQ0aNLD58+dbz549XY/oY489ltYTGtknbI9KE6Txrd99952NHz/eGjduHLYmetaeuXPnWrFixVJ60ppn2JwIAQQQQACBDAKB6wGNrr8CCN1+1trmd9xxh/Xq1Sv67dA812pGTz/9tMvrqbGeX331FcFnHq6uxhC/++677g+XPByGjyKAAAIIIIBALgUC2wMa3d5WrVqZxn326NHD1q5dG/1W4J+rt1OTjPbs2WOacKRb75S8CVxxxRWmHwoCCCCAAAIIJEcg0D2g0WRlypSxV1991aZNm+Y2//nnn7Z9+/boXQL1XLP5+/bta02aNLG2bduabhkTfAbqElJZBBBAAAEEENiPQGgC0Iztq1SpklsHPeP2ILxWQnndalfKKd1uv+GGGyxfvnxBqLpv66hhDCtXrjRlD6AggAACCCCAQHIFQnELPhahlqOsUaNGrLd8u23btm1uLKtmuWtSFctCxu9Sde/e3UqUKGH9+vWL30E5EgIIIIAAAgjkSiC0AahuX+em/Prrr/bNN99k+dG///477rf4L7/8citXrpx9++23VrJkySzrwA7ZFxg+fHj2d2ZPBBBAAAEEEEioQOADUN1aXbdunRUoUMBKlSqVZywFn0OGDMnyOJoUpHGa8SwKmrV8KAUBBBBAAAEEEAizQCADUOXD1C3qsWPHmp6rN1KlePHiVrlyZWvWrJn16dPHDjnkkBxfuxYtWph+siqnnnpq3FMhEXxmpc77CCCAAAIIIBAGgcAFoFr1SDPDNSmndevWVrVqVdfzqdcbNmywZcuWuSTtb7zxhk2fPt2qVasWhutEG3IosGXLFmvUqJFpqValsaIggAACCCCAgH8EAheADh482PVyKt1SkSJFYkpqnfiWLVvaqFGjXE9ozJ3YGGqBwoUL26JFi9xypaFuKI1DAAEEEEAggAKBS8O0cOFC69Chw36DT12DQoUKWadOnWzy5MkBvCRUOR4CCkD1PaAggAACCCCAgP8EAheAav1zJWXPqsyYMcMqVKiQ1W68jwACCCCAAAIIIOCxQOBuwWtVIAWha9assXbt2rkxnqVLl7b8+fO7MaDLly+3MWPG2KRJk9JWRfLYlNMlSWD27Nmm/K/vvPOOHX300UmqBadFAAEEEEAAgawEAheA1qtXz43t69q1q1vpSOmQMhbNgp8yZYo1bdo041u8DqmAMiFoQtqnn356wOEZIW0+zUIAAQQQQCBQAoELQKVbvXp1N8N9586dbnlF9XoqJ2f58uWtYsWKph5RSmoJFCxYkCEXqXXJaS0CCCCAQIAFAhmARrw10UTBqH4oCCCAAAIIIIAAAsEQCHQAGk38/fff26WXXmqjR4823aZPdNmxY4fNnDnTvvzyy0SfyhYsWODymx5++OEJP1fQTvD111+bhmHUrVs311XftGmTW8wA31wTHvCDGzdutN27dxu+B2TK9Zvy1b8B7vzkmvCAH1R+aa24h+8BmXL95vr1693dy5NPPjnXx+CDmQX0vfV7CU0A+tdff9nixYtt27Ztnpg/+eSTNnLkSNOt30SXzz//3LRGvdaJp/wjoP8UtASrrsGSJUv+eSOHz7SUq4Zw4JtDuGzuvnbtWheAli1bNpufYLecCMhXAeiRRx6Zk4+xbzYFfv/9dxeA4ptNsBzupgnFWtGwRIkSOfwkux9IoEePHla7du0D7ZL09xIfPSW9iYmpwCmnnGL68aJo2dGlS5fao48+6sXpUu4cjzzyiPsFOGTIkJRruxcNHjRokKmXY+DAgV6cLuXOoYU3tm7dav3790+5tnvR4L59+7o/oLS8MyX+Avfff7/L2dyrV6/4H5wj+logcHlAfa1J5RBAAAEEEEAAAQSyFAhNAKrbe/pLtVKlSlk2mh0QQAABBBBAAAEEkicQmlvwGp9DF37yvkicGQEEEEAAAQQQyK5AaHpAs9tg9kMAAQQQQAABBBBIrgABaHL9OTsCCCCAAAIIIJByAgSgKXfJaTACCCCAAAIIIJBcAQLQ5PpzdgQQQAABBBBAIOUECEBT7pLTYAQQQAABBBBAILkC+fatJrM3uVXg7FkJKIm3lv4sX758Vrvyfi4EWAkpF2g5+AgrIeUAKxe7slJPLtBy8BF8c4CVi121ElK+fPmsTJkyufg0HwmyAAFokK8edUcAAQQQQAABBAIowC34AF40qowAAggggAACCARZgAA0yFePuiOAAAIIIIAAAgEUIAAN4EWjyggggAACCCCAQJAFCECDfPWoOwIIIIAAAgggEEABAtAAXjSqjAACCCCAAAIIBFmAADTIV4+6I4AAAggggAACARQgAA3gRaPKCCCAAAIIIIBAkAUIQIN89ag7AggggAACCCAQQAEC0ABeNKqMAAIIIIAAAggEWYAANMhXj7ojgAACCCCAAAIBFCAADeBF2759ewBr7d8q792717+VC0nNdu7cabt37w5Ja/zVjD179virQiGrDb8fQnZBaY5vBAhAfXMpsleRF154wQ4//PDs7cxeBxRYsGCBtWvXzg477DCrWrWqPfjggwfcnzdzJ7Bs2TIrX768TZ48OXcH4FMxBV599VWrXbu2FSlSxEqVKmVt2rSxX375Jea+bMy5wAcffGCtW7e2Qw891GrVqmVDhw7N+UH4RLYEunXrZkceeWS29mWn8AgQgAboWr799tt2/fXXG3+R5/2ibdu2zS677DJnOXPmTLv//vvtoYcesv79++f94BwhTUDB5wUXXGDr169P28aTvAu899571rZtW2vYsKFNmzbNBg4caF988YWdd955pt5mSt4EVq5caRdeeKGVLl3apk+fbp07d7Y77rjDHnnkkbwdmE9nEtDv3yeeeCLTdjakgMC+YIbic4HNmzfv3ddTp/vEe2vWrLm3aNGiPq+x/6vXu3fvvcWLF9+7bzhDWmX79Omzd1/v8t6//vorbRtPci/w5JNP7j344IP3HnPMMe67uy9oyv3B+GQ6gXPPPXdv5cqV9+67/Z62/bXXXnPOs2bNStvGk9wJXHPNNXurVau2d9+wkbQDXHLJJXvr1q2b9poneRf4448/3Pd4Xw/z3jJlyuT9gBwhUAL0gAbgj4wvv/zS5syZY+oBve666yxfvnwBqLW/q6jbay1btrSDDjooraLq8Vi3bp19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" /></p>
+</div>
+</div>
+<div id="next-steps" class="section level2">
+<h2>Next steps</h2>
+<ul>
+<li>Detail assumptions</li>
+<li>Post estimation summaries</li>
+<li>other plotting methods, risk difference, risk by treatment</li>
+<li>total gain, true and false positive fractions <span class="citation">(Erin E. Gabriel, Sachs, and Gilbert 2015)</span></li>
+<li>VE surface, depending on both S.1 and S.0</li>
+<li>Allow poisson and binomial distributions in <code>integrate_parametric</code></li>
+<li>Estimation via pseudo-score <span class="citation">(Ying Huang, Gilbert, and Wolfson 2013)</span></li>
+</ul>
+<p>File additional suggestions here as a <a href="https://github.com/sachsmc/pseval/issues">github issue</a></p>
 <div class="references">
-<h1 id="references" class="unnumbered">References</h1>
+<h1>References</h1>
 <p>Follmann, D. 2006. “Augmented Designs to Assess Immune Response in Vaccine Trials.” <em>Biometrics</em> 62 (4): 1161–69.</p>
 <p>Frangakis, CE, and DB Rubin. 2002. “Principal Stratification in Causal Inference.” <em>Biometrics</em> 58 (1): 21–29.</p>
 <p>Gabriel, Erin E, and Dean Follmann. 2015. “Augmented Trial Designs for Evaluation of Principal Surrogates.” <em>Biostatistics</em> 0 (0): 1–25.</p>
 <p>Gabriel, Erin E., and Peter B. Gilbert. 2014. “Evaluating Principal Surrogate Endpoints with Time-to-Event Data Accounting for Time-Varying Treatment Efficacy.” <em>Biostatistics</em> 15 (2): 251–65.</p>
+<p>Gabriel, Erin E., Michael C. Sachs, and Peter B. Gilbert. 2015. “Comparing and Combining Biomarkers as Principle Surrogates for Time-to-Event Clinical Endpoints.” <em>Statistics in Medicine</em> 34 (3): 381–95. doi:<a href="http://dx.doi.org/10.1002/sim.6349">10.1002/sim.6349</a>.</p>
 <p>Gilbert, PB, and MG Hudgens. 2008. “Evaluating Candidate Principal Surrogate Endpoints.” <em>Biometrics</em> 64 (4): 1146–54.</p>
+<p>Huang, Y, and PB Gilbert. 2011. “Comparing Biomarkers as Principal Surrogate Endpoints.” <em>Biometrics</em>.</p>
+<p>Huang, Ying, Peter B Gilbert, and Julian Wolfson. 2013. “Design and Estimation for Evaluating Principal Surrogate Markers in Vaccine Trials.” <em>Biometrics</em> 69 (2): 301–9.</p>
 <p>Pepe, MS, and TR Fleming. 1991. “A Nonparametric Method for Dealing with Mismeasured Covariate Data.” <em>Journal of the American Statistical Association</em> 86 (413): 108–13.</p>
-</div>
 </div>
 </div>
 </div>

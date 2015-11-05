@@ -189,7 +189,7 @@ The next code chunk shows how the model can be defined and estimated all at once
 ```{r alltog, eval = FALSE}
 binary.est <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) + 
   integrate_parametric(S.1 ~ BIP) + 
-  risk_binary(model = Y ~ S.1 * Z, D = 2000, risk = risk.logit) + 
+  risk_binary(model = Y ~ S.1 * Z, D = 1000, risk = risk.logit) + 
   ps_estimate(method = "BFGS")
 ```
 
@@ -203,13 +203,14 @@ smary <- summary(binary.boot)
 ```
 
 
-```{r plot1}
+```{r plot1, fig.width = 7, fig.height = 5}
 plot(binary.boot, summary = "VE")
 abline(h = smary$VE.estimates[2], lty = 2)
 ```
 
 ## Next steps
 
+- Detail assumptions
 - Post estimation summaries 
   + other plotting methods, risk difference, risk by treatment
   + total gain, true and false positive fractions [@Gabriel15]
