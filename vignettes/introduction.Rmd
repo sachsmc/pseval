@@ -110,7 +110,7 @@ The example data includes both a time-to-event outcome, a binary outcome, a surr
 
 ### The `psdesign` object
 
-We begin by creating a `psdesign` object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the `svydesign` function in the [survey](https://cran.r-project.org/web/packages/survey/) package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous $S.1$ and the BIP $X$. The object has a print method, so we can inspect the result. 
+We begin by creating a `psdesign` object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the `svydesign` function in the [survey](https://cran.r-project.org/web/packages/survey/) package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous $S.1$ and the BIP labeled $BIP$. The object has a print method, so we can inspect the result. 
 
 ```{r psdesign}
 binary.ps <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
@@ -212,8 +212,8 @@ abline(h = smary$VE.estimates[2], lty = 2)
 
 - Detail assumptions
 - Post estimation summaries 
-  + other plotting methods, risk difference, risk by treatment
-  + total gain, true and false positive fractions [@Gabriel15]
+    + other plotting methods, risk difference, risk by treatment
+    + total gain, true and false positive fractions [@Gabriel15]
 - VE surface, depending on both S.1 and S.0
 - Allow poisson and binomial distributions in `integrate_parametric`
 - Estimation via pseudo-score [@Huang12]
