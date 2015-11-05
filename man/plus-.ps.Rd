@@ -7,7 +7,7 @@
 \method{+}{ps}(p1, p2)
 }
 \description{
-This operator allows you to add objects to a psdesign object, such as imputation models and risk models
+This operator allows you to add objects to a psdesign object, such as integration models and risk models
 }
 \details{
 If the first object is an object of class \code{psdesign}, you can add
@@ -15,7 +15,7 @@ the following types of objects, and it will return a modified psdesign
 object. Users will generally add them in the order that they appear.
 
 \itemize{
-  \item \code{imputation}: Add or replace imputation model
+  \item \code{integration}: Add or replace integration model
   \item \code{riskmodel}: Add or replace risk model
   \item \code{estimate}: Estimate parameters
   \item \code{bootstrap}: Bootstrap estimates

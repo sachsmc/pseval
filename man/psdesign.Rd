@@ -29,7 +29,7 @@ measurement}
 subsampling, such as case control or two phase}
 
 \item{...}{Other key-value pairs that will be included in the augmented data,
-  e.g. additional candidate surrogates, covariates for adjustment, variables used for imputation}
+  e.g. additional candidate surrogates, covariates for adjustment, variables used for integration}
 }
 \description{
 Generate mappings that describe how variables in the data are mapped to
@@ -40,7 +40,7 @@ weights. These elements are described in details below. Additional keys-value
 pairs can be included in \code{...}. This function generates an augmented
 dataset and additional information for subsequent steps in the analysis. In
 the subsequent steps, refer to the variables by the keys. See
-\link{add_imputation} and \link{add_riskmodel} for information on how to
+\link{add_integration} and \link{add_riskmodel} for information on how to
 proceed in the analysis.
 }
 \details{

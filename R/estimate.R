@@ -1,6 +1,6 @@
 #' Estimate parameters from a specified model using estimated maximum likelihood
 #'
-#' @param psdesign A psdesign object with a risk model and imputation model specified
+#' @param psdesign A psdesign object with a risk model and integration model specified
 #' @param start Vector of starting values, if NULL, will come up with starting values
 #' @param control List of control parameters for passed to \link{optim}
 #' @param ... Arguments passed to \link{optim}
@@ -10,7 +10,7 @@
 ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 
   if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
-  if(!"imputation.models" %in% names(psdesign)) stop("No imputation models specified")
+  if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
 
 
   if(is.null(start)){
@@ -31,7 +31,7 @@ ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 
 #' Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood
 #'
-#' @param psdesign A psdesign object with a risk model and imputation model specified
+#' @param psdesign A psdesign object with a risk model and integration model specified
 #' @param n.boots Number of bootstrap replicates
 #' @param progress.bar Logical, if true will display a progress bar in the console
 #' @param start Vector of starting values, if NULL, will come up with starting values
@@ -45,7 +45,7 @@ ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL, control = list(), ...){
 
   if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
-  if(!"imputation.models" %in% names(psdesign)) stop("No imputation models specified")
+  if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
 
   bootpar <- vector(mode = "list", length = n.boots)
 
@@ -61,11 +61,11 @@ ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = N
     sampdex <- sample(1:nrow(psdesign$augdata), nrow(psdesign$augdata), replace = TRUE)
     psdesign.0$augdata <- psdesign$augdata[sampdex, ]
 
-    ## re-call imputation models
+    ## re-call integration models
 
     psdesign2 <- psdesign.0
-    for(impj in psdesign$imputation.models){
-      psdesign2 <- psdesign2 + do.call(as.character(impj$model$args[[1]]), impj$model$args[-1])
+    for(intj in psdesign$integration.models){
+      psdesign2 <- psdesign2 + do.call(as.character(intj$model$args[[1]]), intj$model$args[-1])
     }
 
     ## re-call risk model

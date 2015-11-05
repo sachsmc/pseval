@@ -10,7 +10,7 @@
 #'   estimates.
 #'
 #' @param psdesign A psdesign object. It must contain a risk model, an
-#'   imputation model, and estimated parameters. Bootstrapped parameters are
+#'   integration model, and estimated parameters. Bootstrapped parameters are
 #'   optional
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
@@ -24,9 +24,9 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
 
-  impped <- psdesign$imputation.models$S.1$icdf_sbarw(runif(n.samps))
+  impped <- psdesign$integration.models$S.1$icdf_sbarw(runif(n.samps))
   randrows <- sample(1:nrow(impped), ncol(impped), replace = TRUE)
-  imputed <- impped[cbind(randrows, 1:n.samps)]
+  integrated <- impped[cbind(randrows, 1:n.samps)]
   obss <- psdesign$augdata$S.1
 
   trueobs <- sample(obss[!is.na(obss)],
@@ -34,9 +34,9 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
 
   if(is.factor(obss)){
-    imputed <- factor(imputed, levels = levels(obss))
+    integrated <- factor(integrated, levels = levels(obss))
   }
-  Splot <- sort(unlist(list(imputed, trueobs)))
+  Splot <- sort(unlist(list(integrated, trueobs)))
 
   dat1 <- data.frame(S.1 = Splot, Z = 1)
   dat0 <- data.frame(S.1 = Splot, Z = 0)

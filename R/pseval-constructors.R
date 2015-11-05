@@ -1,36 +1,35 @@
-#' Imputation models
+#' Integration models
 #'
-#' Add imputation model to a psdesign object
+#' Add integration model to a psdesign object
 #'
-#' @details This is a list of the available imputation models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we impute likelihood contributions for each non-missing S(1) given their value of W, and average over the contributions.
+#' @details This is a list of the available integration models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we integrate likelihood contributions over each non-missing S(1) given their value of W, and average over the contributions.
 #'
 #' \itemize{
-#' \item \link{impute_parametric} This is a parametric imputation model that fits a linear model for the mean of S(1) | W and assumes a Gaussian distribution.
-#' \item \link{impute_bivnorm} This is another parametric imputation model that assumes that S(1) and W are jointly normally distributed. The user must specify their mean, variances and correlation.
-#' \item \link{impute_nonparametric} This is a non-parametric imputation model that is only valid for categorical S(1) and W. It uses the observed proportions to estimate the joint distribution of S(1), W.
-#' \item \link{impute_semiparametric} This is a semi-parametric model that uses the semi-parametric location scale model of Heagerty and Pepe (1999). Models are specified for the location of S(1) | W and the scale of S(1) | W. Then imputations are drawn from the empirical distribution of the residuals from that model, which are then transformed to the appropriate location and scale.
+#' \item \link{integrate_parametric} This is a parametric integration model that fits a linear model for the mean of S(1) | W and assumes a Gaussian distribution.
+#' \item \link{integrate_bivnorm} This is another parametric integration model that assumes that S(1) and W are jointly normally distributed. The user must specify their mean, variances and correlation.
+#' \item \link{integrate_nonparametric} This is a non-parametric integration model that is only valid for categorical S(1) and W. It uses the observed proportions to estimate the joint distribution of S(1), W.
+#' \item \link{integrate_semiparametric} This is a semi-parametric model that uses the semi-parametric location scale model of Heagerty and Pepe (1999). Models are specified for the location of S(1) | W and the scale of S(1) | W. Then integrations are drawn from the empirical distribution of the residuals from that model, which are then transformed to the appropriate location and scale.
 #' }
 #'
 #'
 #' @param psdesign A psdesign object
-#' @param imputation An imputation object
+#' @param integration An integration object
 #'
 #' @export
 #'
 #' @examples
 #'
 #' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
-#'
-#' add_imputation(test, impute_parametric())
-#' test + impute_parametric()  # same as above
+#' add_integration(test, integrate_parametric())
+#' test + integrate_parametric()  # same as above
 #'
 
-add_imputation <- function(psdesign, imputation){
+add_integration <- function(psdesign, integration){
 
   stopifnot(inherits(psdesign, "psdesign"))
-  stopifnot(inherits(imputation, "imputation"))
+  stopifnot(inherits(integration, "integration"))
 
-  psdesign <- imputation(psdesign)
+  psdesign <- integration(psdesign)
   psdesign
 
 }
@@ -68,14 +67,14 @@ add_riskmodel <- function(psdesign, riskmodel){
 
 #' Modify a psdesign object by adding on new components.
 #'
-#' This operator allows you to add objects to a psdesign object, such as imputation models and risk models
+#' This operator allows you to add objects to a psdesign object, such as integration models and risk models
 #'
 #' If the first object is an object of class \code{psdesign}, you can add
 #' the following types of objects, and it will return a modified psdesign
 #' object. Users will generally add them in the order that they appear.
 #'
 #' \itemize{
-#'   \item \code{imputation}: Add or replace imputation model
+#'   \item \code{integration}: Add or replace integration model
 #'   \item \code{riskmodel}: Add or replace risk model
 #'   \item \code{estimate}: Estimate parameters
 #'   \item \code{bootstrap}: Bootstrap estimates
@@ -85,8 +84,8 @@ add_riskmodel <- function(psdesign, riskmodel){
 
 "+.ps" <- function(p1, p2){
 
-  if(inherits(p2, "imputation")){
-    add_imputation(p1, p2)
+  if(inherits(p2, "integration")){
+    add_integration(p1, p2)
     } else if(inherits(p2, "riskmodel")){
       add_riskmodel(p1, p2)
     }

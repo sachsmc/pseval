@@ -245,9 +245,9 @@ expand_augdata <- function(model, psdesign, D = 500){
 
     for(j in misvars){
 
-      if(!j %in% names(psdesign$imputation.models)) stop(paste("Missing values in", j, "but no imputation model present."))
+      if(!j %in% names(psdesign$integration.models)) stop(paste("Missing values in", j, "but no integration model present."))
 
-      untrtsamp <- c(psdesign$imputation.models[[j]]$icdf_sbarw(runif(D)))
+      untrtsamp <- c(psdesign$integration.models[[j]]$icdf_sbarw(runif(D)))
       untrtobs[, j] <- untrtsamp
 
       untrt.expand <- model.matrix(model, untrtobs)

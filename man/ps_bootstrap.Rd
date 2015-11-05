@@ -8,7 +8,7 @@ ps_bootstrap(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL,
   control = list(), ...)
 }
 \arguments{
-\item{psdesign}{A psdesign object with a risk model and imputation model specified}
+\item{psdesign}{A psdesign object with a risk model and integration model specified}
 
 \item{n.boots}{Number of bootstrap replicates}
 

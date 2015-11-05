@@ -1,23 +1,23 @@
-#' Parametric imputation model for the missing S(1)
+#' Parametric integration model for the missing S(1)
 #'
-#' @param formula Formula specifying the imputation model for the surrogate
+#' @param formula Formula specifying the integration model for the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
-#' @param distribution Assumed distribution for the imputation model. Must be
+#' @param distribution Assumed distribution for the integration model. Must be
 #'   compatible with the \code{family} argument of \link{glm}. Currenly only
 #'   Gaussian models are supported
 #' @param ... Arguments passed to \link{glm}
 #'
 #' @export
 
-impute_parametric <- function(formula, distribution = gaussian, ...){
+integrate_parametric <- function(formula, distribution = gaussian, ...){
 
   stopifnot(identical(distribution, gaussian))
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
-    if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
+    if(!"integration.models" %in% names(psdesign)) psdesign$integration.models <- NULL
     outname <- paste(formula[[2]])
 
     missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
@@ -25,11 +25,11 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
     fit <- glm(formula, data = psdesign$augdata[missdex, ], family = distribution,
                weights = cdfweights, ...)
 
-    psdesign$imputation.models[[outname]]$model <- list(model = "parametric", args = arglist)
+    psdesign$integration.models[[outname]]$model <- list(model = "parametric", args = arglist)
 
     mindelta <- subset(psdesign$augdata, !missdex)
 
-    psdesign$imputation.models[[outname]]$cdf_sbarw <-
+    psdesign$integration.models[[outname]]$cdf_sbarw <-
       function(S.1){
 
         mu <- predict(fit, newdata = mindelta, type = "response")
@@ -38,7 +38,7 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
         sapply(S.1, function(s) pnorm(s, mean = mu, sd = sd))
 
       }
-    psdesign$imputation.models[[outname]]$icdf_sbarw <-
+    psdesign$integration.models[[outname]]$icdf_sbarw <-
       function(U.1){
 
         mu <- predict(fit, newdata = mindelta, type = "response")
@@ -51,17 +51,16 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
     psdesign
   }
 
-  class(rval) <- c("ps", "imputation")
+  class(rval) <- c("ps", "integration")
   rval
 
 }
 
-#' Nonparametric imputation model for the missing S(1)
+#' Nonparametric integration model for the missing S(1)
 #'
-#' Both S(1) and the BIP or set of BIPs must be categorical. This model imputes
-#' missing S(1)s based on the empirical probability of S(1) | BIP
+#' Both S(1) and the BIP or set of BIPs must be categorical. This model integrates over the estimated distribution of S(1) | BIP
 #'
-#' @param formula Formula specifying the imputation model for the surrogate
+#' @param formula Formula specifying the integration model for the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side. In this case
 #'   the BIP and the S(1) must be categorical.
@@ -69,12 +68,12 @@ impute_parametric <- function(formula, distribution = gaussian, ...){
 #'
 #' @export
 
-impute_nonparametric <- function(formula, ...){
+integrate_nonparametric <- function(formula, ...){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
 
-    if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
+    if(!"integration.models" %in% names(psdesign)) psdesign$integration.models <- NULL
     outname <- paste(formula[[2]])
 
     missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
@@ -93,7 +92,7 @@ impute_nonparametric <- function(formula, ...){
       missinglevels <- lapply(d.miss, function(d) {
         if(d %in% d.nomiss) return("") else return(d)
       })
-      stop("Too many categories. ", paste("Cannot impute for levels: ", paste(missinglevels, collapse = ", ")))
+      stop("Too many categories. ", paste("Cannot estimate probabilities for levels: ", paste(missinglevels, collapse = ", ")))
 
     }
 
@@ -105,9 +104,9 @@ impute_nonparametric <- function(formula, ...){
       } else {
       outvect <- sort(unique(psdesign$augdata[[outname]]))
     }
-    psdesign$imputation.models[[outname]]$model <- list(model = "nonparametric", args = arglist)
+    psdesign$integration.models[[outname]]$model <- list(model = "nonparametric", args = arglist)
 
-    psdesign$imputation.models[[outname]]$cdf_sbarw <-
+    psdesign$integration.models[[outname]]$cdf_sbarw <-
       function(S.1){
 
         sapply(S.1, function(s){
@@ -118,7 +117,7 @@ impute_nonparametric <- function(formula, ...){
         })
 
       }
-    psdesign$imputation.models[[outname]]$icdf_sbarw <-
+    psdesign$integration.models[[outname]]$icdf_sbarw <-
       function(U.1){
 
         dex <- c(list(lookup), list(TRUE), as.list(impwith))
@@ -135,7 +134,7 @@ impute_nonparametric <- function(formula, ...){
     psdesign
   }
 
-  class(rval) <- c("ps", "imputation")
+  class(rval) <- c("ps", "integration")
   rval
 
 }
@@ -143,23 +142,23 @@ impute_nonparametric <- function(formula, ...){
 
 
 
-#' Bivariate normal imputation models for the missing S(1)
+#' Bivariate normal integration models for the missing S(1)
 #'
 #' This model assumes that the pair [S(1), W] is bivariate normal, where W is
 #' the BIP. The means, standard deviations, and correlation are estimated or
 #' fixed before calling this function. Then the conditional normal formula is
 #' applied in order to get the distribution of S(1) | W. That distribution is
-#' used to impute the missing S(1) values. This method requires a BIP in the
+#' used to integrate over the missing S(1) values. This method requires a BIP in the
 #' design.
 #'
-#' @param x, expression identifying the variable to be imputed. Typically this is S.1 or S.0
+#' @param x, expression identifying the variable to be integrated. Typically this is S.1 or S.0
 #' @param mu, means of the pair of surrogates, missing one first
 #' @param sd, standard deviations of the pair, missing one first
 #' @param rho, the correlation between X1 and X2
 #'
 #' @export
 
-impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
+integrate_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
 
   outname <- as.character(substitute(x))
   arglist <- as.list(match.call())
@@ -167,9 +166,9 @@ impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
   rval <- function(psdesign){
 
 
-    if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
+    if(!"integration.models" %in% names(psdesign)) psdesign$integration.models <- NULL
 
-    psdesign$imputation.models[[outname]]$model <- list(model = "bivnorm", args = arglist)
+    psdesign$integration.models[[outname]]$model <- list(model = "bivnorm", args = arglist)
 
     missdex <- !is.na(get(outname, psdesign$augdata))
     mindelta <- subset(psdesign$augdata, !missdex)
@@ -178,13 +177,13 @@ impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
     vsd <- (1 - rho^2) * sd[1]^2
 
 
-    psdesign$imputation.models[[outname]]$cdf_sbarw <-
+    psdesign$integration.models[[outname]]$cdf_sbarw <-
       function(S.1){
 
         sapply(S.1, function(s) pnorm(s, mean = vmu, sd = vsd))
 
       }
-    psdesign$imputation.models[[outname]]$icdf_sbarw <-
+    psdesign$integration.models[[outname]]$icdf_sbarw <-
       function(U.1){
 
         sapply(U.1, function(s) qnorm(s, mean = vmu, sd = vsd))
@@ -194,30 +193,30 @@ impute_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
     psdesign
   }
 
-  class(rval) <- c("ps", "imputation")
+  class(rval) <- c("ps", "integration")
   rval
 
 }
 
 
-#' Semiparametric imputation model using the location-scale model
+#' Semiparametric integration model using the location-scale model
 #'
-#' @param formula.location Formula specifying the imputation model for the location component of the surrogate
+#' @param formula.location Formula specifying the integration model for the location component of the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
-#' @param formula.scale Formula specifying the imputation model for the scale component of the surrogate
+#' @param formula.scale Formula specifying the integration model for the scale component of the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
 #'   @param ... Other parameters passed to \link{sp_locscale}
 #'
 #'   @export
 
-impute_semiparametric <- function(formula.location, formula.scale, ...){
+integrate_semiparametric <- function(formula.location, formula.scale, ...){
   arglist <- as.list(match.call())
 
   rval <- function(psdesign){
 
-    if(!"imputation.models" %in% names(psdesign)) psdesign$imputation.models <- NULL
+    if(!"integration.models" %in% names(psdesign)) psdesign$integration.models <- NULL
 
     missdex <- !is.na(get(paste(formula.location[[2]]), psdesign$augdata))
 
@@ -226,11 +225,11 @@ impute_semiparametric <- function(formula.location, formula.scale, ...){
 
     stopifnot(fit$converge)
 
-    psdesign$imputation.models[[paste(formula.location[[2]])]]$model <- list(model = "semiparametric", args = arglist)
+    psdesign$integration.models[[paste(formula.location[[2]])]]$model <- list(model = "semiparametric", args = arglist)
 
     mindelta <- subset(psdesign$augdata, !missdex)
 
-    psdesign$imputation.models[[paste(formula.location[[2]])]]$cdf_sbarw <-
+    psdesign$integration.models[[paste(formula.location[[2]])]]$cdf_sbarw <-
       function(S.1){
 
         mu <- model.matrix(formula.location[-2], data = mindelta) %*% fit$beta.l
@@ -241,7 +240,7 @@ impute_semiparametric <- function(formula.location, formula.scale, ...){
         })
 
       }
-    psdesign$imputation.models[[paste(formula.location[[2]])]]$icdf_sbarw <-
+    psdesign$integration.models[[paste(formula.location[[2]])]]$icdf_sbarw <-
       function(U.1){
 
         mu <- model.matrix(formula.location[-2], data = mindelta) %*% fit$beta.l
@@ -255,7 +254,7 @@ impute_semiparametric <- function(formula.location, formula.scale, ...){
     psdesign
   }
 
-  class(rval) <- c("ps", "imputation")
+  class(rval) <- c("ps", "integration")
   rval
 
 }

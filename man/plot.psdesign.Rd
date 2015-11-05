@@ -7,7 +7,7 @@
 \method{plot}{psdesign}(psdesign, t, summary = "VE", sig.level = 0.05, ...)
 }
 \arguments{
-\item{psdesign}{A psdesign object that contains a risk model, imputation
+\item{psdesign}{A psdesign object that contains a risk model, integration
 model, and valid estimates}
 
 \item{t}{For time to event outcomes, a fixed time \code{t} may be provided to

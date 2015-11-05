@@ -3,7 +3,7 @@
 #'
 #' Plot the vaccine efficacy versus S.1 for an estimated psdesign object
 #'
-#' @param psdesign A psdesign object that contains a risk model, imputation
+#' @param psdesign A psdesign object that contains a risk model, integration
 #'   model, and valid estimates
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
@@ -81,17 +81,17 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
   })
 
-  cat("\nImputation models: \n")
-  if(!"imputation.models" %in% objs) {
+  cat("\nIntegration models: \n")
+  if(!"integration.models" %in% objs) {
 
-    cat("\tNone present, see ?add_imputation for information on imputation models.\n")
+    cat("\tNone present, see ?add_integration for information on integration models.\n")
 
   } else {
 
-    for(j in names(psdesign$imputation.models)){
-      cat("\t Imputation model for ", j, ":\n")
-      tyj <- psdesign$imputation.models[[j]]$model
-      cat("\t\t", paste0("impute_", tyj$model, "("))
+    for(j in names(psdesign$integration.models)){
+      cat("\t integration model for ", j, ":\n")
+      tyj <- psdesign$integration.models[[j]]$model
+      cat("\t\t", paste0("integrate_", tyj$model, "("))
       cat(paste(sapply(names(tyj$args[-1]), function(nj) paste0(nj, " = ", tyj$args[-1][nj])), collapse = ", "), ")\n")
     }
 
