@@ -27,6 +27,6 @@ This is a list of the available integration models. The fundamental problem in s
 \examples{
 test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 add_integration(test, integrate_parametric())
-test + integrate_parametric()  # same as above
+test + integrate_parametric(S.1 ~ BIP)  # same as above
 }
 

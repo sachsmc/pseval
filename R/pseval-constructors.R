@@ -21,7 +21,7 @@
 #'
 #' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 #' add_integration(test, integrate_parametric())
-#' test + integrate_parametric()  # same as above
+#' test + integrate_parametric(S.1 ~ BIP)  # same as above
 #'
 
 add_integration <- function(psdesign, integration){
@@ -64,6 +64,46 @@ add_riskmodel <- function(psdesign, riskmodel){
 
 }
 
+#' Estimate parameters
+#'
+#' @param psdesign A psdesign object, it must have risk model and integration model components
+#' @param estimate An estimate object created by \link{ps_estimate}
+#'
+#' @examples
+#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
+#' test + integrate_parametric(S.1 ~ BIP) + risk_binary() + ps_estimate(method = "BFGS")
+
+add_estimate <- function(psdesign, estimate){
+
+  stopifnot(inherits(psdesign, "psdesign"))
+  stopifnot(inherits(estimate, "estimate"))
+
+  psdesign <- estimate(psdesign)
+  psdesign
+
+}
+
+#' Bootstrap resampling parameters
+#'
+#' @param psdesign A psdesign object, it must have risk model and integration model components
+#' @param bootstrap A bootstrap object created by \link{ps_bootstrap}
+#'
+#' @examples
+#' \dontrun{
+#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
+#' est1 <- test + integrate_parametric(S.1 ~ BIP) + risk_binary() + ps_estimate(method = "BFGS")
+#' est1 + ps_bootstrap(method = "BFGS", start = est1$estimates$par, n.boots = 50)
+#' }
+
+add_bootstrap <- function(psdesign, bootstrap){
+
+  stopifnot(inherits(psdesign, "psdesign"))
+  stopifnot(inherits(bootstrap, "bootstrap"))
+
+  psdesign <- bootstrap(psdesign)
+  psdesign
+
+}
 
 #' Modify a psdesign object by adding on new components.
 #'
@@ -88,6 +128,10 @@ add_riskmodel <- function(psdesign, riskmodel){
     add_integration(p1, p2)
     } else if(inherits(p2, "riskmodel")){
       add_riskmodel(p1, p2)
+    } else if(inherits(p2, "estimate")){
+      add_estimate(p1, p2)
+    } else if(inherits(p2, "bootstrap")){
+      add_bootstrap(p1, p2)
     }
 
 }

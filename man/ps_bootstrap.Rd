@@ -4,12 +4,10 @@
 \alias{ps_bootstrap}
 \title{Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood}
 \usage{
-ps_bootstrap(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL,
+ps_bootstrap(n.boots = 200, progress.bar = TRUE, start = NULL,
   control = list(), ...)
 }
 \arguments{
-\item{psdesign}{A psdesign object with a risk model and integration model specified}
-
 \item{n.boots}{Number of bootstrap replicates}
 
 \item{progress.bar}{Logical, if true will display a progress bar in the console}

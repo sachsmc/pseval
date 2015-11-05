@@ -1,37 +1,43 @@
 #' Estimate parameters from a specified model using estimated maximum likelihood
 #'
-#' @param psdesign A psdesign object with a risk model and integration model specified
 #' @param start Vector of starting values, if NULL, will come up with starting values
 #' @param control List of control parameters for passed to \link{optim}
 #' @param ... Arguments passed to \link{optim}
 #'
 #' @export
 #'
-ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
+ps_estimate <- function(start = NULL, control = list(), ...){
 
-  if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
-  if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
+  est.call <- match.call()
+  rval <- function(psdesign){
+
+    if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
+    if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
 
 
-  if(is.null(start)){
+    if(is.null(start)){
 
-    start <- rep(0, psdesign$nparam)
+      start <- rep(0, psdesign$nparam)
+
+    }
+
+    est1 <- optim(start, fn = psdesign$likelihood, control = control, ...)
+    names(est1$par) <- psdesign$param.names
+
+    psdesign$estimate.call <- est.call
+    psdesign$estimates <- est1
+    psdesign
 
   }
 
-  est1 <- optim(start, fn = psdesign$likelihood, control = control, ...)
-  names(est1$par) <- psdesign$param.names
-
-  psdesign$estimates <- est1
-  psdesign
-
+  class(rval) <- c("ps", "estimate")
+  rval
 
 }
 
 
 #' Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood
 #'
-#' @param psdesign A psdesign object with a risk model and integration model specified
 #' @param n.boots Number of bootstrap replicates
 #' @param progress.bar Logical, if true will display a progress bar in the console
 #' @param start Vector of starting values, if NULL, will come up with starting values
@@ -42,54 +48,63 @@ ps_estimate <- function(psdesign, start = NULL, control = list(), ...){
 #
 
 
-ps_bootstrap <- function(psdesign, n.boots = 200, progress.bar = TRUE, start = NULL, control = list(), ...){
+ps_bootstrap <- function(n.boots = 200, progress.bar = TRUE, start = NULL, control = list(), ...){
 
-  if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
-  if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
+  bs.call <- match.call()
 
-  bootpar <- vector(mode = "list", length = n.boots)
+  rval <- function(psdesign){
+    if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
+    if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
 
-  if(progress.bar){
-     cat(paste("Bootstrapping", n.boots, "replicates:\n"))
-     pb <- txtProgressBar(min = 1, max = n.boots)
-  }
-
-  psdesign.0 <- psdesign
-  for(i in 1:n.boots){
-    # resample augdata
-
-    sampdex <- sample(1:nrow(psdesign$augdata), nrow(psdesign$augdata), replace = TRUE)
-    psdesign.0$augdata <- psdesign$augdata[sampdex, ]
-
-    ## re-call integration models
-
-    psdesign2 <- psdesign.0
-    for(intj in psdesign$integration.models){
-      psdesign2 <- psdesign2 + do.call(as.character(intj$model$args[[1]]), intj$model$args[-1])
-    }
-
-    ## re-call risk model
-
-    psdesign3 <- psdesign2 + do.call(as.character(psdesign$risk.model$args[[1]]), psdesign$risk.model$args[-1])
-
-    # estimate
-
-    bpar <- ps_estimate(psdesign3, start = start, control = control, ...)
-
-    bootpar[[i]] <- c(bpar$estimates$par, convergence = bpar$estimates$convergence)
+    bootpar <- vector(mode = "list", length = n.boots)
 
     if(progress.bar){
-      setTxtProgressBar(pb, value = i)
-      flush.console()
+      cat(paste("Bootstrapping", n.boots, "replicates:\n"))
+      pb <- txtProgressBar(min = 1, max = n.boots)
     }
+
+    psdesign.0 <- psdesign
+    for(i in 1:n.boots){
+      # resample augdata
+
+      sampdex <- sample(1:nrow(psdesign$augdata), nrow(psdesign$augdata), replace = TRUE)
+      psdesign.0$augdata <- psdesign$augdata[sampdex, ]
+
+      ## re-call integration models
+
+      psdesign2 <- psdesign.0
+      for(intj in psdesign$integration.models){
+        psdesign2 <- psdesign2 + do.call(as.character(intj$model$args[[1]]), intj$model$args[-1])
+      }
+
+      ## re-call risk model
+
+      psdesign3 <- psdesign2 + do.call(as.character(psdesign$risk.model$args[[1]]), psdesign$risk.model$args[-1])
+
+      # estimate
+
+      bpar <- ps_estimate(psdesign3, start = start, control = control, ...)
+
+      bootpar[[i]] <- c(bpar$estimates$par, convergence = bpar$estimates$convergence)
+
+      if(progress.bar){
+        setTxtProgressBar(pb, value = i)
+        flush.console()
+      }
+
+    }
+
+    if(progress.bar) close(pb)
+
+    bootpar <- as.data.frame(do.call(rbind, bootpar))
+    psdesign$bootstraps <- bootpar
+    psdesign$bs.call <- bs.call
+    psdesign
 
   }
 
-  if(progress.bar) close(pb)
-
-  bootpar <- as.data.frame(do.call(rbind, bootpar))
-  psdesign$bootstraps <- bootpar
-  psdesign
+  class(rval) <- c("ps", "bootstrap")
+  rval
 
 }
 
