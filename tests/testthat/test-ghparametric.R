@@ -11,17 +11,17 @@ test_that("Gilbert Hudgens estimates work", {
 
     ghdes.cat <- psdesign(ghdat, Z = Z, Y = Y.obs, S = S.obs.cat, BIP = BIP.cat)
 
-    ghdes.cat2 <- ghdes.cat + impute_nonparametric(S.1 ~ BIP)
+    ghdes.cat2 <- ghdes.cat + integrate_nonparametric(S.1 ~ BIP)
     test.cat <- ps_estimate(ghdes.cat2 + risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.expit), method = "BFGS")
 
-    ghdes2 <- ghdes + impute_parametric(S.1 ~ BIP)
-    ghdes2b <- ghdes + impute_semiparametric(S.1 ~ BIP, S.1 ~ 1)
+    ghdes2 <- ghdes + integrate_parametric(S.1 ~ BIP)
+    ghdes2b <- ghdes + integrate_semiparametric(S.1 ~ BIP, S.1 ~ 1)
 
     ghdes3 <- ghdes2 + risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.expit)
     ghdes3b <- ghdes2b + risk_binary(D = 1000, risk = risk.expit)
 
 
-    ghdes3c <- ghdes.surv + impute_parametric(S.1 ~ BIP) + risk_exponential(D = 500)
+    ghdes3c <- ghdes.surv + integrate_parametric(S.1 ~ BIP) + risk_exponential(D = 500)
     test3c <- ps_estimate(ghdes3c, start = rep(0, 4), method = "BFGS")
     test3c <- ps_bootstrap(test3c, method = "BFGS", start = test3c$estimates$par)
 
