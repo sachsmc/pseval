@@ -13,7 +13,7 @@ vignette: >
 ```{r knitup, include = FALSE}
 library(knitr)
 library(printr)
-set.seed(205)
+set.seed(225452)
 ```
 
 # Methods
@@ -106,7 +106,7 @@ fakedata <- generate_example_data(n = 500)
 head(fakedata)
 ```
 
-The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = 1, S(1) = 0, Z = -0.5, S(1):Z = -1. The true model for binary is logistic, with the same parameter values. 
+The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = 1, S(1) = -0.5, Z = 0, S(1):Z = -1. The true model for binary is logistic, with the same parameter values. 
 
 ### The `psdesign` object
 
@@ -178,7 +178,6 @@ The `ps_bootstrap` function takes the additional arguments `n.boots` for the num
 binary.est <- binary.ps + ps_estimate(method = "BFGS")
 binary.boot <- binary.est + ps_bootstrap(n.boots = 100, progress.bar = FALSE, 
                             start = binary.est$estimates$par, method = "BFGS")
-
 binary.boot
 ```
 
@@ -204,8 +203,22 @@ smary <- summary(binary.boot)
 
 
 ```{r plot1, fig.width = 7, fig.height = 5}
-plot(binary.boot, summary = "VE")
+plot(binary.boot, summary = "VE", lwd = 2)
 abline(h = smary$VE.estimates[2], lty = 2)
+
+expit <- function(x) exp(x)/(1 + exp(x))
+trueVE <- function(s){
+  
+  r0 <- expit(1 - .5 * s)
+  r1 <- expit(1 - 1.5 * s)
+  1 - r1/r0
+  
+}
+
+rug(binary.boot$augdata$S.1)
+curve(trueVE(x), add = TRUE, col = "red")
+legend("bottomright", legend = c("estimated VE", "marginal VE", "true VE"), 
+       col = c("black", "black", "red"), lty = c(1, 3, 1), lwd = c(2, 1, 1))
 ```
 
 ## Next steps

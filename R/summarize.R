@@ -70,6 +70,8 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
   if(inherits(psdesign$augdata$Y, "Surv") && missing(t)){
 
     ttt <- summary(survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+
+    warning(sprintf("No time given for time to event outcome, using restricted mean survival: %.1f", ttt))
     R1 <- psdesign$risk.function(dat1, psdesign$estimates$par, t = ttt)
     R0 <- psdesign$risk.function(dat0, psdesign$estimates$par, t = ttt)
 
