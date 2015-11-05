@@ -113,8 +113,8 @@ no_event <- function(Y){
   if(inherits(Y, "Surv")){
     stopifnot(dim(Y)[2] <= 2)
     Y[, 2] == 0
+  } else {
+    Y == 0
   }
-  Y == 0
-
 }
 
