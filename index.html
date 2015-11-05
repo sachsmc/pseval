@@ -224,7 +224,7 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 </div>
 <div id="the-psdesign-object" class="section level3">
 <h3>The <code>psdesign</code> object</h3>
-<p>We begin by creating a <code>psdesign</code> object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the <code>svydesign</code> function in the <a href="https://cran.r-project.org/web/packages/survey/">survey</a> package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous <span class="math">\(S.1\)</span> and the BIP <span class="math">\(X\)</span>. The object has a print method, so we can inspect the result.</p>
+<p>We begin by creating a <code>psdesign</code> object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the <code>svydesign</code> function in the <a href="https://cran.r-project.org/web/packages/survey/">survey</a> package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous <span class="math">\(S.1\)</span> and the BIP labeled <span class="math">\(BIP\)</span>. The object has a print method, so we can inspect the result.</p>
 <pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP)
 binary.ps</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
@@ -684,9 +684,11 @@ binary.boot</code></pre>
 <h2>Next steps</h2>
 <ul>
 <li>Detail assumptions</li>
-<li>Post estimation summaries</li>
+<li>Post estimation summaries
+<ul>
 <li>other plotting methods, risk difference, risk by treatment</li>
 <li>total gain, true and false positive fractions <span class="citation">(Erin E. Gabriel, Sachs, and Gilbert 2015)</span></li>
+</ul></li>
 <li>VE surface, depending on both S.1 and S.0</li>
 <li>Allow poisson and binomial distributions in <code>integrate_parametric</code></li>
 <li>Estimation via pseudo-score <span class="citation">(Ying Huang, Gilbert, and Wolfson 2013)</span></li>
