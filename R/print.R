@@ -24,10 +24,10 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps 
     VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
     plot(VE ~ S.1, data = VE.me, type = 'l', ...)
 
-    if("boot.se" %in% colnames(VE.me)){
+    if("VE.boot.se" %in% colnames(VE.me)){
 
-      lnme <- grep("lower.", colnames(VE.me), fixed = TRUE)
-      unme <- grep("upper.", colnames(VE.me), fixed = TRUE)
+      lnme <- grep("VE.lower.", colnames(VE.me), fixed = TRUE)
+      unme <- grep("VE.upper.", colnames(VE.me), fixed = TRUE)
 
       if(is.factor(VE.me[, 1])){
 
@@ -44,7 +44,63 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps 
         }
     }
 
-  } else {
+  } else if(summary == "RR"){
+
+    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
+    plot(1 - VE ~ S.1, data = VE.me, type = 'l', ...)
+
+    if("VE.boot.se" %in% colnames(VE.me)){
+
+      lnme <- grep("VE.lower.", colnames(VE.me), fixed = TRUE)
+      unme <- grep("VE.upper.", colnames(VE.me), fixed = TRUE)
+
+      if(is.factor(VE.me[, 1])){
+
+        subVE <- unique(VE.me)
+        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, lnme], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+
+        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, unme], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+
+      } else {
+        lines(1 - VE.me[, lnme] ~ VE.me$S.1, lty = 3, ...)
+        lines(1 - VE.me[, unme] ~ VE.me$S.1, lty = 3, ...)
+        }
+    }
+
+  } else if(summary == "logRR"){
+
+    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
+    plot(log(1 - VE) ~ S.1, data = VE.me, type = 'l', ...)
+
+    if("VE.boot.se" %in% colnames(VE.me)){
+
+      lnme <- grep("VE.lower.", colnames(VE.me), fixed = TRUE)
+      unme <- grep("VE.upper.", colnames(VE.me), fixed = TRUE)
+
+      if(is.factor(VE.me[, 1])){
+
+        subVE <- unique(VE.me)
+        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, lnme], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+
+        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, unme], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+
+      } else {
+        lines(log(1 - VE.me[, lnme]) ~ VE.me$S.1, lty = 3, ...)
+        lines(log(1 - VE.me[, unme]) ~ VE.me$S.1, lty = 3, ...)
+        }
+    }
+
+  } else if(summary == "risk") {
+
+      VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
+
+
+
+    } else {
     stop(paste("Plots of type", summary, "are not supported"))
   }
 
