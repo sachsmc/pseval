@@ -8,16 +8,21 @@
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
-#' @param summary Summary statistic to plot. Currently only \link{VE} is
-#'   supported.
+#' @param summary Summary statistic to plot. \code{"VE"} for vaccine efficacy =
+#'   1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
+#'   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
+#'   \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
+#'   risk difference = risk_1(s) - risk_0(s).
 #' @param sig.level Significance level used for confidence bands on the VE
 #'   curve. This is only used if bootstrapped estimates are available.
-#'   @param n.samps Number of samples to use over the range of S.1 for plotting the curve
+#' @param n.samps Number of samples to use over the range of S.1 for plotting
+#'   the curve
 #' @param ... Other arguments passes to \link{plot}
 #'
 #' @export
 
 plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps = 500, ...){
+
 
   if(summary == "VE"){
 
@@ -125,12 +130,12 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps 
 
         } else {
 
-          lines(R0 ~ S.1, data = VE.me, type = 'l', ...)
-          lines(VE.me[, lnme[1]] ~ VE.me$S.1, type = 'l', ...)
-          lines(VE.me[, unme[1]] ~ VE.me$S.1, type = 'l', ...)
+          lines(R0 ~ S.1, data = VE.me, type = 'l', lty = 2, ...)
+          lines(VE.me[, lnme[1]] ~ VE.me$S.1, type = 'l', lty = 3, ...)
+          lines(VE.me[, unme[1]] ~ VE.me$S.1, type = 'l', lty = 3, ...)
 
-          lines(VE.me[, lnme[2]] ~ VE.me$S.1, type = 'l', ...)
-          lines(VE.me[, unme[2]] ~ VE.me$S.1, type = 'l', ...)
+          lines(VE.me[, lnme[2]] ~ VE.me$S.1, type = 'l', lty = 4, ...)
+          lines(VE.me[, unme[2]] ~ VE.me$S.1, type = 'l', lty = 4, ...)
 
         }
 
@@ -146,7 +151,7 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps 
 
         } else {
 
-          lines(R0 ~ S.1, data = VE.me, type = 'l', ...)
+          lines(R0 ~ S.1, data = VE.me, type = 'l', lty = 2, ...)
 
         }
       }

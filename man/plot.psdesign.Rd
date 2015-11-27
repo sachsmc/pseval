@@ -15,13 +15,17 @@ model, and valid estimates}
 compute the cumulative distribution function. If not, the restricted mean
 survival time is used. Omit for binary outcomes.}
 
-\item{summary}{Summary statistic to plot. Currently only \link{VE} is
-supported.}
+\item{summary}{Summary statistic to plot. \code{"VE"} for vaccine efficacy =
+1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
+risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
+\code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
+risk difference = risk_1(s) - risk_0(s).}
 
 \item{sig.level}{Significance level used for confidence bands on the VE
 curve. This is only used if bootstrapped estimates are available.}
 
-\item{n.samps}{Number of samples to use over the range of S.1 for plotting the curve}
+\item{n.samps}{Number of samples to use over the range of S.1 for plotting
+the curve}
 
 \item{...}{Other arguments passes to \link{plot}}
 }
