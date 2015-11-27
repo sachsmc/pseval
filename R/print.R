@@ -98,6 +98,58 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps 
 
       VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
 
+      if("R0.boot.se" %in% colnames(VE.me)){
+
+        lnme <- sapply(c("R1.lower.", "R0.lower."), function(x) grep(x, colnames(VE.me), fixed = TRUE))
+        unme <- sapply(c("R1.upper.", "R0.upper."), function(x) grep(x, colnames(VE.me), fixed = TRUE))
+
+        ymax <- max(VE.me[, unme])
+        ymin <- min(VE.me[, lnme])
+
+        plot(R1 ~ S.1, data = VE.me, type = 'l', ylim = c(ymin, ymax), ...)
+        if(is.factor(VE.me[, 1])){
+
+          subVE <- unique(VE.me)
+
+          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme[1]], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme[1]], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+
+          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, "R0"], 2),
+                   x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 1, lwd = 2, ...)
+          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme[2]], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme[2]], 2),
+                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+
+        } else {
+
+          lines(R0 ~ S.1, data = VE.me, type = 'l', ...)
+          lines(VE.me[, lnme[1]] ~ VE.me$S.1, type = 'l', ...)
+          lines(VE.me[, unme[1]] ~ VE.me$S.1, type = 'l', ...)
+
+          lines(VE.me[, lnme[2]] ~ VE.me$S.1, type = 'l', ...)
+          lines(VE.me[, unme[2]] ~ VE.me$S.1, type = 'l', ...)
+
+        }
+
+      } else {
+
+        ymax <- max(VE.me[, c("R1", "R0")])
+        ymin <- min(VE.me[, c("R1", "R0")])
+
+        plot(R1 ~ S.1, data = VE.me, type = 'l', ylim = c(ymin, ymax), ...)
+        if(is.factor(VE.me[, 1])){
+          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, "R0"], 2),
+                   x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lwd = 2, ...)
+
+        } else {
+
+          lines(R0 ~ S.1, data = VE.me, type = 'l', ...)
+
+        }
+      }
 
 
     } else {
