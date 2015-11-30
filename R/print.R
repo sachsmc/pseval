@@ -17,149 +17,130 @@
 #'   curve. This is only used if bootstrapped estimates are available.
 #' @param n.samps Number of samples to use over the range of S.1 for plotting
 #'   the curve
-#' @param ... Other arguments passes to \link{plot}
+#'   @param col Vector of integers specifying colors for each curve.
+#'   @param lty Vector of integers specifying linetypes for each curve.
+#'   @param lwd Vector of numeric values for line widths.
+#' @param ... Other arguments passed to \link{plot}
 #'
 #' @export
 
-plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps = 500, ...){
+plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
 
 
-  if(summary == "VE"){
+  VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
+  n.curve.base <- ifelse(summary == "risk", 2, 1)
+  ncurve <- ifelse("VE.boot.se" %in% colnames(VE.me), n.curve.base * 3, n.curve.base)
 
-    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
-    plot(VE ~ S.1, data = VE.me, type = 'l', ...)
+  ## some logic taken from plot.survfit
 
-    if("VE.boot.se" %in% colnames(VE.me)){
 
-      lnme <- grep("VE.lower.", colnames(VE.me), fixed = TRUE)
-      unme <- grep("VE.upper.", colnames(VE.me), fixed = TRUE)
+    if (length(lty)==1 && is.numeric(lty))
+      lty <- rep(c(lty, lty+1, lty+1), 2)
+    else if (length(lty) < ncurve)
+      lty <- rep(rep(lty, each=3), length.out=(ncurve*3))
+    else lty <- rep(lty, length.out= ncurve*3)
 
-      if(is.factor(VE.me[, 1])){
+    if (length(col) <= ncurve) col <- rep(rep(col, each=3), length.out=3*ncurve)
+    else col <- rep(col, length.out=3*ncurve)
 
-        subVE <- unique(VE.me)
-        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
+    if (length(lwd) <= ncurve) lwd <- rep(rep(lwd, each=3), length.out=3*ncurve)
+    else lwd <- rep(lwd, length.out=3*ncurve)
 
-        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
 
-      } else {
-        lines(VE.me[, lnme] ~ VE.me$S.1, lty = 3, ...)
-        lines(VE.me[, unme] ~ VE.me$S.1, lty = 3, ...)
-        }
-    }
+  mainme <- switch(summary, VE = parse(text = "VE"),
+                   RR = parse(text = "1 - VE"),
+                   logRR = parse(text = "log(1 - VE)"),
+                   risk = parse(text = "list(R1, R0)"),
+                   riskdiff = parse(text = "R1 - R0"))
 
-  } else if(summary == "RR"){
+  if(is.null(mainme)) stop(paste("Plots of summary", summary, "are not supported."))
 
-    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
-    plot(1 - VE ~ S.1, data = VE.me, type = 'l', ...)
+  if(is.factor(VE.me[, 1])){
+    envir <- unique(VE.me)
+  } else envir <- VE.me
 
-    if("VE.boot.se" %in% colnames(VE.me)){
+  if(summary == "risk"){
 
-      lnme <- grep("VE.lower.", colnames(VE.me), fixed = TRUE)
-      unme <- grep("VE.upper.", colnames(VE.me), fixed = TRUE)
+    rlist <- eval(mainme, envir = envir)
+    plot(rlist[[1]] ~ envir[, 1], type = 'l', col = col[1], lty = lty[1], lwd = lwd[1], ylab = ylab, xlab = xlab)
+    if(is.factor(VE.me[, 1])){
 
-      if(is.factor(VE.me[, 1])){
-
-        subVE <- unique(VE.me)
-        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, lnme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-
-        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, unme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-
-      } else {
-        lines(1 - VE.me[, lnme] ~ VE.me$S.1, lty = 3, ...)
-        lines(1 - VE.me[, unme] ~ VE.me$S.1, lty = 3, ...)
-        }
-    }
-
-  } else if(summary == "logRR"){
-
-    VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
-    plot(log(1 - VE) ~ S.1, data = VE.me, type = 'l', ...)
-
-    if("VE.boot.se" %in% colnames(VE.me)){
-
-      lnme <- grep("VE.lower.", colnames(VE.me), fixed = TRUE)
-      unme <- grep("VE.upper.", colnames(VE.me), fixed = TRUE)
-
-      if(is.factor(VE.me[, 1])){
-
-        subVE <- unique(VE.me)
-        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, lnme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-
-        segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(1 - subVE[, unme], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-
-      } else {
-        lines(log(1 - VE.me[, lnme]) ~ VE.me$S.1, lty = 3, ...)
-        lines(log(1 - VE.me[, unme]) ~ VE.me$S.1, lty = 3, ...)
-        }
-    }
-
-  } else if(summary == "risk") {
-
-      VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
-
-      if("R0.boot.se" %in% colnames(VE.me)){
-
-        lnme <- sapply(c("R1.lower.", "R0.lower."), function(x) grep(x, colnames(VE.me), fixed = TRUE))
-        unme <- sapply(c("R1.upper.", "R0.upper."), function(x) grep(x, colnames(VE.me), fixed = TRUE))
-
-        ymax <- max(VE.me[, unme])
-        ymin <- min(VE.me[, lnme])
-
-        plot(R1 ~ S.1, data = VE.me, type = 'l', ylim = c(ymin, ymax), ...)
-        if(is.factor(VE.me[, 1])){
-
-          subVE <- unique(VE.me)
-
-          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme[1]], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme[1]], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-
-          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, "R0"], 2),
-                   x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 1, lwd = 2, ...)
-          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, lnme[2]], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, unme[2]], 2),
-                 x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lty = 3, ...)
-
-        } else {
-
-          lines(R0 ~ S.1, data = VE.me, type = 'l', lty = 2, ...)
-          lines(VE.me[, lnme[1]] ~ VE.me$S.1, type = 'l', lty = 3, ...)
-          lines(VE.me[, unme[1]] ~ VE.me$S.1, type = 'l', lty = 3, ...)
-
-          lines(VE.me[, lnme[2]] ~ VE.me$S.1, type = 'l', lty = 4, ...)
-          lines(VE.me[, unme[2]] ~ VE.me$S.1, type = 'l', lty = 4, ...)
-
-        }
-
-      } else {
-
-        ymax <- max(VE.me[, c("R1", "R0")])
-        ymin <- min(VE.me[, c("R1", "R0")])
-
-        plot(R1 ~ S.1, data = VE.me, type = 'l', ylim = c(ymin, ymax), ...)
-        if(is.factor(VE.me[, 1])){
-          segments(rep.int(as.integer(subVE[, "S.1"]), 2) - .4, rep.int(subVE[, "R0"], 2),
-                   x1 = rep.int(as.integer(subVE[, "S.1"]), 2) + .4, lwd = 2, ...)
-
-        } else {
-
-          lines(R0 ~ S.1, data = VE.me, type = 'l', lty = 2, ...)
-
-        }
-      }
-
+      segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(rlist[[2]], 2),
+               x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[4], lty = lty[4], lwd = lwd[4])
 
     } else {
-    stop(paste("Plots of type", summary, "are not supported"))
+
+      lines(rlist[[2]] ~ envir[, 1], type = 'l', col = col[4], lty = lty[4], lwd = lwd[4])
+
+    }
+
+  } else {
+
+    plot(eval(mainme, envir = envir) ~ envir[, 1], col = col[1], lty = lty[1], lwd = lwd[1], type = 'l', ylab = ylab, xlab = xlab)
+
   }
+
+
+  if("VE.boot.se" %in% colnames(VE.me)){
+
+    lnme <- switch(summary, VE = parse(text = grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)),
+                   RR =  parse(text = paste("1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE))),
+                   logRR =  parse(text = paste("log(1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
+                   risk = parse(text = paste("list(", paste(sapply(c("R1.lower.", "R0.lower."),
+                                                                   function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
+                   riskdiff = parse(text = paste(sapply(c("R1.lower.", "R0.lower."), function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = " - ")))
+
+    unme <- switch(summary, VE = parse(text = grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)),
+                   RR =  parse(text = paste("1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE))),
+                   logRR =  parse(text = paste("log(1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
+                   risk = parse(text = paste("list(", paste(sapply(c("R1.upper.", "R0.upper."),
+                                                                   function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
+                   riskdiff = parse(text = paste(sapply(c("R1.upper.", "R0.upper."), function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = " - ")))
+
+    if(summary == "risk"){
+
+      rlistl <- eval(lnme, envir = envir)
+      rlistu <- eval(unme, envir = envir)
+
+      if(is.factor(VE.me[, 1])){
+
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(rlistu[[1]], 2),
+                 x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[2], lty = lty[2], lwd = lwd[2], ...)
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(rlistu[[2]], 2),
+                 x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[5], lty = lty[5], lwd = lwd[5], ...)
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(rlistl[[1]], 2),
+                 x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[3], lty = lty[3], lwd = lwd[3], ...)
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(rlistl[[2]], 2),
+                 x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[6], lty = lty[6], lwd = lwd[6], ...)
+
+      } else {
+
+        lines(rlistu[[1]] ~ envir[, 1], type = 'l', col = col[2], lty = lty[2], lwd = lwd[2])
+        lines(rlistu[[2]] ~ envir[, 1], type = 'l', col = col[5], lty = lty[5], lwd = lwd[5])
+        lines(rlistl[[1]] ~ envir[, 1], type = 'l', col = col[3], lty = lty[3], lwd = lwd[3])
+        lines(rlistl[[2]] ~ envir[, 1], type = 'l', col = col[6], lty = lty[6], lwd = lwd[6])
+
+      }
+
+    } else {
+
+      if(is.factor(VE.me[, 1])){
+
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(eval(unme, envir = envir), 2),
+                 x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[2], lty = lty[2], lwd = lwd[2], ...)
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(eval(lnme, envir = envir), 2),
+                 x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[3], lty = lty[3], lwd = lwd[3], ...)
+
+      } else {
+
+        lines(eval(unme, envir = envir) ~ envir[, 1], col = col[2], lty = lty[2], lwd = lwd[2], type = 'l')
+        lines(eval(lnme, envir = envir) ~ envir[, 1], col = col[3], lty = lty[3], lwd = lwd[3], type = 'l')
+      }
+    }
+
+
+    }
+
 
 }
 

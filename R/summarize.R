@@ -136,9 +136,9 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
     A2 <- as.data.frame(summarize_bs(bootR0, sig.level = sig.level)$table)
     A3 <- as.data.frame(summarize_bs(bootVEs, sig.level = sig.level)$table)
 
-    colnames(A1) <- paste("R1", colnames(A1), sep = ".")
-    colnames(A2) <- paste("R0", colnames(A2), sep = ".")
-    colnames(A3) <- paste("VE", colnames(A3), sep = ".")
+    colnames(A1) <- gsub("%", "", paste("R1", colnames(A1), sep = "."), fixed = TRUE)
+    colnames(A2) <- gsub("%", "", paste("R0", colnames(A2), sep = "."), fixed = TRUE)
+    colnames(A3) <- gsub("%", "", paste("VE", colnames(A3), sep = "."), fixed = TRUE)
 
     obsVE <- cbind(obsVE, A3, A2, A1)
 

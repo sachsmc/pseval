@@ -5,7 +5,8 @@
 \title{Plot summary statistics for a psdesign object}
 \usage{
 \method{plot}{psdesign}(psdesign, t, summary = "VE", sig.level = 0.05,
-  n.samps = 500, ...)
+  n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1,
+  lwd = 1, ...)
 }
 \arguments{
 \item{psdesign}{A psdesign object that contains a risk model, integration
@@ -27,7 +28,13 @@ curve. This is only used if bootstrapped estimates are available.}
 \item{n.samps}{Number of samples to use over the range of S.1 for plotting
 the curve}
 
-\item{...}{Other arguments passes to \link{plot}}
+\item{col}{Vector of integers specifying colors for each curve.}
+
+\item{lty}{Vector of integers specifying linetypes for each curve.}
+
+\item{lwd}{Vector of numeric values for line widths.}
+
+\item{...}{Other arguments passed to \link{plot}}
 }
 \description{
 Plot the vaccine efficacy versus S.1 for an estimated psdesign object

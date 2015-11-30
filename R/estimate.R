@@ -70,6 +70,13 @@ ps_bootstrap <- function(n.boots = 200, progress.bar = TRUE, start = NULL, contr
       sampdex <- sample(1:nrow(psdesign$augdata), nrow(psdesign$augdata), replace = TRUE)
       psdesign.0$augdata <- psdesign$augdata[sampdex, ]
 
+      if(is.factor(psdesign.0$augdata$S.1)){
+
+        if(length(unique(as.numeric(psdesign.0$augdata$S.1))) != length(unique(as.numeric(psdesign$augdata$S.1)))){
+          next
+        }
+
+      }
       ## re-call integration models
 
       psdesign2 <- psdesign.0
