@@ -73,6 +73,7 @@ ps_bootstrap <- function(n.boots = 200, progress.bar = TRUE, start = NULL, contr
       if(is.factor(psdesign.0$augdata$S.1)){
 
         if(length(unique(as.numeric(psdesign.0$augdata$S.1))) != length(unique(as.numeric(psdesign$augdata$S.1)))){
+          bootpar[[i]] <- c(rep(NA, psdesign$nparam), convergence = 11)
           next
         }
 

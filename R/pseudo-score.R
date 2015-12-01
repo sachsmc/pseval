@@ -1,0 +1,101 @@
+#' Estimate parameters from a specified model using pseudo-score
+#'
+#' @param start Vector of starting values, if NULL, will come up with starting values
+#' @param epsilon Convergence criteria
+#' @param maxit Maximum number of iterations
+#' @param ... Arguments passed to something
+#'
+#' @export
+#'
+pseudo_score <- function(start = NULL, epsilon = 1e-5, maxit = 50, ...){
+
+  est.call <- match.call()
+  rval <- function(psdesign){
+
+    if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
+    if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
+
+    if(psdesign$risk.model$model != "binary") stop("Only binary models supported for pseudo-score")
+    if(psdesign$integration.models$S.1 != "nonparametric") stop("Only nonparametric integration supported for pseudo-score")
+
+    if(is.null(start)){
+
+      start <- rep(0, psdesign$nparam)
+
+    }
+
+    ## estimate P(Delta = 1 | Y, Z)
+    aug <- psdesign$augdata
+    del.lookup <- NULL
+    for(i in c(0, 1)){ for(j in c(0, 1)){
+
+      del.lookup <- rbind(del.lookup, data.frame(Y = i, Z = j, Pr = mean(!is.na(aug[aug$Y == i & aug$Z == j, "S.1"]))))
+
+    }}
+
+    del0 <- aug[is.na(aug$S.1), ]
+    del1 <- aug[!is.na(aug$S.1), ]
+    del1$glmweights <- 1
+    form <- eval(psdesign$risk.model$args$model)
+
+    impute <- lapply(1:nrow(del0), function(i){
+
+      df <- del0[i, ]
+      ws <- del1[del1$BIP == df$BIP, "S.1"]
+      df1 <- df[rep(1, length(ws)), ]
+      df1$S.1 <- ws
+      df1
+
+    })
+
+    pz1 <- mean(aug$Z == 1)
+    pz0 <- mean(aug$Z == 0)
+
+    link <- strsplit(as.character(psdesign$risk.model$args$risk), ".", fixed = TRUE)[[1]][2]
+    stopifnot(link %in% c("probit", "logit"))
+
+    beta0 <- start
+    niter <- 0
+    repeat{
+      weighteddf <- lapply(impute, function(df){
+
+        risk <- psdesign$risk.function(data = df, beta = beta0)
+        df1 <- df0 <- df
+        df1$Z <- 1
+        df0$Z <- 0
+
+        prDelt <- (del.lookup[1, "Pr"] * (1 - psdesign$risk.function(data = df0, beta = beta0)) * pz0 +
+                     del.lookup[2, "Pr"] * (1 - psdesign$risk.function(data = df1, beta = beta0)) * pz1 +
+                     del.lookup[3, "Pr"] * (psdesign$risk.function(data = df0, beta = beta0)) * pz0 +
+                     del.lookup[4, "Pr"] * (psdesign$risk.function(data = df1, beta = beta0)) * pz1)
+
+        df$glmweights <- (risk / prDelt) / sum(risk / prDelt)
+        df
+
+      })
+
+      glmdf <- do.call(rbind, weighteddf)
+      glmdf <- rbind(glmdf, del1)
+
+      fit <- glm(form, data = glmdf, weights = glmdf$glmweights, family = binomial(link = link))
+
+      beta1 <- fit$coefficients
+      diffbeta <- sum(abs(beta0 - beta1))
+      niter <- niter + 1
+
+      beta0 <- beta1
+      if(diffbeta < epsilon | niter > maxit) break
+
+
+    }
+
+    psdesign$estimate.call <- est.call
+    psdesign$estimates <- fit
+    psdesign
+
+  }
+
+  class(rval) <- c("ps", "pseudo-estimate")
+  rval
+
+}
