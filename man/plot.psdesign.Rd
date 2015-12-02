@@ -5,7 +5,8 @@
 \title{Plot summary statistics for a psdesign object}
 \usage{
 \method{plot}{psdesign}(psdesign, t, summary = "VE", sig.level = 0.05,
-  n.samps = 500, ...)
+  n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1,
+  lwd = 1, ...)
 }
 \arguments{
 \item{psdesign}{A psdesign object that contains a risk model, integration
@@ -15,15 +16,25 @@ model, and valid estimates}
 compute the cumulative distribution function. If not, the restricted mean
 survival time is used. Omit for binary outcomes.}
 
-\item{summary}{Summary statistic to plot. Currently only \link{VE} is
-supported.}
+\item{summary}{Summary statistic to plot. \code{"VE"} for vaccine efficacy =
+1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
+risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
+\code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
+risk difference = risk_1(s) - risk_0(s).}
 
 \item{sig.level}{Significance level used for confidence bands on the VE
 curve. This is only used if bootstrapped estimates are available.}
 
-\item{n.samps}{Number of samples to use over the range of S.1 for plotting the curve}
+\item{n.samps}{Number of samples to use over the range of S.1 for plotting
+the curve}
 
-\item{...}{Other arguments passes to \link{plot}}
+\item{col}{Vector of integers specifying colors for each curve.}
+
+\item{lty}{Vector of integers specifying linetypes for each curve.}
+
+\item{lwd}{Vector of numeric values for line widths.}
+
+\item{...}{Other arguments passed to \link{plot}}
 }
 \description{
 Plot the vaccine efficacy versus S.1 for an estimated psdesign object

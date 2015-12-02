@@ -5,7 +5,7 @@
 \title{Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood}
 \usage{
 ps_bootstrap(n.boots = 200, progress.bar = TRUE, start = NULL,
-  control = list(), ...)
+  method = "BFGS", control = list(), ...)
 }
 \arguments{
 \item{n.boots}{Number of bootstrap replicates}
@@ -13,6 +13,10 @@ ps_bootstrap(n.boots = 200, progress.bar = TRUE, start = NULL,
 \item{progress.bar}{Logical, if true will display a progress bar in the console}
 
 \item{start}{Vector of starting values, if NULL, will come up with starting values}
+
+\item{method}{Method to use for optimization, can be "pseudo-score" for
+categorical S with nonparametric integration, or any of the methods
+available in \link{optim}. Defaults to "BFGS"}
 
 \item{control}{List of control parameters for passed to \link{optim}}
 

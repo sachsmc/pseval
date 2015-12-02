@@ -12,22 +12,24 @@ integration model, and estimated parameters. Bootstrapped parameters are
 optional}
 
 \item{t}{For time to event outcomes, a fixed time \code{t} may be provided to
- compute the cumulative distribution function. If not, the restricted mean
- survival time is used. Omit for binary outcomes.}
+compute the cumulative distribution function. If not, the restricted mean
+survival time is used. Omit for binary outcomes.}
 
 \item{sig.level}{Significance level for bootstrap confidence intervals}
 
-\item{bootstraps}{If true, will calculate bootstrap standard errors and confidence bands.}
+\item{bootstraps}{If true, will calculate bootstrap standard errors and
+  confidence bands.}
 }
 \value{
-A data frame containing columns for the S values, the VE at those S
-  values, and optionally standard errors computed using bootstrapped
-  estimates.
+A data frame containing columns for the S values, the VE, R0, and R1
+  at those S values, and optionally standard errors and confidence intervals
+  computed using bootstrapped estimates.
 }
 \description{
-Computes the vaccince efficacy (VE) over the range of surrogate values
-observed in the data. VE(s) is defined as 1 - risk(s, z = 1)/risk(s, z = 0),
-where z is the treatment indicator. If any other variables are present in the
-risk model, then the risk is computed at their median value.
+Computes the vaccince efficacy (VE) and risk in each treatment arm over the
+range of surrogate values observed in the data. VE(s) is defined as 1 -
+risk(s, z = 1)/risk(s, z = 0), where z is the treatment indicator. If any
+other variables are present in the risk model, then the risk is computed at
+their median value.
 }
 

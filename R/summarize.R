@@ -1,13 +1,14 @@
 #' Calculate the vaccine efficacy
 #'
-#' Computes the vaccince efficacy (VE) over the range of surrogate values
-#' observed in the data. VE(s) is defined as 1 - risk(s, z = 1)/risk(s, z = 0),
-#' where z is the treatment indicator. If any other variables are present in the
-#' risk model, then the risk is computed at their median value.
+#' Computes the vaccince efficacy (VE) and risk in each treatment arm over the
+#' range of surrogate values observed in the data. VE(s) is defined as 1 -
+#' risk(s, z = 1)/risk(s, z = 0), where z is the treatment indicator. If any
+#' other variables are present in the risk model, then the risk is computed at
+#' their median value.
 #'
-#' @return A data frame containing columns for the S values, the VE at those S
-#'   values, and optionally standard errors computed using bootstrapped
-#'   estimates.
+#' @return A data frame containing columns for the S values, the VE, R0, and R1
+#'   at those S values, and optionally standard errors and confidence intervals
+#'   computed using bootstrapped estimates.
 #'
 #' @param psdesign A psdesign object. It must contain a risk model, an
 #'   integration model, and estimated parameters. Bootstrapped parameters are
@@ -15,8 +16,9 @@
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
-#'  @param sig.level Significance level for bootstrap confidence intervals
-#'  @param bootstraps If true, will calculate bootstrap standard errors and confidence bands.
+#' @param sig.level Significance level for bootstrap confidence intervals
+#' @param bootstraps If true, will calculate bootstrap standard errors and
+#'   confidence bands.
 #'
 #' @export
 #'
@@ -95,6 +97,8 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
     bsests <- psdesign$bootstraps
     bootVEs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootR1 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootR0 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
     for(i in 1:nrow(bsests)){
 
       thispar <- as.numeric(bsests[i, -ncol(bsests)])
@@ -118,13 +122,25 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
       }
 
       bootVEs[i, ] <- c(1 - R1/R0, bsests[i, "convergence"])
+      bootR1[i, ] <- c(R1, bsests[i, "convergence"])
+      bootR0[i, ] <- c(R0, bsests[i, "convergence"])
 
     }
 
     bootVEs <- as.data.frame(bootVEs)
-    colnames(bootVEs)[ncol(bootVEs)] <- "convergence"
-    addon <- as.data.frame(summarize_bs(bootVEs, sig.level = sig.level)$table)
-    obsVE <- cbind(obsVE, addon)
+    bootR1 <- as.data.frame(bootR1)
+    bootR0 <- as.data.frame(bootR0)
+
+    colnames(bootVEs)[ncol(bootVEs)] <- colnames(bootR0)[ncol(bootR0)] <- colnames(bootR1)[ncol(bootR1)] <- "convergence"
+    A1 <- as.data.frame(summarize_bs(bootR1, sig.level = sig.level)$table)
+    A2 <- as.data.frame(summarize_bs(bootR0, sig.level = sig.level)$table)
+    A3 <- as.data.frame(summarize_bs(bootVEs, sig.level = sig.level)$table)
+
+    colnames(A1) <- gsub("%", "", paste("R1", colnames(A1), sep = "."), fixed = TRUE)
+    colnames(A2) <- gsub("%", "", paste("R0", colnames(A2), sep = "."), fixed = TRUE)
+    colnames(A3) <- gsub("%", "", paste("VE", colnames(A3), sep = "."), fixed = TRUE)
+
+    obsVE <- cbind(obsVE, A3, A2, A1)
 
   }
 

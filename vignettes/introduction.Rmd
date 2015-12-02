@@ -1,6 +1,6 @@
 ---
 title: "Introduction to Principal Surrogate Evaluation in R"
-author: "Michael C Sachs"
+author: "Michael C Sachs and Erin E Gabriel"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output: 
     rmarkdown::html_vignette:
@@ -23,9 +23,9 @@ set.seed(225452)
 
 ## Introduction
 
-A valid surrogate endpoint can be used as a primary endpoint for evaluating treatments in phase I-II clinical trials and for predicting phase III treatment effects without requiring large and costly efficacy trials. A surrogate is considered to be valid if it provides reliable predictions of treatment effects on the clinical endpoint of interest. @Frangakis02 introduced the concept of principal stratification and the definition of a principal surrogate (PS). Informally, a post-treatment intermediate response variable is a principal surrogate if causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist. 
+A valid principal surrogate endpoint can be used as a primary endpoint for evaluating treatments in phase II clinical trials and for predicting individual treatment effects post lincensure. A surrogate is considered to be valid if it provides reliable predictions of treatment effects on the clinical endpoint of interest. @Frangakis02 introduced the concept of principal stratification and the definition of a principal surrogate (PS). Informally, a post-treatment intermediate response variable is a principal surrogate if causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist. The criteria for a PS have been modified and extended in more recent works, with most current literture focusing of wide effect modification as the primary criterion of interst; tests for wide effect modification are included in the package. 
 
-The goal of PS evaluation is to compare and predict the clinical outcomes conditional on all possible treatment and surrogate combinations of interest. The combinations of interest are called the principal strata and they include a set of unobservable counterfactual responses: responses that would have occured under a set of condtions counter to the observed conditions. To finesse this problem of unobservable responses, a variety of clever trial designs and estimation approaches have been proposed. Several of these have been implemented in the `pseval` package. 
+The goal of PS evaluation is to predict the clinical outcomes conditional on all possible treatment and surrogate combinations of interest. The combinations of interest are called the principal strata and they include a set of unobservable counterfactual responses: responses that would have occured under a set of condtions counter to the observed conditions. To finesse this problem of unobservable responses, a variety of clever trial designs and estimation approaches have been proposed. Several of these have been implemented in the `pseval` package. 
 
 
 ## Notation
@@ -35,7 +35,7 @@ Let $Z_i$ be the treatment indicator for subject $i$, where 0 indicates the cont
 
 ## Estimands 
 
-Criteria for $S$ to be a good surrogate are based on risk estimands that condition on the potential intermediate responses. The risk is defined as a mapping $g$ of the cumulative distribution function of $Y(z)$ condtional on the intermediate responses. Currently we focus only on marginal risk estimands which condition only on $S(1)$: 
+Criteria for $S$ to be a good surrogate are based on risk estimands that condition on the potential intermediate responses. The risk is defined as a mapping $g$ of the cumulative distribution function of $Y(z)$ condtional on the intermediate responses. Currently we focus only on marginal risk estimands which condition only on $S(1)$, the intermediate response or biomarker under active treatment: 
 
 $$
 risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
@@ -43,6 +43,23 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 $$
 
 For instance, for a binary outcome, the risk function may simply be the probability $risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)$, or for a time-to-event outcome the risk function may be the cumulative distribution function $risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)$. Specification of the distributions of $Y(z) | S(1)$ determines the likelihood, we will denote this as $f(y | \beta, s_1, z)$. If $S(1)$ were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves integrating out missing values based on some models and/or set of assumptions. Namely, $S(1)$ is unobserved for all subjects who received treatment 0. 
+
+## Prinicipal Surrogate Criteria
+
+@Frangakis02 gave a single criterion for a biomarker S to be a PS: causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist. In general this can only be evaluated using the joint risk estimands, which consider not only the counterfacutal values of the biomarker under treatment, but also under control S(0). However, in the specidal case where all S(0) values are constant, say at level C, such as an immune response to HIV in a HIV negative population pre-vaccination this criteria, often referred to as average causal neccasity (ACN), can by written in terms of the marginal risk estimands as:
+
+$$
+risk_1(C)=risk_0(C) 
+$$
+
+More recently, other works (XXXXX) have suggest that this criterion is both too restrictive and in some cases can be vacuously true. Instead most current works suggest that the wide effect modification (WEM) criterion is of primary importance, ACN being of secondary importance. WEM is given formally in terms of the risk estimands and a known contrast function $h$ satisfying $h(x, y) = 0$ if and only if $x = y$ by:
+
+$$
+|h(risk_1(s_1),risk_0(s_1)) - h(risk_1(s{_1}^*),risk_0(s{_1}^*))|>\delta
+$$
+
+for at least some $s_1 \neq s_{1}^*$ and $\delta>0$, with the larger the $\delta$ the better. To evaluate WEM and ACN we need to identify the risk estimands. 
+
 
 ## Augmentation and Assumptions
 
@@ -76,6 +93,12 @@ $$
 with respect to $\beta$. 
 
 This procedure is called estimated maximum likelihood (EML) and was developed in @Pepe91. The key idea is that we are averaging the likelihood contributions for subjects missing $S(1)$ with respect to the estimated distribution of $S(1) | W$. A BIP $W$ that is strongly associated with $S(1)$ is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors. It was suggested as an approach to prinicipal surrogate evaluation by @Gilbert08 and @Huang11.
+
+
+##Psuedoscore 
+
+@Huang12 suggest a different estimation procedure that does have a closed form variance estimates are known. Psuedscore estimates were suggest in @WolfsonDiss and implemented for several special cases in @Huang12. 
+
 
 ## Conclusion 
 
@@ -264,6 +287,18 @@ cat.fit <- psdesign(fakedata, Z = Z, Y = Y.obs,
   risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.probit) + ps_estimate(method = "BFGS")
 cat.fit
 plot(cat.fit)
+```
+
+Categorical S and W allows for estimation of the model using the pseudo-score method: 
+
+```{r catfitps}
+cat.fit.ps <- psdesign(fakedata, Z = Z, Y = Y.obs, 
+                     S = S.obs.cat, BIP = BIP.cat) + 
+  integrate_nonparametric(formula = S.1 ~ BIP) + 
+  risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.logit) + ps_estimate(method = "pseudo-score") + 
+  ps_bootstrap(n.boots = 20, method = "pseudo-score")
+summary(cat.fit.ps)
+plot(cat.fit.ps)
 ```
 
 
