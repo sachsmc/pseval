@@ -64,7 +64,8 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, n.samps = 500, 
   if(summary == "risk"){
 
     rlist <- eval(mainme, envir = envir)
-    plot(rlist[[1]] ~ envir[, 1], type = 'l', col = col[1], lty = lty[1], lwd = lwd[1], ylab = ylab, xlab = xlab)
+    plot(rlist[[1]] ~ envir[, 1], type = 'l', col = col[1], lty = lty[1], lwd = lwd[1],
+         ylab = ylab, xlab = xlab, ...)
     if(is.factor(VE.me[, 1])){
 
       segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(rlist[[2]], 2),
@@ -78,7 +79,8 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, n.samps = 500, 
 
   } else {
 
-    plot(eval(mainme, envir = envir) ~ envir[, 1], col = col[1], lty = lty[1], lwd = lwd[1], type = 'l', ylab = ylab, xlab = xlab)
+    plot(eval(mainme, envir = envir) ~ envir[, 1], col = col[1], lty = lty[1],
+         lwd = lwd[1], type = 'l', ylab = ylab, xlab = xlab, ...)
 
   }
 
