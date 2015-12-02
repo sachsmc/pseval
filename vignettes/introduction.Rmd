@@ -289,6 +289,18 @@ cat.fit
 plot(cat.fit)
 ```
 
+Categorical S and W allows for estimation of the model using the pseudo-score method: 
+
+```{r catfitps}
+cat.fit.ps <- psdesign(fakedata, Z = Z, Y = Y.obs, 
+                     S = S.obs.cat, BIP = BIP.cat) + 
+  integrate_nonparametric(formula = S.1 ~ BIP) + 
+  risk_binary(Y ~ S.1 * Z, D = 1000, risk = risk.logit) + ps_estimate(method = "pseudo-score") + 
+  ps_bootstrap(n.boots = 20, method = "pseudo-score")
+summary(cat.fit.ps)
+plot(cat.fit.ps)
+```
+
 
 # References
 

@@ -253,7 +253,7 @@ summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
     psdesign2 <- psdesign + do.call(as.character(pdat[[1]]), pdat[-1])
     marg.est <- psdesign2 + ps_estimate()
-    marg.VE <- colMeans(VE(marg.est, bootstraps = FALSE))[2]
+    marg.VE <- mean(VE(marg.est, bootstraps = FALSE)[, 2])
     emp.VE <- empirical_VE(psdesign)
     cond.VE <- VE(psdesign, bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)

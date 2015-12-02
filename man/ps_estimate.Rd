@@ -4,14 +4,19 @@
 \alias{ps_estimate}
 \title{Estimate parameters from a specified model using estimated maximum likelihood}
 \usage{
-ps_estimate(start = NULL, control = list(), ...)
+ps_estimate(start = NULL, method = "BFGS", control = list(), ...)
 }
 \arguments{
-\item{start}{Vector of starting values, if NULL, will come up with starting values}
+\item{start}{Vector of starting values, if NULL, will come up with starting
+values}
+
+\item{method}{Method to use for optimization, can be "pseudo-score" for
+categorical S with nonparametric integration, or any of the methods
+available in \link{optim}. Defaults to "BFGS"}
 
 \item{control}{List of control parameters for passed to \link{optim}}
 
-\item{...}{Arguments passed to \link{optim}}
+\item{...}{Arguments passed to \link{optim} or \link{pseudo_score}.}
 }
 \description{
 Estimate parameters from a specified model using estimated maximum likelihood

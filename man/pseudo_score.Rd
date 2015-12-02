@@ -4,16 +4,16 @@
 \alias{pseudo_score}
 \title{Estimate parameters from a specified model using pseudo-score}
 \usage{
-pseudo_score(start = NULL, epsilon = 1e-05, maxit = 50, ...)
+pseudo_score(psdesign, start = NULL, epsilon = 1e-05, maxit = 50)
 }
 \arguments{
+\item{psdesign}{An object of class psdesign}
+
 \item{start}{Vector of starting values, if NULL, will come up with starting values}
 
 \item{epsilon}{Convergence criteria}
 
 \item{maxit}{Maximum number of iterations}
-
-\item{...}{Arguments passed to something}
 }
 \description{
 Estimate parameters from a specified model using pseudo-score

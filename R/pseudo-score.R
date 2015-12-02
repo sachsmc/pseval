@@ -1,22 +1,16 @@
 #' Estimate parameters from a specified model using pseudo-score
 #'
+#' @param psdesign An object of class psdesign
 #' @param start Vector of starting values, if NULL, will come up with starting values
 #' @param epsilon Convergence criteria
 #' @param maxit Maximum number of iterations
-#' @param ... Arguments passed to something
 #'
 #' @export
 #'
-pseudo_score <- function(start = NULL, epsilon = 1e-5, maxit = 50, ...){
-
-  est.call <- match.call()
-  rval <- function(psdesign){
-
-    if(!"risk.model" %in% names(psdesign)) stop("No risk model specified")
-    if(!"integration.models" %in% names(psdesign)) stop("No integration models specified")
+pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
 
     if(psdesign$risk.model$model != "binary") stop("Only binary models supported for pseudo-score")
-    if(psdesign$integration.models$S.1 != "nonparametric") stop("Only nonparametric integration supported for pseudo-score")
+    if(psdesign$integration.models$S.1$model$model != "nonparametric") stop("Only nonparametric integration supported for pseudo-score")
 
     if(is.null(start)){
 
@@ -56,7 +50,9 @@ pseudo_score <- function(start = NULL, epsilon = 1e-5, maxit = 50, ...){
 
     beta0 <- start
     niter <- 0
+
     repeat{
+
       weighteddf <- lapply(impute, function(df){
 
         risk <- psdesign$risk.function(data = df, beta = beta0)
@@ -77,7 +73,7 @@ pseudo_score <- function(start = NULL, epsilon = 1e-5, maxit = 50, ...){
       glmdf <- do.call(rbind, weighteddf)
       glmdf <- rbind(glmdf, del1)
 
-      fit <- glm(form, data = glmdf, weights = glmdf$glmweights, family = binomial(link = link))
+      fit <- glm(form, data = glmdf, weights = glmdf$glmweights, family = quasibinomial(link = link))
 
       beta1 <- fit$coefficients
       diffbeta <- sum(abs(beta0 - beta1))
@@ -89,13 +85,6 @@ pseudo_score <- function(start = NULL, epsilon = 1e-5, maxit = 50, ...){
 
     }
 
-    psdesign$estimate.call <- est.call
-    psdesign$estimates <- fit
-    psdesign
-
-  }
-
-  class(rval) <- c("ps", "pseudo-estimate")
-  rval
+    list(par = beta1, value = diffbeta, counts = niter, convergence = ifelse(niter > maxit, 11, 0))
 
 }
