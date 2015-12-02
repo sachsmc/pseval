@@ -228,8 +228,9 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
 
     ## WEM test
     wem <- wem_test(x)
-    cat("\n\t Test for wide effect modification on ", wem$df, " degree of freedom. 2-sided p value = ",
-        ifelse(wem$p.value < .0001, "< .0001", round(wem$p.value, 4)))
+    cat("\n\t Test for wide effect modification on", wem$df, ifelse(wem$df > 1, "degrees", "degree"),
+        "of freedom. 2-sided p value ",
+        ifelse(wem$p.value < .0001, "< .0001", paste0("= ", round(wem$p.value, 4))))
 
 
     pout$wem.test <- wem
