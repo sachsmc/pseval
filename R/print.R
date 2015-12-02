@@ -230,7 +230,7 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
     wem <- wem_test(x)
     cat("\n\t Test for wide effect modification on", wem$df, ifelse(wem$df > 1, "degrees", "degree"),
         "of freedom. 2-sided p value ",
-        ifelse(wem$p.value < .0001, "< .0001", paste0("= ", round(wem$p.value, 4))))
+        ifelse(wem$p.value < .0001, "< .0001", paste0("= ", round(wem$p.value, 4))), "\n")
 
 
     pout$wem.test <- wem
@@ -269,12 +269,13 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
     cond.VE <- VE(object, bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
-    print(VEtab, digits = digits)
 
     empdiff <- 100 * VEtab[3]/VEtab[1] - 100
     mardiff <- 100 * VEtab[3]/VEtab[2] - 100
 
-    cat(sprintf("Model-based average VE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
+    cat("\nVaccine Efficacy: \n")
+    print(VEtab, digits = digits)
+    cat(sprintf("\tModel-based average VE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
     if(abs(mardiff) > 100) warning("Check model and results carefully!")
 
     invisible(list(print = pout, VE.estimates = VEtab))
