@@ -5,7 +5,7 @@
 \title{Specify a design for a principal surrogate evaluation}
 \usage{
 psdesign(data, Z, Y, S, BIP = NULL, CPV = NULL, BSM = NULL,
-  weights = NULL, ...)
+  weights = NULL, tau, ...)
 }
 \arguments{
 \item{data}{Data frame containing data to be analyzed}
@@ -28,8 +28,14 @@ measurement}
 \item{weights}{optional expression defining weights to accomodate nonrandom
 subsampling, such as case control or two phase}
 
+\item{tau}{numeric, When the outcome Y is a survival time, it is possible
+that the surrogate was measured at some time tau after enrollment. Use the
+argument tau to specify the time when the surrogate was measured, in study
+time. Not required for binary Y.}
+
 \item{...}{Other key-value pairs that will be included in the augmented data,
-  e.g. additional candidate surrogates, covariates for adjustment, variables used for integration}
+  e.g. additional candidate surrogates, covariates for adjustment, variables
+  used for integration}
 }
 \description{
 Generate mappings that describe how variables in the data are mapped to

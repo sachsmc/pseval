@@ -25,18 +25,45 @@
 #' @param BSM Optional expression defining the baseline surrogate measurement
 #' @param weights optional expression defining weights to accomodate nonrandom
 #'   subsampling, such as case control or two phase
+#' @param tau numeric, When the outcome Y is a survival time, it is possible
+#'   that the surrogate was measured at some time tau after enrollment. Use the
+#'   argument tau to specify the time when the surrogate was measured, in study
+#'   time. Not required for binary Y.
 #' @param ... Other key-value pairs that will be included in the augmented data,
-#'   e.g. additional candidate surrogates, covariates for adjustment, variables used for integration
+#'   e.g. additional candidate surrogates, covariates for adjustment, variables
+#'   used for integration
 #'
 #' @export
 
 psdesign <- function(data, Z, Y, S,
-                     BIP = NULL, CPV = NULL, BSM = NULL, weights = NULL, ...){
+                     BIP = NULL, CPV = NULL, BSM = NULL, weights = NULL, tau, ...){
 
 
   mapping <- sapply(as.list(match.call())[-c(1, 2)], as.character)
 
+  ## if Y is a survival object, check for presence of tau, the time when the biomarker was measured
+
+  oot <- eval(substitute(Y), envir = data)
+  if(inherits(oot, "Surv")){
+
+    if(missing(tau)){
+      warning("tau missing in psdesign: assuming that the surrogate S was measured at time 0.")
+    } else {
+
+      oot[, 1] <- oot[, 1] - tau
+      nminus <- sum(oot[, 1] < 0)
+
+      stdex <- oot[, 1] >= 0
+      warning("Removing ", nminus, " subjects with survival times less that tau.")
+
+      data <- data[stdex, ]
+
+    }
+
+  }
+
   trt <- verify_trt(eval(substitute(Z), envir = data))
+
   oot <- eval(substitute(Y), envir = data)
   if(!inherits(oot, "Surv")){
     oot <- verify_trt(oot)

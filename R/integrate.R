@@ -3,16 +3,16 @@
 #' @param formula Formula specifying the integration model for the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
-#' @param distribution Assumed distribution for the integration model. Must be
+#' @param family Assumed distribution for the integration model. Must be
 #'   compatible with the \code{family} argument of \link{glm}. Currenly only
 #'   Gaussian models are supported
 #' @param ... Arguments passed to \link{glm}
 #'
 #' @export
 
-integrate_parametric <- function(formula, distribution = gaussian, ...){
+integrate_parametric <- function(formula, family = gaussian, ...){
 
-  stopifnot(identical(distribution, gaussian))
+  stopifnot(identical(family, gaussian))
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
@@ -22,8 +22,8 @@ integrate_parametric <- function(formula, distribution = gaussian, ...){
 
     missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
 
-    fit <- glm(formula, data = psdesign$augdata[missdex, ], family = distribution,
-               weights = cdfweights, ...)
+    cdfweights <- NULL # hack to get rid of note
+    fit <- glm(formula, data = psdesign$augdata[missdex, ], weights = cdfweights, family = gaussian())
 
     psdesign$integration.models[[outname]]$model <- list(model = "parametric", args = arglist)
 
@@ -158,9 +158,9 @@ integrate_nonparametric <- function(formula, ...){
 #'
 #' @export
 
-integrate_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
+integrate_bivnorm <- function(x = "S.1", mu = c(0, 0), sd = c(1, 1), rho = .2){
 
-  outname <- as.character(substitute(x))
+  outname <- x
   arglist <- as.list(match.call())
 
   rval <- function(psdesign){
@@ -178,9 +178,9 @@ integrate_bivnorm <- function(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = .2){
 
 
     psdesign$integration.models[[outname]]$cdf_sbarw <-
-      function(S.1){
+      function(s1){
 
-        sapply(S.1, function(s) pnorm(s, mean = vmu, sd = vsd))
+        sapply(s1, function(s) pnorm(s, mean = vmu, sd = vsd))
 
       }
     psdesign$integration.models[[outname]]$icdf_sbarw <-
@@ -301,7 +301,7 @@ sp_locscale <- function(formula.location, formula.scale, data, weights, tol = 1e
 
   res2 <- (resp - mu1)^2
 
-  fitW <- glm(res2 ~ desmat.s - 1, weights = weights, family=quasi(var="mu", link="log"))
+  fitW <- glm(res2 ~ desmat.s - 1, weights = weights, family=quasi(variance="mu", link="log"))
 
   delta<-fitW$coef/2
 

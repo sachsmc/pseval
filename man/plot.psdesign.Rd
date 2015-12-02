@@ -4,12 +4,12 @@
 \alias{plot.psdesign}
 \title{Plot summary statistics for a psdesign object}
 \usage{
-\method{plot}{psdesign}(psdesign, t, summary = "VE", sig.level = 0.05,
+\method{plot}{psdesign}(x, t, summary = "VE", sig.level = 0.05,
   n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1,
   lwd = 1, ...)
 }
 \arguments{
-\item{psdesign}{A psdesign object that contains a risk model, integration
+\item{x}{A \link{psdesign} object that contains a risk model, integration
 model, and valid estimates}
 
 \item{t}{For time to event outcomes, a fixed time \code{t} may be provided to
@@ -27,6 +27,10 @@ curve. This is only used if bootstrapped estimates are available.}
 
 \item{n.samps}{Number of samples to use over the range of S.1 for plotting
 the curve}
+
+\item{xlab}{X-axis label}
+
+\item{ylab}{Y-axis label}
 
 \item{col}{Vector of integers specifying colors for each curve.}
 

@@ -9,6 +9,8 @@ expit <- function(x) exp(x)/(1 + exp(x))
 
 #' Generate sample data used for testing
 #'
+#' @param n Integer, the sample size
+#'
 #' @export
 
 generate_example_data <- function(n){

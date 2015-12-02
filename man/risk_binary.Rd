@@ -4,7 +4,7 @@
 \alias{risk_binary}
 \title{Risk model for binary outcome}
 \usage{
-risk_binary(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit, ...)
+risk_binary(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit)
 }
 \arguments{
 \item{model}{Formula specifying the risk model}

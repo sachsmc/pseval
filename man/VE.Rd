@@ -17,6 +17,8 @@ survival time is used. Omit for binary outcomes.}
 
 \item{sig.level}{Significance level for bootstrap confidence intervals}
 
+\item{n.samps}{The number of samples to take over the range of S.1 at which the VE is calculated}
+
 \item{bootstraps}{If true, will calculate bootstrap standard errors and
   confidence bands.}
 }

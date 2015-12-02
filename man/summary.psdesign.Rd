@@ -4,14 +4,16 @@
 \alias{summary.psdesign}
 \title{Summary method for psdesign objects}
 \usage{
-\method{summary}{psdesign}(psdesign, digits = 3, sig.level = 0.05)
+\method{summary}{psdesign}(object, digits = 3, sig.level = 0.05, ...)
 }
 \arguments{
-\item{psdesign}{A \link{psdesign} object}
+\item{object}{An object of class \link{psdesign}}
 
 \item{digits}{Number of significant digits to display}
 
 \item{sig.level}{Significance level to use for computing bootstrapped confidence intervals}
+
+\item{...}{Currently unused}
 }
 \description{
 Summary method for psdesign objects

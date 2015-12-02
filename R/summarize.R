@@ -17,6 +17,7 @@
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
 #' @param sig.level Significance level for bootstrap confidence intervals
+#' @param n.samps The number of samples to take over the range of S.1 at which the VE is calculated
 #' @param bootstraps If true, will calculate bootstrap standard errors and
 #'   confidence bands.
 #'
@@ -72,7 +73,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
   if(inherits(psdesign$augdata$Y, "Surv") && missing(t)){
 
-    ttt <- summary(survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+    ttt <- summary(survival::survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
 
     warning(sprintf("No time given for time to event outcome, using restricted mean survival: %.1f", ttt))
     R1 <- psdesign$risk.function(dat1, psdesign$estimates$par, t = ttt)
@@ -104,7 +105,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
       thispar <- as.numeric(bsests[i, -ncol(bsests)])
       if(inherits(psdesign$augdata$Y, "Surv") && missing(t)){
 
-        ttt <- summary(survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+        ttt <- summary(survival::survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
         R1 <- psdesign$risk.function(dat1, thispar, t = ttt)
         R0 <- psdesign$risk.function(dat0, thispar, t = ttt)
 
@@ -157,7 +158,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
 summarize_bs <- function(bootdf, sig.level = .05) {
 
-  bs <- subset(bootdf, convergence == 0)[, -which(colnames(bootdf) == "convergence")]
+  bs <- bootdf[bootdf$convergence == 0, -which(colnames(bootdf) == "convergence")]
 
   mary <- function(x){
     funlist <- list(median = stats::median, mean = base::mean, boot.se = stats::sd,
@@ -177,7 +178,7 @@ summarize_bs <- function(bootdf, sig.level = .05) {
 
 #' Compute the empirical Vaccine Efficacy
 #'
-#' @param psdesign
+#' @param psdesign An object of class \link{psdesign}
 #' @param t Fixed time for time to event outcomes to compute VE. If missing, uses restricted mean survival.
 #'
 #' @export

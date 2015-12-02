@@ -20,7 +20,7 @@
 #' @examples
 #'
 #' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
-#' add_integration(test, integrate_parametric())
+#' add_integration(test, integrate_parametric(S.1 ~ BIP))
 #' test + integrate_parametric(S.1 ~ BIP)  # same as above
 #'
 
@@ -39,18 +39,19 @@ add_integration <- function(psdesign, integration){
 #' @details The risk model component specifies the likelihood for the data. This involves specifying the distribution of the outcome variable, whether it is binary or time-to-event, and specifying how the surrogate S(1) and the treatment Z interact and affect the outcome. We use the formula notation to be consistent with other regression type models in R. Below is a list of available risk models.
 #'
 #' \itemize{
-#' \item \link{risk_binary} This is a generic risk model for binary outcomes. The user can specify the formula, and link function using either \link{risk.expit} for the logistic link, or \link{risk.probit} for the probit link. Custom link functions may also be specified, which take a single numeric vector argument, and returns a vector of corresponding probabilities.
+#' \item \link{risk_binary} This is a generic risk model for binary outcomes. The user can specify the formula, and link function using either \link{risk.logit} for the logistic link, or \link{risk.probit} for the probit link. Custom link functions may also be specified, which take a single numeric vector argument, and returns a vector of corresponding probabilities.
 #' \item \link{risk_weibull} This is a parameterization of the Weibull model for time-to-event outcomes that is consistent with that of \link{rweibull}. The user specifies the formula for the linear predictor of the scale parameter.
 #' \item \link{risk_exponential} This is a simple exponential model for a time-to-event outcome.
 #' }
 #'
 #' @param psdesign A psdesign object
-#' @param risk A risk model object
+#' @param riskmodel A risk model object, from the list above
 #'
 #' @export
 #'
 #' @examples
-#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
+#' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) +
+#'      integrate_parametric(S.1 ~ BIP)
 #' add_riskmodel(test, risk_binary())
 #' test + risk_binary() # same as above
 
@@ -108,6 +109,9 @@ add_bootstrap <- function(psdesign, bootstrap){
 #' Modify a psdesign object by adding on new components.
 #'
 #' This operator allows you to add objects to a psdesign object, such as integration models and risk models
+#'
+#' @param p1 An object of class \link{psdesign}
+#' @param p2 Another object to be added to \code{p1}, see list below for possible options
 #'
 #' If the first object is an object of class \code{psdesign}, you can add
 #' the following types of objects, and it will return a modified psdesign
