@@ -7,7 +7,7 @@
 empirical_VE(psdesign, t)
 }
 \arguments{
-\item{psdesign}{}
+\item{psdesign}{An object of class \link{psdesign}}
 
 \item{t}{Fixed time for time to event outcomes to compute VE. If missing, uses restricted mean survival.}
 }

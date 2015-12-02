@@ -4,14 +4,14 @@
 \alias{integrate_parametric}
 \title{Parametric integration model for the missing S(1)}
 \usage{
-integrate_parametric(formula, distribution = gaussian, ...)
+integrate_parametric(formula, family = gaussian, ...)
 }
 \arguments{
 \item{formula}{Formula specifying the integration model for the surrogate
 under treatment. Generally the candidate surrogate will be on the left side
 in the formula, and the BIP or BIPs will be on the right side}
 
-\item{distribution}{Assumed distribution for the integration model. Must be
+\item{family}{Assumed distribution for the integration model. Must be
 compatible with the \code{family} argument of \link{glm}. Currenly only
 Gaussian models are supported}
 

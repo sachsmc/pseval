@@ -3,7 +3,7 @@
 #'
 #' Plot the vaccine efficacy versus S.1 for an estimated psdesign object
 #'
-#' @param psdesign A psdesign object that contains a risk model, integration
+#' @param x A \link{psdesign} object that contains a risk model, integration
 #'   model, and valid estimates
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
@@ -17,6 +17,8 @@
 #'   curve. This is only used if bootstrapped estimates are available.
 #' @param n.samps Number of samples to use over the range of S.1 for plotting
 #'   the curve
+#'   @param xlab X-axis label
+#'   @param ylab Y-axis label
 #'   @param col Vector of integers specifying colors for each curve.
 #'   @param lty Vector of integers specifying linetypes for each curve.
 #'   @param lwd Vector of numeric values for line widths.
@@ -24,10 +26,10 @@
 #'
 #' @export
 
-plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
+plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
 
 
-  VE.me <- VE(psdesign, t, sig.level = sig.level, n.samps = n.samps)
+  VE.me <- VE(x, t, sig.level = sig.level, n.samps = n.samps)
   n.curve.base <- ifelse(summary == "risk", 2, 1)
   ncurve <- ifelse("VE.boot.se" %in% colnames(VE.me), n.curve.base * 3, n.curve.base)
 
@@ -147,26 +149,26 @@ plot.psdesign <- function(psdesign, t, summary = "VE", sig.level = .05, n.samps 
 
 #' Concisely print information about a psdesign object
 #'
-#' @param psdesign A \link{psdesign} object
+#' @param x An object of class \link{psdesign}
 #' @param digits Number of significant digits to display
 #' @param sig.level Significance level to use for computing bootstrapped confidence intervals
-#'
+#' @param ... Currently unused
 #' @export
 #'
-print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
+print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
 
-  objs <- names(psdesign)
+  objs <- names(x)
   pout <- NULL
 
-  cat("Augmented data frame: ", nrow(psdesign$augdata), " obs. by ", ncol(psdesign$augdata), " variables. \n")
-  print(head(psdesign$augdata), digits = digits)
+  cat("Augmented data frame: ", nrow(x$augdata), " obs. by ", ncol(x$augdata), " variables. \n")
+  print(head(x$augdata), digits = digits)
 
-  cat("\nEmpirical VE: ", round(empirical_VE(psdesign), digits), "\n")
+  cat("\nEmpirical VE: ", round(empirical_VE(x), digits), "\n")
 
   cat("\nMapped variables: \n")
-  temp <- lapply(names(psdesign$mapping), function(ln){
+  temp <- lapply(names(x$mapping), function(ln){
 
-    lnm <- psdesign$mapping[[ln]]
+    lnm <- x$mapping[[ln]]
 
     if(length(lnm) == 1){
       cat("\t", ln, " -> ", lnm, "\n")
@@ -184,9 +186,9 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
   } else {
 
-    for(j in names(psdesign$integration.models)){
+    for(j in names(x$integration.models)){
       cat("\t integration model for ", j, ":\n")
-      tyj <- psdesign$integration.models[[j]]$model
+      tyj <- x$integration.models[[j]]$model
       cat("\t\t", paste0("integrate_", tyj$model, "("))
       cat(paste(sapply(names(tyj$args[-1]), function(nj) paste0(nj, " = ", tyj$args[-1][nj])), collapse = ", "), ")\n")
     }
@@ -198,7 +200,7 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     cat("\tNone present, see ?add_riskmodel for information on risk models.\n")
   } else {
 
-    tyj <- psdesign$risk.model
+    tyj <- x$risk.model
     cat("\t", paste0("risk_", tyj$model, "("))
     cat(paste(sapply(names(tyj$args[-1]), function(nj) paste0(nj, " = ", tyj$args[-1][nj])), collapse = ", "), ")\n\n")
 
@@ -209,8 +211,8 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     cat("\tNo estimates present, see ?ps_estimate.\n")
   } else {
     cat("Estimated parameters:\n")
-    print(psdesign$estimates$par, digits = digits)
-    cat("\tConvergence: ", psdesign$estimates$convergence == 0, "\n\n")
+    print(x$estimates$par, digits = digits)
+    cat("\tConvergence: ", x$estimates$convergence == 0, "\n\n")
 
   }
 
@@ -220,10 +222,17 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
   } else {
 
     cat("Bootstrap replicates:\n")
-    sbs <- summarize_bs(psdesign$bootstraps, sig.level = sig.level)
+    sbs <- summarize_bs(x$bootstraps, sig.level = sig.level)
     print(sbs$table, digits = digits)
     cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
 
+    ## WEM test
+    wem <- wem_test(x)
+    cat("\n\t Test for wide effect modification on ", wem$df, " degree of freedom. 2-sided p value = ",
+        ifelse(wem$p.value < .0001, "< .0001", round(wem$p.value, 4)))
+
+
+    pout$wem.test <- wem
     pout$boot.table <- sbs
 
   }
@@ -235,27 +244,28 @@ print.psdesign <- function(psdesign, digits = 3, sig.level = .05){
 
 #' Summary method for psdesign objects
 #'
-#' @param psdesign A \link{psdesign} object
+#' @param object An object of class \link{psdesign}
 #' @param digits Number of significant digits to display
 #' @param sig.level Significance level to use for computing bootstrapped confidence intervals
+#' @param ... Currently unused
 #'
 #' @export
 #'
-summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
+summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 
-  pout <- print(psdesign, digits = digits, sig.level = sig.level)
+  pout <- print(object, digits = digits, sig.level = sig.level)
 
   ## compute marginal model and summarize VE
 
-  if("risk.model" %in% names(psdesign)){
-    pdat <- psdesign$risk.model$args
+  if("risk.model" %in% names(object)){
+    pdat <- object$risk.model$args
     pdat$model <- Y ~ Z
 
-    psdesign2 <- psdesign + do.call(as.character(pdat[[1]]), pdat[-1])
+    psdesign2 <- object + do.call(as.character(pdat[[1]]), pdat[-1])
     marg.est <- psdesign2 + ps_estimate()
     marg.VE <- mean(VE(marg.est, bootstraps = FALSE)[, 2])
-    emp.VE <- empirical_VE(psdesign)
-    cond.VE <- VE(psdesign, bootstraps = FALSE)
+    emp.VE <- empirical_VE(object)
+    cond.VE <- VE(object, bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
     print(VEtab, digits = digits)
@@ -269,4 +279,34 @@ summary.psdesign <- function(psdesign, digits = 3, sig.level = .05){
     invisible(list(print = pout, VE.estimates = VEtab))
 
   }
+}
+
+
+
+#' Test for wide effect modificiation
+#'
+#' This runs a multivariate Wald test on the interaction terms of the model, using the bootstrap covariance
+#'
+#' @param x An object of class \link{psdesign} with bootstrap replicates
+#'
+#'  @export
+wem_test <- function(x){
+
+  testdex <- grep(":Z", x$param.names, fixed = TRUE)
+  bscov <- cov(x$bootstraps)
+
+  if(length(testdex) == 1){
+
+    bsse <- bscov[testdex, testdex]
+    bsmu <- x$estimates$par[testdex]
+    Xstat <- bsmu/bsse
+    list(stat = Xstat, df = 1, p.value = 2 * pnorm(-abs(Xstat)))
+
+  } else {
+
+    Xstat <- x$estimates$par[testdex] %*% solve(bscov[testdex, testdex]) %*% x$estimates$par[testdex]
+    list(stat = Xstat, df = length(testdex), p.value = pchisq(Xstat, df = length(testdex), lower.tail = FALSE))
+
+  }
+
 }

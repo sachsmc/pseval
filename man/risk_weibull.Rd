@@ -4,14 +4,12 @@
 \alias{risk_weibull}
 \title{Weibull risk model for time to event outcome}
 \usage{
-risk_weibull(model = Y ~ S.1 * Z, D = 5000, ...)
+risk_weibull(model = Y ~ S.1 * Z, D = 5000)
 }
 \arguments{
 \item{model}{Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring}
 
 \item{D}{number of samples for simulated annealing}
-
-\item{...}{}
 }
 \description{
 Weibull risk model for time to event outcome

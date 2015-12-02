@@ -6,6 +6,9 @@
 \usage{
 generate_example_data(n)
 }
+\arguments{
+\item{n}{Integer, the sample size}
+}
 \description{
 Generate sample data used for testing
 }

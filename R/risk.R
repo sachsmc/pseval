@@ -7,7 +7,7 @@
 #'   @export
 
 
-risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit, ...){
+risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
@@ -63,11 +63,10 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit, ...){
 #'
 #' @param model Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring
 #' @param D number of samples for simulated annealing
-#' @param ...
 #'
 #'@export
 
-risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
+risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
@@ -140,11 +139,10 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 #'
 #' @param model Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring
 #' @param D number of samples for simulated annealing
-#' @param ...
 #'
 #'@export
 
-risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
+risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
   arglist <- as.list(match.call())
   rval <- function(psdesign){
@@ -200,8 +198,12 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000, ... ){
 
 }
 
-
+#' Logit link function
+#'
+#' @param x A vector of linear predictors
 #' @export
+#'
+#' @return A vector of probabilities
 
 risk.logit <- function(x) {
 
@@ -209,13 +211,26 @@ risk.logit <- function(x) {
 
 }
 
+#' Probit link function
+#'
+#' @param x A vector of linear predictors
 #' @export
+#' @return A vector of probabilities
+#'
 risk.probit <- function(x) {
 
   pnorm(x)
 
 }
 
+#' Expand augmented data using the integration function
+#'
+#'
+#' @param model Formula defining the risk model
+#' @param psdesign An object of class \link{psdesign}, that contains at least 1 integration model
+#' @param D The number of samples to take for the simulated annealing
+#'
+#' @keywords Internal
 
 expand_augdata <- function(model, psdesign, D = 500){
 
@@ -238,7 +253,7 @@ expand_augdata <- function(model, psdesign, D = 500){
 
   } else {
 
-    misvars <- vars[apply(is.na(psdesign$augdata[, vars, drop = FALSE]), MAR = 2, any)]
+    misvars <- vars[apply(is.na(psdesign$augdata[, vars, drop = FALSE]), MARGIN = 2, any)]
     impdex <- rowSums(is.na(psdesign$augdata[, misvars, drop = FALSE])) > 0
     dex <- (1:nrow(psdesign$augdata))[impdex]
     untrtobs <- psdesign$augdata[rep(dex, D), ]

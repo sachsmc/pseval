@@ -4,14 +4,12 @@
 \alias{risk_exponential}
 \title{Exponential risk model for time to event outcome}
 \usage{
-risk_exponential(model = Y ~ S.1 * Z, D = 5000, ...)
+risk_exponential(model = Y ~ S.1 * Z, D = 5000)
 }
 \arguments{
 \item{model}{Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring}
 
 \item{D}{number of samples for simulated annealing}
-
-\item{...}{}
 }
 \description{
 Exponential risk model for time to event outcome

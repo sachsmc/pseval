@@ -4,7 +4,7 @@
 \alias{integrate_bivnorm}
 \title{Bivariate normal integration models for the missing S(1)}
 \usage{
-integrate_bivnorm(x = S.1, mu = c(0, 0), sd = c(1, 1), rho = 0.2)
+integrate_bivnorm(x = "S.1", mu = c(0, 0), sd = c(1, 1), rho = 0.2)
 }
 \arguments{
 \item{x,}{expression identifying the variable to be integrated. Typically this is S.1 or S.0}

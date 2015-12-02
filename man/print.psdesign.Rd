@@ -4,14 +4,16 @@
 \alias{print.psdesign}
 \title{Concisely print information about a psdesign object}
 \usage{
-\method{print}{psdesign}(psdesign, digits = 3, sig.level = 0.05)
+\method{print}{psdesign}(x, digits = 3, sig.level = 0.05, ...)
 }
 \arguments{
-\item{psdesign}{A \link{psdesign} object}
+\item{x}{An object of class \link{psdesign}}
 
 \item{digits}{Number of significant digits to display}
 
 \item{sig.level}{Significance level to use for computing bootstrapped confidence intervals}
+
+\item{...}{Currently unused}
 }
 \description{
 Concisely print information about a psdesign object

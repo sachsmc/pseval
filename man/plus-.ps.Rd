@@ -6,10 +6,11 @@
 \usage{
 \method{+}{ps}(p1, p2)
 }
-\description{
-This operator allows you to add objects to a psdesign object, such as integration models and risk models
-}
-\details{
+\arguments{
+\item{p1}{An object of class \link{psdesign}}
+
+\item{p2}{Another object to be added to \code{p1}, see list below for possible options
+
 If the first object is an object of class \code{psdesign}, you can add
 the following types of objects, and it will return a modified psdesign
 object. Users will generally add them in the order that they appear.
@@ -19,6 +20,9 @@ object. Users will generally add them in the order that they appear.
   \item \code{riskmodel}: Add or replace risk model
   \item \code{estimate}: Estimate parameters
   \item \code{bootstrap}: Bootstrap estimates
+}}
 }
+\description{
+This operator allows you to add objects to a psdesign object, such as integration models and risk models
 }
 
