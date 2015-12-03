@@ -10,7 +10,7 @@
 
 <meta name="author" content="Michael C Sachs and Erin E Gabriel" />
 
-<meta name="date" content="2015-12-02" />
+<meta name="date" content="2015-12-03" />
 
 <title>Introduction to Principal Surrogate Evaluation in R</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Introduction to Principal Surrogate Evaluation in R</h1>
 <h4 class="author"><em>Michael C Sachs and Erin E Gabriel</em></h4>
-<h4 class="date"><em>December 02, 2015</em></h4>
+<h4 class="date"><em>December 03, 2015</em></h4>
 </div>
 
 
@@ -76,56 +76,71 @@ code > span.er { color: #ff0000; font-weight: bold; }
 risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
 risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 \]</span></p>
-<p>For instance, for a binary outcome, the risk function may simply be the probability <span class="math">\(risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)\)</span>, or for a time-to-event outcome the risk function may be the cumulative distribution function <span class="math">\(risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)\)</span>. Specification of the distributions of <span class="math">\(Y(z) | S(1)\)</span> determines the likelihood, we will denote this as <span class="math">\(f(y | \beta, s_1, z)\)</span>. If <span class="math">\(S(1)\)</span> were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves integrating out missing values based on some models and/or set of assumptions. Namely, <span class="math">\(S(1)\)</span> is unobserved for all subjects who received treatment 0.</p>
+<p>The joint risk estimands, also condition on <span class="math">\(S(0)\)</span>, the intermediate response or biomarker under control. In the special case where <span class="math">\(S(0)\)</span> is constant, such as the immune response to HIV antigens in the placebo arm of a vaccine trial, the joint and marginal risk estimands are equivalent. This special case is referred to as case constant biomarker (CB) in much of the literature <span class="citation">(P. Gilbert and Hudgens 2008)</span>.</p>
+<p>For instance, for a binary outcome, the risk function may simply be the probability <span class="math">\(risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)\)</span>, or for a time-to-event outcome the risk function may be the cumulative distribution function <span class="math">\(risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)\)</span>.</p>
+<p>Specification of the distributions of <span class="math">\(Y(z) | S(1)\)</span> determines the likelihood, we will denote this as <span class="math">\(f(y | \beta, s_1, z)\)</span>. If <span class="math">\(S(1)\)</span> were fully observed, simple maximum likelihood estimation could be used. The key challenge in estimating these risk estimands is solving the problem of conditioning on counterfactual values that are not observable for at least a subset of subjects in a randomized trial. This involves integrating out missing values based on some models and/or set of assumptions. Namely, <span class="math">\(S(1)\)</span> is unobserved for all subjects who received treatment 0.</p>
 </div>
 <div id="prinicipal-surrogate-criteria" class="section level2">
 <h2>Prinicipal Surrogate Criteria</h2>
-<p><span class="citation">Frangakis and Rubin (2002)</span> gave a single criterion for a biomarker S to be a PS: causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist. In general this can only be evaluated using the joint risk estimands, which consider not only the counterfacutal values of the biomarker under treatment, but also under control S(0). However, in the specidal case where all S(0) values are constant, say at level C, such as an immune response to HIV in a HIV negative population pre-vaccination this criteria, often referred to as average causal neccasity (ACN), can by written in terms of the marginal risk estimands as:</p>
+<p><span class="citation">Frangakis and Rubin (2002)</span> gave a single criterion for a biomarker S to be a PS: causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist. In general this can only be evaluated using the joint risk estimands, which consider not only the counterfacutal values of the biomarker under treatment, but also under control <span class="math">\(S(0)\)</span>. However, in the special case where all <span class="math">\(S(0)\)</span> values are constant, say at level <span class="math">\(C\)</span>, such as an immune response to HIV in a HIV negative population pre-vaccination this criteria, often referred to as average causal neccasity (ACN), can by written in terms of the marginal risk estimands as:</p>
 <p><span class="math">\[
-risk_1(C)=risk_0(C) 
+  risk_1(C)=risk_0(C) 
 \]</span></p>
-<p>More recently, other works (XXXXX) have suggest that this criterion is both too restrictive and in some cases can be vacuously true. Instead most current works suggest that the wide effect modification (WEM) criterion is of primary importance, ACN being of secondary importance. WEM is given formally in terms of the risk estimands and a known contrast function <span class="math">\(h\)</span> satisfying <span class="math">\(h(x, y) = 0\)</span> if and only if <span class="math">\(x = y\)</span> by:</p>
+<p>More recently, other works <span class="citation">P. Gilbert and Hudgens (2008)</span>, <span class="citation">J. Wolfson and Gilbert (2010)</span>, <span class="citation">Ying Huang, Gilbert, and Wolfson (2013)</span>, <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>, and <span class="citation">Erin E Gabriel and Follmann (2015)</span> have suggested that this criterion is both too restrictive and in some cases can be vacuously true. Instead most current works suggest that the wide effect modification (WEM) criterion is of primary importance, ACN being of secondary importance. WEM is given formally in terms of the risk estimands and a known contrast function <span class="math">\(h\)</span> satisfying <span class="math">\(h(x, y) = 0\)</span> if and only if <span class="math">\(x = y\)</span> by:</p>
 <p><span class="math">\[
-|h(risk_1(s_1),risk_0(s_1)) - h(risk_1(s{_1}^*),risk_0(s{_1}^*))|&gt;\delta
+  |h(risk_1(s_1),risk_0(s_1)) - h(risk_1(s{_1}^*),risk_0(s{_1}^*))|&gt;\delta
 \]</span></p>
 <p>for at least some <span class="math">\(s_1 \neq s_{1}^*\)</span> and <span class="math">\(\delta&gt;0\)</span>, with the larger the <span class="math">\(\delta\)</span> the better. To evaluate WEM and ACN we need to identify the risk estimands.</p>
 </div>
 <div id="augmentation-and-assumptions" class="section level2">
 <h2>Augmentation and Assumptions</h2>
-<p>We first make two standard assumptions:</p>
+<p>We first make three standard assumptions used in much of the literature for absorbing events outcomes:</p>
 <ul>
 <li>Stable Unit Treatment Value Assumption (SUTVA): Observations on the independent units in the trial should be unaffected by the treatment assignment of other units.</li>
 <li>Ignorable Treatment Assignment: The observed treatment assignment does not change the counterfactual clinical outcome.</li>
+<li>Equal individual risk up to the time of candidate surrogate measurement <span class="math">\(\tau\)</span>.</li>
 </ul>
-<p>Now to estimate the missing <span class="math">\(S(1)\)</span> values among those with <span class="math">\(Z = 0\)</span>, we focus on three trial augmentations: Baseline immunogenicity predictor (BIP), closeout placebo vaccination (CPV), and baseline surrogate measurement (BSM). For details on these augmentations, we refer you to <span class="citation">D. Follmann (2006)</span>, <span class="citation">P. Gilbert and Hudgens (2008)</span>, <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>, and <span class="citation">Erin E Gabriel and Follmann (2015)</span>.</p>
+<p><span class="citation">J. Wolfson and Gilbert (2010)</span> outlines how these assumptions are needed for identification of the risk estimands. Now to deal with the missing <span class="math">\(S(1)\)</span> values among those with <span class="math">\(Z = 0\)</span>, we focus on three trial augmentations: Baseline immunogenicity predictor (BIP), closeout placebo vaccination (CPV), and baseline surrogate measurement (BSM). For details on these augmentations, we refer you to <span class="citation">D. Follmann (2006)</span>, <span class="citation">P. Gilbert and Hudgens (2008)</span>, <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>, and <span class="citation">Erin E Gabriel and Follmann (2015)</span>.</p>
+<p>In time-to-event settings one more assumption is needed: - Non-informative censoring.</p>
+<p><em>It should be noted that the equal individual risk assumption requires that time-to-event analysis start at time <span class="math">\(\tau\)</span>, rather than at randomization.</em></p>
 <div id="bip" class="section level3">
 <h3>BIP</h3>
 <p>Briefly, a BIP <span class="math">\(W\)</span> is any baseline measurement or set of measurements that is highly correlated with <span class="math">\(S\)</span>, and is unlikely to be associated with the clinical outcome after conditioning on <span class="math">\(S\)</span>, i.e. <span class="math">\(Y \perp W | S(1)\)</span>. The BIP <span class="math">\(W\)</span> is used to integrate out the missing <span class="math">\(S(1)\)</span> among those with <span class="math">\(Z = 0\)</span> based on a model for <span class="math">\(S(1) | W\)</span> that is estimated among those with <span class="math">\(Z = 1\)</span>. We describe how this model is used in the next section.</p>
+<p>The assumptions needed for a BIP to be useful depend on the risk model used. If the BIP is included in the risk model, only the assumption of no interaction with treatment and the candidate surrogate are needed. However, if the BIP is not included in the risk model, the assumption that that clinical outocme is indepedent of the BIP given the candidate surrogate is needed. Although not a requirement for identification of the risk estimands, it has been found in most simulations studies that a correlation between the BIP and <span class="math">\(S(1)\)</span> of greater than 0.6 is needed for unbiased estimation in finite samples.</p>
 </div>
 <div id="cpv" class="section level3">
 <h3>CPV</h3>
-<p>Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct integration for the missing <span class="math">\(S(1)\)</span>.</p>
+<p>Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing <span class="math">\(S(1)\)</span>. The assumptions to use CPV as a direct imputation for <span class="math">\(S(1)\)</span> are given in <span class="citation">J. Wolfson and Gilbert (2010)</span> are:</p>
+<ul>
+<li>Time constancy of the true immune response under active treatment, <span class="math">\(S(1)=S_{CPV}\)</span> almost surely, for placebo recipients that are crossed over at the end of the trial</li>
+<li>No infections during the close-out period</li>
+</ul>
 </div>
 <div id="bsm" class="section level3">
 <h3>BSM</h3>
-<p><span class="citation">Erin E. Gabriel and Gilbert (2014)</span> suggested the baseline augmentation BSM, which is a pre-treatment measurement of the candidate PS, denoted <span class="math">\(S_B\)</span>. The BSM may be a good predictor of <span class="math">\(S(1)\)</span> without any further assumptions. It can be used in the same way as a BIP. Alternatively you transform <span class="math">\(S(1) - S_B\)</span> as the candidate surrogate, further increasing the assocation with the BSM/BIP.</p>
+<p><span class="citation">Erin E. Gabriel and Gilbert (2014)</span> suggested the baseline augmentation BSM, which is a pre-treatment measurement of the candidate PS, denoted <span class="math">\(S_B\)</span>. The BSM may be a good predictor of <span class="math">\(S(1)\)</span> without any further assumptions. It can be used in the same way as a BIP. Alternatively you can transform <span class="math">\(S(1) - S_B\)</span> and use this as the candidate surrogate, further increasing the assocation with the BSM/BIP. Under the BSM assumption outlined in <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>;</p>
+<ul>
+<li>Time constancy of the true immune response under control,</li>
+</ul>
+<p>then <span class="math">\(S(0)=S_{BSM}\)</span> almost surely.</p>
 </div>
 </div>
 <div id="estimated-maximum-likelihood" class="section level2">
 <h2>Estimated Maximum Likelihood</h2>
 <p>Let <span class="math">\(f(y | \beta, s_1, z)\)</span> denote the density of <span class="math">\(Y | S(1), Z\)</span> with parameters <span class="math">\(\beta\)</span>. Further let <span class="math">\(R_i\)</span> denote the indicator for missingness in <span class="math">\(S_i(1)\)</span>. We proceed to estimate <span class="math">\(\beta\)</span> by maximizing</p>
 <p><span class="math">\[
-\prod_{i = 1}^n \left\{f(Y_i | \beta, S_i(1), Z_i)\right\}^R_i \left\{\int f(Y_i | \beta, s, Z_i) \, d \hat{F}_{S(1) | W}(s | W_i)\right\}^{1 - R_i}
+  \prod_{i = 1}^n \left\{f(Y_i | \beta, S_i(1), Z_i)\right\}^R_i \left\{\int f(Y_i | \beta, s, Z_i) \, d \hat{F}_{S(1) | W}(s | W_i)\right\}^{1 - R_i}
 \]</span></p>
 <p>with respect to <span class="math">\(\beta\)</span>.</p>
-<p>This procedure is called estimated maximum likelihood (EML) and was developed in <span class="citation">Pepe and Fleming (1991)</span>. The key idea is that we are averaging the likelihood contributions for subjects missing <span class="math">\(S(1)\)</span> with respect to the estimated distribution of <span class="math">\(S(1) | W\)</span>. A BIP <span class="math">\(W\)</span> that is strongly associated with <span class="math">\(S(1)\)</span> is needed for adequate performance. Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors. It was suggested as an approach to prinicipal surrogate evaluation by <span class="citation">P. Gilbert and Hudgens (2008)</span> and <span class="citation">Y Huang and Gilbert (2011)</span>.</p>
+<p>This procedure is called estimated maximum likelihood (EML) and was developed in <span class="citation">Pepe and Fleming (1991)</span>. The key idea is that we are averaging the likelihood contributions for subjects missing <span class="math">\(S(1)\)</span> with respect to the estimated distribution of <span class="math">\(S(1) | W\)</span>. A BIP <span class="math">\(W\)</span> that is strongly associated with <span class="math">\(S(1)\)</span> is needed for adequate performance.</p>
+<p>Closed-form inference is not available for EML estimates, thus we recommend use of the bootstrap for estimation of standard errors. It was suggested as an approach to prinicipal surrogate evaluation by <span class="citation">P. Gilbert and Hudgens (2008)</span> and <span class="citation">Y Huang and Gilbert (2011)</span>.</p>
 </div>
-<div id="psuedoscore" class="section level2">
-<h2>Psuedoscore</h2>
-<p><span class="citation">Ying Huang, Gilbert, and Wolfson (2013)</span> suggest a different estimation procedure that does have a closed form variance estimates are known. Psuedscore estimates were suggest in <span class="citation">J. Wolfson (2009)</span> and implemented for several special cases in <span class="citation">Ying Huang, Gilbert, and Wolfson (2013)</span>.</p>
+<div id="pseudoscore" class="section level2">
+<h2>Pseudoscore</h2>
+<p><span class="citation">Ying Huang, Gilbert, and Wolfson (2013)</span> suggest a different estimation procedure that does have a closed form variance estimates are known. Pseudscore estimates were also suggested in <span class="citation">J. Wolfson (2009)</span> and implemented for several special cases in <span class="citation">Ying Huang, Gilbert, and Wolfson (2013)</span>. We have implemented here only one of the special cases: categorical <span class="math">\(S\)</span> and <span class="math">\(BIP\)</span> and binary <span class="math">\(Y\)</span>. In addition to having closed form variance estimates, it has been argued that the pseudo-score estimators are more efficient than the EML estimators.</p>
 </div>
-<div id="conclusion" class="section level2">
-<h2>Conclusion</h2>
+<div id="package-features" class="section level2">
+<h2>Package features</h2>
 <p>The <code>pseval</code> package allows users to specify the type of augmented design that suits their data, specify the form of the risk model along with the distribution of <span class="math">\(Y | S(1)\)</span>, and specify different integration models to estimate the distribution of <span class="math">\(S(1) | W\)</span>. Then the likelihood can be maximized and bootstraps run. Post-estimation summaries are available to display and analyze the treatment efficacy as a function of <span class="math">\(S(1)\)</span>. All of this is implemented with a flexible and familiar interface.</p>
 </div>
 </div>
@@ -934,6 +949,7 @@ cat.fit</code></pre>
 <p>Huang, Ying, Peter B Gilbert, and Julian Wolfson. 2013. “Design and Estimation for Evaluating Principal Surrogate Markers in Vaccine Trials.” <em>Biometrics</em> 69 (2): 301–9.</p>
 <p>Pepe, MS, and TR Fleming. 1991. “A Nonparametric Method for Dealing with Mismeasured Covariate Data.” <em>Journal of the American Statistical Association</em> 86 (413): 108–13.</p>
 <p>Wolfson, J. 2009. “Statistical Methods for Identifying Surrogate Endpoints in Vaccine Trails.” PhD thesis, Chair: Gilbert, Peter: University of Washington; Department of Biostatistics.</p>
+<p>Wolfson, J, and PB Gilbert. 2010. “Statistical Identifiability and the Surrogate Endpoint Problem, with Application to Vaccine Trials.” <em>Biometrics</em> 66 (4): 1153–61.</p>
 </div>
 </div>
 </div>
