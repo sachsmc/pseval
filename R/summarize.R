@@ -17,13 +17,14 @@
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
 #' @param sig.level Significance level for bootstrap confidence intervals
+#' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
 #' @param n.samps The number of samples to take over the range of S.1 at which the VE is calculated
 #' @param bootstraps If true, will calculate bootstrap standard errors and
 #'   confidence bands.
 #'
 #' @export
 #'
-VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
+VE <- function(psdesign, t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -98,6 +99,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 
     bsests <- psdesign$bootstraps
     bootVEs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootDiff <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
     bootR1 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
     bootR0 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
     for(i in 1:nrow(bsests)){
@@ -123,6 +125,7 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
       }
 
       bootVEs[i, ] <- c(1 - R1/R0, bsests[i, "convergence"])
+      bootDiff[i, ] <- c(R1 - R0, bsests[i, "convergence"])
       bootR1[i, ] <- c(R1, bsests[i, "convergence"])
       bootR0[i, ] <- c(R0, bsests[i, "convergence"])
 
@@ -131,17 +134,20 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
     bootVEs <- as.data.frame(bootVEs)
     bootR1 <- as.data.frame(bootR1)
     bootR0 <- as.data.frame(bootR0)
+    bootDiff <- as.data.frame(bootDiff)
 
-    colnames(bootVEs)[ncol(bootVEs)] <- colnames(bootR0)[ncol(bootR0)] <- colnames(bootR1)[ncol(bootR1)] <- "convergence"
-    A1 <- as.data.frame(summarize_bs(bootR1, sig.level = sig.level)$table)
-    A2 <- as.data.frame(summarize_bs(bootR0, sig.level = sig.level)$table)
-    A3 <- as.data.frame(summarize_bs(bootVEs, sig.level = sig.level)$table)
+    colnames(bootVEs)[ncol(bootVEs)] <- colnames(bootDiff)[ncol(bootDiff)] <- colnames(bootR0)[ncol(bootR0)] <- colnames(bootR1)[ncol(bootR1)] <- "convergence"
+    A1 <- as.data.frame(summarize_bs(bootR1, obsVE$R1, sig.level = sig.level, CI.type = CI.type)$table)
+    A2 <- as.data.frame(summarize_bs(bootR0, obsVE$R0, sig.level = sig.level, CI.type = CI.type)$table)
+    A3 <- as.data.frame(summarize_bs(bootVEs, obsVE$VE, sig.level = sig.level, CI.type = CI.type)$table)
+    A4 <- as.data.frame(summarize_bs(bootDiff, obsVE$R1 - obsVE$R0, sig.level = sig.level, CI.type = CI.type)$table)
 
     colnames(A1) <- gsub("%", "", paste("R1", colnames(A1), sep = "."), fixed = TRUE)
     colnames(A2) <- gsub("%", "", paste("R0", colnames(A2), sep = "."), fixed = TRUE)
     colnames(A3) <- gsub("%", "", paste("VE", colnames(A3), sep = "."), fixed = TRUE)
+    colnames(A4) <- gsub("%", "", paste("Rdiff", colnames(A4), sep = "."), fixed = TRUE)
 
-    obsVE <- cbind(obsVE, A3, A2, A1)
+    obsVE <- cbind(obsVE, A3, A2, A1, A4)
 
   }
 
@@ -154,21 +160,38 @@ VE <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
 #' Summarize bootstrap samples
 #'
 #' @param bootdf Data frame containing bootstrapped estimates, with a column containing a convergence indicator
+#' @param estdf Data frame containing full sample estimate
 #' @param sig.level Significance level to use for confidence intervals
+#' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
 
-summarize_bs <- function(bootdf, sig.level = .05) {
+summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band") {
 
   bs <- bootdf[bootdf$convergence == 0, -which(colnames(bootdf) == "convergence")]
 
-  mary <- function(x){
-    funlist <- list(median = stats::median, mean = base::mean, boot.se = stats::sd,
-                  lower.CL = function(x) quantile(x, sig.level/2),
-                  upper.CL = function(x) quantile(x, 1 - sig.level/2))
+  if(CI.type == "pointwise"){
+    mary <- function(x){
+      funlist <- list(median = stats::median, mean = base::mean, boot.se = stats::sd,
+                    lower.CL = function(x) quantile(x, sig.level/2),
+                    upper.CL = function(x) quantile(x, 1 - sig.level/2))
 
-    sapply(funlist, function(f) f(x))
+      sapply(funlist, function(f) f(x))
+    }
+
+    table <- t(sapply(bs, mary))
+
+  } else if(CI.type == "band"){
+
+    estmat <- matrix(rep(estdf, nrow(bs)), nrow = nrow(bs), byrow = TRUE)
+    maxdiff <- apply(abs(as.matrix(bs) - estmat), MARGIN = 1, FUN = max)
+    inCI <- as.matrix(bs)[which(maxdiff < quantile(maxdiff, 1 - sig.level)), ]
+    upper.CL <- apply(inCI, MARGIN = 2, FUN = max)
+    lower.CL <- apply(inCI, MARGIN = 2, FUN = min)
+
+    table <- data.frame(upper.CL = upper.CL, lower.CL = lower.CL)
+    colnames(table) <- paste(colnames(table), 1-sig.level, sep = ".")
+
   }
 
-  table <- t(sapply(bs, mary))
   conv <- c(nboot = nrow(bootdf), ncov = sum(bootdf$convergence == 0))
 
   list(table = table, conv = conv)

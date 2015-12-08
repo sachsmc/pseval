@@ -4,7 +4,8 @@
 \alias{VE}
 \title{Calculate the vaccine efficacy}
 \usage{
-VE(psdesign, t, sig.level = 0.05, n.samps = 5000, bootstraps = TRUE)
+VE(psdesign, t, sig.level = 0.05, CI.type = "band", n.samps = 5000,
+  bootstraps = TRUE)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
@@ -16,6 +17,8 @@ compute the cumulative distribution function. If not, the restricted mean
 survival time is used. Omit for binary outcomes.}
 
 \item{sig.level}{Significance level for bootstrap confidence intervals}
+
+\item{CI.type}{Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
 
 \item{n.samps}{The number of samples to take over the range of S.1 at which the VE is calculated}
 

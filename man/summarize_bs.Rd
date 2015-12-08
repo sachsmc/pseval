@@ -4,12 +4,16 @@
 \alias{summarize_bs}
 \title{Summarize bootstrap samples}
 \usage{
-summarize_bs(bootdf, sig.level = 0.05)
+summarize_bs(bootdf, estdf = NULL, sig.level = 0.05, CI.type = "band")
 }
 \arguments{
 \item{bootdf}{Data frame containing bootstrapped estimates, with a column containing a convergence indicator}
 
+\item{estdf}{Data frame containing full sample estimate}
+
 \item{sig.level}{Significance level to use for confidence intervals}
+
+\item{CI.type}{Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
 }
 \description{
 Summarize bootstrap samples
