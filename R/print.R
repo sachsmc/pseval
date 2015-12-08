@@ -15,6 +15,7 @@
 #'   risk difference = risk_1(s) - risk_0(s).
 #' @param sig.level Significance level used for confidence bands on the VE
 #'   curve. This is only used if bootstrapped estimates are available.
+#'   @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
 #' @param n.samps Number of samples to use over the range of S.1 for plotting
 #'   the curve
 #'   @param xlab X-axis label
@@ -26,10 +27,10 @@
 #'
 #' @export
 
-plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
+plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
 
 
-  VE.me <- VE(x, t, sig.level = sig.level, n.samps = n.samps)
+  VE.me <- VE(x, t, sig.level = sig.level, CI.type = CI.type, n.samps = n.samps)
   n.curve.base <- ifelse(summary == "risk", 2, 1)
   ncurve <- ifelse("VE.boot.se" %in% colnames(VE.me), n.curve.base * 3, n.curve.base)
 
@@ -85,21 +86,21 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, n.samps = 500, 
   }
 
 
-  if("VE.boot.se" %in% colnames(VE.me)){
+  if("bootstraps" %in% names(x)){
 
     lnme <- switch(summary, VE = parse(text = grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)),
                    RR =  parse(text = paste("1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE))),
                    logRR =  parse(text = paste("log(1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
                    risk = parse(text = paste("list(", paste(sapply(c("R1.lower.", "R0.lower."),
                                                                    function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
-                   riskdiff = parse(text = paste(sapply(c("R1.lower.", "R0.lower."), function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = " - ")))
+                   riskdiff = parse(text =grep("Rdiff.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)))
 
     unme <- switch(summary, VE = parse(text = grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)),
                    RR =  parse(text = paste("1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE))),
                    logRR =  parse(text = paste("log(1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
                    risk = parse(text = paste("list(", paste(sapply(c("R1.upper.", "R0.upper."),
                                                                    function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
-                   riskdiff = parse(text = paste(sapply(c("R1.upper.", "R0.upper."), function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = " - ")))
+                   riskdiff = parse(text =grep("Rdiff.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)))
 
     if(summary == "risk"){
 
@@ -224,7 +225,7 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
   } else {
 
     cat("Bootstrap replicates:\n")
-    sbs <- summarize_bs(x$bootstraps, sig.level = sig.level)
+    sbs <- summarize_bs(x$bootstraps, x$estimates$par, sig.level = sig.level, CI.type = "pointwise")
     print(sbs$table, digits = digits)
     cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
 

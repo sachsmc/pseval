@@ -5,8 +5,8 @@
 \title{Plot summary statistics for a psdesign object}
 \usage{
 \method{plot}{psdesign}(x, t, summary = "VE", sig.level = 0.05,
-  n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1,
-  lwd = 1, ...)
+  CI.type = "band", n.samps = 500, xlab = "S.1", ylab = summary,
+  col = 1, lty = 1, lwd = 1, ...)
 }
 \arguments{
 \item{x}{A \link{psdesign} object that contains a risk model, integration
@@ -24,6 +24,8 @@ risk difference = risk_1(s) - risk_0(s).}
 
 \item{sig.level}{Significance level used for confidence bands on the VE
 curve. This is only used if bootstrapped estimates are available.}
+
+\item{CI.type}{Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
 
 \item{n.samps}{Number of samples to use over the range of S.1 for plotting
 the curve}
