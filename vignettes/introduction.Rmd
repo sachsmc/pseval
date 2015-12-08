@@ -19,6 +19,12 @@ library(printr)
 set.seed(225452)
 ```
 
+<style type="text/css">
+div.r-help-page {
+  outline: #000000 solid thin;
+}
+</style>
+
 # Methods
 
 ## Introduction
@@ -268,17 +274,19 @@ legend("bottomright", legend = c("estimated VE", "marginal VE", "true VE"),
        col = c("black", "black", "red"), lty = c(1, 3, 1), lwd = c(2, 1, 1))
 ```
 
-## Next steps
 
-- Detail assumptions
-- Post estimation summaries 
-    + other plotting methods, risk difference, risk by treatment
-    + total gain, true and false positive fractions [@Gabriel15]
-- VE surface, depending on both S.1 and S.0
-- Allow poisson and binomial distributions in `integrate_parametric`
-- Estimation via pseudo-score [@Huang12]
+By default, plots of psdesign objects with bootstrap samples will display simultaneous confidence bands for the curve. These bands $L\alpha$ satisfy
 
-File additional suggestions here as a [github issue](https://github.com/sachsmc/pseval/issues)
+$$
+P\left\{\sup_{s \in B} | \hat{VE}(s) - VE(s) | \leq L_\alpha \right\} \leq 1 - \alpha,
+$$
+
+for confidence level $\alpha$. The alternative is to use pointwise confidence intervals, with the option `CI.type = "pointwise"`. These intervals satisfy
+
+$$
+P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \mbox{ for all } s. 
+$$
+
 
 ## Additional examples
 
@@ -321,6 +329,11 @@ cat.fit.ps <- psdesign(fakedata, Z = Z, Y = Y.obs,
 summary(cat.fit.ps)
 plot(cat.fit.ps)
 ```
+
+
+# Bug reports
+
+- File bugs and suggestions here as a [github issue](https://github.com/sachsmc/pseval/issues)
 
 
 # References
