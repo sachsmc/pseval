@@ -1,3 +1,5 @@
+[![Travis-CI Build Status](https://travis-ci.org/sachsmc/pseval.svg?branch=master)](https://travis-ci.org/sachsmc/pseval)
+
 # pseval: Methods for Evaluting Principal Surrogates of Treatment Response
 
 ## Installation
