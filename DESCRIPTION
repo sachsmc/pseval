@@ -1,8 +1,8 @@
 Package: pseval
 Type: Package
 Title: Methods for Evaluating Principal Surrogates of Treatment Response
-Version: 0.1
-Date: 2015-12-02
+Version: 0.9.0
+Date: 2015-12-09
 Author: Michael C Sachs
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Description: Contains the core methods for the evaluation of principal surrogates in a single clinical trial.

@@ -227,7 +227,7 @@ We estimate the parameters and bootstrap using the same type of syntax. We can a
 
 The `ps_bootstrap` function takes the additional arguments `n.boots` for the number of bootstrap replicates, and `progress.bar` which is a logical that displays a progress bar in the R console if true. It is helpful to pass the estimates as starting values in the bootstrap resampling. 
 
-```{r est, cache = TRUE}
+```{r est}
 binary.est <- binary.ps + ps_estimate(method = "BFGS")
 binary.boot <- binary.est + ps_bootstrap(n.boots = 50, progress.bar = FALSE, 
                             start = binary.est$estimates$par, method = "BFGS")

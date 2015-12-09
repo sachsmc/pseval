@@ -50,7 +50,7 @@ est.bin.pseudo <- matrix(NA, nrow = nsim, ncol = 5)
 est.surv.para <- matrix(NA, nrow = nsim, ncol = 5)
 est.surv.semi <- matrix(NA, nrow = nsim, ncol = 5)
 
-
+if(FALSE){ # change to TRUE if you want to run simulation
 for(i in 1:nsim){
 
   fakedata <- generate_example_data(n = 800)
@@ -69,5 +69,20 @@ for(i in 1:nsim){
 
 }
 
+res <- list(bin.para = est.bin.para, bin.semi = est.bin.semi, bin.pseudo = est.bin.pseudo, surv.para = est.surv.para, surv.semi = est.surv.semi)
 
+plotdem <- function(mat){
 
+  for(i in 1:(ncol(mat) - 1)){
+    hist(mat[, i])
+    abline(v = true.par[i], col = "red", lwd = 2)
+  }
+
+  colMeans(mat[mat[, ncol(mat)] == 1, -ncol(mat)]) - true.par
+
+}
+
+par(mfrow = c(2, 2))
+lapply(res, plotdem)
+
+}
