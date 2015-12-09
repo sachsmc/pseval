@@ -15,7 +15,7 @@ vignette: >
 
 ```{r knitup, include = FALSE}
 library(knitr)
-library(printr)
+require(printr, quietly = TRUE)
 set.seed(225452)
 ```
 
