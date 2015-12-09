@@ -54,8 +54,9 @@ psdesign <- function(data, Z, Y, S,
       nminus <- sum(oot[, 1] < 0)
 
       stdex <- oot[, 1] >= 0
-      warning("Removing ", nminus, " subjects with survival times less that tau.")
-
+      if(nminus > 0){
+        warning("Removing ", nminus, " subjects with survival times less that tau.")
+      }
       data <- data[stdex, ]
 
     }
@@ -87,7 +88,9 @@ psdesign <- function(data, Z, Y, S,
     S.0[is.na(S.0)] <- bsm[is.na(S.0)]
   }
 
-  if(is.null(weights)) weights <- rep(1, length(S.0))
+  if(is.null(weights)){
+    weights <- rep(1, length(S.0))
+  } else weights <- eval(substitute(weights), envir = data)
   rval <- NULL
 
   rval$augdata <- data.frame(Z = trt, Y = oot, S.1 = S.1, S.0 = S.0,

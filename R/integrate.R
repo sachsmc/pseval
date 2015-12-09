@@ -21,9 +21,16 @@ integrate_parametric <- function(formula, family = gaussian, ...){
     outname <- paste(formula[[2]])
 
     missdex <- !is.na(get(paste(formula[[2]]), psdesign$augdata))
+    glmdat <- psdesign$augdata[missdex, ]
+
+    if(is.factor(glmdat[, outname])){
+
+      stop("Parametric integration models not valid for factors. Use integrate_nonparametric instead.")
+
+    }
 
     cdfweights <- NULL # hack to get rid of note
-    fit <- glm(formula, data = psdesign$augdata[missdex, ], weights = cdfweights, family = gaussian())
+    fit <- glm(formula, data = glmdat, weights = cdfweights, family = gaussian())
 
     psdesign$integration.models[[outname]]$model <- list(model = "parametric", args = arglist)
 
@@ -87,7 +94,7 @@ integrate_nonparametric <- function(formula, ...){
     d.nomiss <- do.call("c", dimnames(tab.nomiss))
     d.miss <- do.call("c", dimnames(tab.miss))
 
-    if(!all.equal(d.nomiss, d.miss)){
+    if(!identical(d.nomiss, d.miss)){
 
       missinglevels <- lapply(d.miss, function(d) {
         if(d %in% d.nomiss) return("") else return(d)
@@ -98,6 +105,7 @@ integrate_nonparametric <- function(formula, ...){
 
     lookup <- prop.table(table(groups), margin = (1:length(dim(table(groups))))[-1]) # conditional probability
     impwith <- model.frame(formula[-2], mindelta)
+    impwith <- lapply(impwith, as.character)
 
     if(is.factor(psdesign$augdata[[outname]])){
       outvect <- levels(psdesign$augdata[[outname]])
@@ -173,8 +181,16 @@ integrate_bivnorm <- function(x = "S.1", mu = c(0, 0), sd = c(1, 1), rho = .2){
     missdex <- !is.na(get(outname, psdesign$augdata))
     mindelta <- subset(psdesign$augdata, !missdex)
 
+    if(is.factor(mindelta[, x])){
+
+      stop("Parametric integration models not valid for factors. Use integrate_nonparametric instead.")
+
+    }
+
     vmu <- mu[1] + sd[1]/sd[2] * rho * (mindelta$BIP - mu[2])
     vsd <- (1 - rho^2) * sd[1]^2
+
+
 
 
     psdesign$integration.models[[outname]]$cdf_sbarw <-
@@ -218,7 +234,15 @@ integrate_semiparametric <- function(formula.location, formula.scale, ...){
 
     if(!"integration.models" %in% names(psdesign)) psdesign$integration.models <- NULL
 
-    missdex <- !is.na(get(paste(formula.location[[2]]), psdesign$augdata))
+    outname <- paste(formula.location[[2]])
+
+    missdex <- !is.na(get(outname, psdesign$augdata))
+
+    if(is.factor(psdesign$augdata[, outname])){
+
+      stop("Semiparametric integration models not valid for factors. Use integrate_nonparametric instead.")
+
+    }
 
     fit <- sp_locscale(formula.location = formula.location, formula.scale = formula.scale,
                        data = psdesign$augdata[missdex, ], weights = psdesign$augdata$cdfweights[missdex], ...)

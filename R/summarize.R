@@ -95,7 +95,7 @@ VE <- function(psdesign, t, sig.level = .05, CI.type = "band", n.samps = 5000, b
 
   obsVE <- data.frame(S.1 = Splot, VE = 1 - R1/R0, R1 = R1, R0 = R0)
 
-  if("bootstraps" %in% names(psdesign) & bootstraps){
+  if(bootstraps && "bootstraps" %in% names(psdesign)){
 
     bsests <- psdesign$bootstraps
     bootVEs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))

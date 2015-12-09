@@ -30,7 +30,11 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
     del0 <- aug[is.na(aug$S.1), ]
     del1 <- aug[!is.na(aug$S.1), ]
     del1$glmweights <- 1
-    form <- eval(psdesign$risk.model$args$model)
+    if(is.null(psdesign$risk.model$args$model)){
+      form <- Y ~ S.1 * Z
+    } else {
+      form <- eval(psdesign$risk.model$args$model)
+    }
 
     impute <- lapply(1:nrow(del0), function(i){
 
@@ -45,7 +49,11 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
     pz1 <- mean(aug$Z == 1)
     pz0 <- mean(aug$Z == 0)
 
-    link <- strsplit(as.character(psdesign$risk.model$args$risk), ".", fixed = TRUE)[[1]][2]
+    if(is.null(psdesign$risk.model$args$risk)){
+      link <- "logit"
+    } else {
+      link <- strsplit(as.character(psdesign$risk.model$args$risk), ".", fixed = TRUE)[[1]][2]
+    }
     stopifnot(link %in% c("probit", "logit"))
 
     beta0 <- start
