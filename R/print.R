@@ -15,7 +15,7 @@
 #'   risk difference = risk_1(s) - risk_0(s).
 #' @param sig.level Significance level used for confidence bands on the VE
 #'   curve. This is only used if bootstrapped estimates are available.
-#'   @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
+#' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
 #' @param n.samps Number of samples to use over the range of S.1 for plotting
 #'   the curve
 #' @param xlab X-axis label

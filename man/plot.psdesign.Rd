@@ -23,8 +23,9 @@ risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 risk difference = risk_1(s) - risk_0(s).}
 
 \item{sig.level}{Significance level used for confidence bands on the VE
-curve. This is only used if bootstrapped estimates are available.
-@param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
+curve. This is only used if bootstrapped estimates are available.}
+
+\item{CI.type}{Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
 
 \item{n.samps}{Number of samples to use over the range of S.1 for plotting
 the curve}
