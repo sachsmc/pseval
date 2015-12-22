@@ -172,6 +172,26 @@ binary.ps
 
 The printout displays a brief description of the data, including the empirical vaccine efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for `add_integration`, in order to add an integration model to the psdesign object, the next step in the analysis. 
 
+`psdesign` easily accomodates case-control or case-cohort sampling. Let's modify the fake dataset to see how it works. We're going to sample all of the cases, and 20% of the controls for measurement of $S$. 
+
+```{r casecont}
+fakedata.cc <- fakedata
+missdex <- sample((1:nrow(fakedata.cc))[fakedata.cc$Y.obs == 0], 
+       size = floor(sum(fakedata.cc$Y.obs == 0) * .8))
+fakedata.cc[missdex, ]$S.obs <- NA
+fakedata.cc$weights <- ifelse(fakedata.cc$Y.obs == 1, 1, .2)
+```
+
+Now we can create the `psdesign` object, using the entire dataset (including those missing `S.obs`) and passing the weights to the `weights` field. 
+
+```{r casecont2}
+binary.cc <- psdesign(data = fakedata.cc, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, weights = weights)
+binary.cc
+```
+
+For survival outcomes, a key assumption is that the potential surrogate is measured at a fixed time $\tau$ after entry into the study. Any subjects who have a clinical outcome prior to $\tau$ will be removed from the analysis, with a warning. If `tau` is not specified in the `psdesign` object, then it is assumed to be 0. 
+
+
 ### Integration models
 
 The EML procedure requires an estimate of $F_{S(1) | W}$, this is referred to as the integration model. Let's see the help page for `add_integration`:
