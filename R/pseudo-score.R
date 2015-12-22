@@ -10,7 +10,6 @@
 pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
 
     if(psdesign$risk.model$model != "binary") stop("Only binary models supported for pseudo-score")
-    if(psdesign$integration.models$S.1$model$model != "nonparametric") stop("Only nonparametric integration supported for pseudo-score")
 
     if(is.null(start)){
 
@@ -35,6 +34,12 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
     } else {
       form <- eval(psdesign$risk.model$args$model)
     }
+
+    ## check that all levels of BIP in del0 have a value in del1, otherwise imputations won't work
+
+    bip0 <- unique(del0$BIP)
+    bipmatch <- sapply(bip0, function(x) x %in% del1$BIP)
+    if(!all(bipmatch)) stop("BIP has too many levels, is it categorical?")
 
     impute <- lapply(1:nrow(del0), function(i){
 

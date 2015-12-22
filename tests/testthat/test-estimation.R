@@ -60,6 +60,12 @@ test_that("Testing all combinations of integration and risk models", {
 
   expect_is(cat.ps.num + integrate_nonparametric(S.1 ~ BIP) + risk_binary(D = 10) + ps_estimate(method = "pseudo-score"), "psdesign")
 
+  ## categorical W with continuous S
+
+  catw.ps <- psdesign(fakedata, Z = Z, Y = Y.obs,
+                     S = S.obs, BIP = BIP.cat)
+  expect_is(catw.ps + integrate_parametric(S.1 ~ BIP) + risk_binary(D = 10) + ps_estimate(method = "pseudo-score"), "psdesign")
+
   expect_is(cat.ps +
     integrate_nonparametric(formula = S.1 ~ BIP) +
     risk_binary(Y ~ S.1 * Z, D = 10, risk = risk.logit) +

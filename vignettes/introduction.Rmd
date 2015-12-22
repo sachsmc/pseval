@@ -31,24 +31,24 @@ div.r-help-page {
 
 A valid principal surrogate endpoint can be used as a primary endpoint for evaluating treatments in phase II clinical trials and for predicting individual treatment effects post lincensure. A surrogate is considered to be valid if it provides reliable predictions of treatment effects on the clinical endpoint of interest. @Frangakis02 introduced the concept of principal stratification and the definition of a principal surrogate (PS). Informally, a post-treatment intermediate response variable is a principal surrogate if causal effects of the treatment on the clinical outcome only exist when causal effects of the treatment on the intermediate variable exist. The criteria for a PS have been modified and extended in more recent works, with most current literture focusing of wide effect modification as the primary criterion of interst; tests for wide effect modification are included in the package. 
 
-The goal of PS evaluation is to predict the clinical outcomes conditional on all possible treatment and surrogate combinations of interest. The combinations of interest are called the principal strata and they include a set of unobservable counterfactual responses: responses that would have occured under a set of condtions counter to the observed conditions. To finesse this problem of unobservable responses, a variety of clever trial designs and estimation approaches have been proposed. Several of these have been implemented in the `pseval` package. 
+The goal of PS evaluation is estimation and testing of how treatment efficacy on the clinical outcome of interest varies over subgroups defined by possible treatment and surrogate combinations of interest; this is an effect modification objective. The combinations of interest are called the principal strata and they include a set of unobservable counterfactual responses: responses that would have occured under a set of condtions counter to the observed conditions. To finesse this problem of unobservable responses, a variety of clever trial designs and estimation approaches have been proposed. Several of these have been implemented in the `pseval` package. 
 
 
 ## Notation
 
-Let $Z_i$ be the treatment indicator for subject $i$, where 0 indicates the control or standard treatment, and 1 indicates the experimental treatment. We currently only allow for two levels of treatment and assume that the treatment assigments are randomized. Let $S_i$ be the observed value of the intermediate response for subject $i$. Since $S_i$ can be affected by treatment, there are two naturally occuring counterfactual values of $S_i$: $S_i(1)$ under treatment, and $S_i(0)$ under control. Let $s_z$ be the realization of the random variable $S(z)$. The outcome of interest is denoted $Y_i$. We consider the counterfactual values of $Y_i(0)$ and $Y_i(1)$. We allow for both binary and time-to-event outcomes, thus $Y_i$ may be a vector containing a time variable and an event/censoring indicator, i.e. $Y_i = (T_i, C_i)$ where $C_i = 1$ if $T_i$ is an event time, and $C_i = 0$ if $T_i$ is a censoring time. 
+Let $Z_i$ be the treatment indicator for subject $i$, where 0 indicates the control or standard treatment, and 1 indicates the experimental treatment. We currently only allow for two levels of treatment and assume that the treatment assigments are randomized. Let $S_i$ be the observed value of the intermediate response for subject $i$. Since $S_i$ can be affected by treatment, there are two naturally occuring counterfactual values of $S_i$: $S_i(1)$ under treatment, and $S_i(0)$ under control. Let $s_z$ be the realization of the random variable $S(z)$, for $z \in \{0, 1\}$. The outcome of interest is denoted $Y_i$. We consider the counterfactual values of $Y_i(0)$ and $Y_i(1)$. We allow for both binary and time-to-event outcomes, thus $Y_i$ may be a vector containing a time variable and an event/censoring indicator, i.e. $Y_i = (T_i, \Delta_i)$ where $\Delta_i = 1$ if $T_i$ is an event time, and $\Delta_i = 0$ if $T_i$ is a censoring time. For all of the methods, $S_i(z)$ is only defined if the clinical outcome $Y_i(z)$ does not occur before the potential surrogate $S_i(z)$ is measured at a fixed time $\tau$ after entry into the study.  The data analyses only include participants who have not experienced the clinical outcome by time $\tau$.  For validity all of the methods assume no individual-level treatment effects on $Y$ before $\tau$, which we refer to as the ‘Equal early individual risk’ assumption below.
 
 
 ## Estimands 
 
-Criteria for $S$ to be a good surrogate are based on risk estimands that condition on the potential intermediate responses. The risk is defined as a mapping $g$ of the cumulative distribution function of $Y(z)$ condtional on the intermediate responses. Currently we focus only on marginal risk estimands which condition only on $S(1)$, the intermediate response or biomarker under active treatment: 
+Criteria for $S$ to be a good surrogate are based on risk estimands that condition on the potential intermediate responses. The risk is defined as a mapping $g$ of the cumulative distribution function of $Y(z)$ conditional on the intermediate responses. Currently we focus only on marginal risk estimands which condition only on $S(1)$, the intermediate response or biomarker under active treatment: 
   
 $$
 risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
 risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 $$
   
-The joint risk estimands, also condition on $S(0)$, the intermediate response or biomarker under control. In the special case where $S(0)$ is constant, such as the immune response to HIV antigens in the placebo arm of a vaccine trial, the joint and marginal risk estimands are equivalent. This special case is referred to as case constant biomarker (CB) in much of the literature [@Gilbert08]. 
+The joint risk estimands also condition on $S(0)$, the intermediate response or biomarker under control. In the special case where $S(0)$ is constant, such as the immune response to HIV antigens in the placebo arm of a vaccine trial, the joint and marginal risk estimands are equivalent. This special case is referred to as case constant biomarker (CB) in much of the literature [@Gilbert08]. 
   
 For instance, for a binary outcome, the risk function may simply be the probability $risk_z(s_1) = P(Y(z) = 1 | S(1) = s_1)$, or for a time-to-event outcome the risk function may be the cumulative distribution function $risk_z(s_1) = P(Y(z) \leq t | S(1) = s_1)$. 
 
@@ -87,9 +87,9 @@ In time-to-event settings one more assumption is needed:
 
 ### BIP
 
-Briefly, a BIP $W$ is any baseline measurement or set of measurements that is highly correlated with $S$, and is unlikely to be associated with the clinical outcome after conditioning on $S$, i.e. $Y \perp W | S(1)$. The BIP $W$ is used to integrate out the missing $S(1)$ among those with $Z = 0$ based on a model for $S(1) | W$ that is estimated among those with $Z = 1$. We describe how this model is used in the next section.
+Briefly, a BIP $W$ is any baseline measurement or set of measurements that is highly correlated with $S$. It is particularly useful if $W$ is unlikely to be associated with the clinical outcome after conditioning on $S$, i.e. $Y \perp W | S(1)$; some of the methods leverage this assumption. The BIP $W$ is used to integrate out the missing $S(1)$ among those with $Z = 0$ based on a model for $S(1) | W$ that is estimated among those with $Z = 1$. We describe how this model is used in the next section.
 
-The assumptions needed for a BIP to be useful depend on the risk model used. If the BIP is included in the risk model, only the assumption of no interaction with treatment and the candidate surrogate are needed. However, if the BIP is not included in the risk model, the assumption that that clinical outocme is indepedent of the BIP given the candidate surrogate is needed. Although not a requirement for identification of the risk estimands, it has been found in most simulations studies that a correlation between the BIP and $S(1)$ of greater than 0.6 is needed for unbiased estimation in finite samples. 
+The assumptions needed for a BIP to be useful depend on the risk model used. If the BIP is included in the risk model, only the assumption of no interaction with treatment and the candidate surrogate are needed. However, if the BIP is not included in the risk model, the assumption that that clinical outcome is independent of the BIP given the candidate surrogate is needed. Although not a requirement for identification of the risk estimands, it has been found in most simulations studies that a correlation between the BIP and $S(1)$ of greater than 0.6 is needed for unbiased estimation in finite samples. 
 
 ### CPV
 
@@ -124,7 +124,7 @@ Closed-form inference is not available for EML estimates, thus we recommend use 
 
 ##Pseudoscore 
 
-@Huang12 suggest a different estimation procedure that does have a closed form variance estimates are known. Pseudscore estimates were also suggested in @WolfsonDiss and implemented for several special cases in @Huang12. We have implemented here only one of the special cases: categorical $S$ and $BIP$ and binary $Y$. In addition to having closed form variance estimates, it has been argued that the pseudo-score estimators are more efficient than the EML estimators. 
+@Huang12 suggest a different estimation procedure that does have a closed form variance estimator. Pseudscore estimates were also suggested in @WolfsonDiss and implemented for several special cases in @Huang12. We have implemented here only one of the special cases: categorical $BIP$ and binary $Y$ ($S$ may be continuous or categorical. In addition to having closed form variance estimators, it has been argued that the pseudo-score estimators are more efficient than the EML estimators. The closed form variance estimates are not yet implemented. 
 
 
 ## Package features
@@ -296,7 +296,7 @@ $$
 surv.fit <- psdesign(fakedata, Z = Z, Y = Surv(time.obs, event.obs), 
                      S = S.obs, BIP = BIP, CPV = CPV) + 
   integrate_semiparametric(formula.location = S.1 ~ BIP, formula.scale = S.1 ~ 1) + 
-  risk_exponential(D = 10) + ps_estimate(method = "BFGS")
+  risk_exponential(D = 10) + ps_estimate(method = "BFGS") + ps_bootstrap(n.boots = 20)
 surv.fit
 plot(surv.fit)
 ```
@@ -318,11 +318,13 @@ cat.fit
 plot(cat.fit)
 ```
 
-Categorical S and W allows for estimation of the model using the pseudo-score method: 
+### Pseudo-score
+
+Categorical W allows for estimation of the model using the pseudo-score method. $S$ may be continuous or categorical: 
 
 ```{r catfitps}
 cat.fit.ps <- psdesign(fakedata, Z = Z, Y = Y.obs, 
-                     S = S.obs.cat, BIP = BIP.cat) + 
+                     S = S.obs, BIP = BIP.cat) + 
   integrate_nonparametric(formula = S.1 ~ BIP) + 
   risk_binary(Y ~ S.1 * Z, D = 10, risk = risk.logit) + ps_estimate(method = "pseudo-score") + 
   ps_bootstrap(n.boots = 20, method = "pseudo-score")
