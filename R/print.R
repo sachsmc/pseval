@@ -18,11 +18,11 @@
 #'   @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
 #' @param n.samps Number of samples to use over the range of S.1 for plotting
 #'   the curve
-#'   @param xlab X-axis label
-#'   @param ylab Y-axis label
-#'   @param col Vector of integers specifying colors for each curve.
-#'   @param lty Vector of integers specifying linetypes for each curve.
-#'   @param lwd Vector of numeric values for line widths.
+#' @param xlab X-axis label
+#' @param ylab Y-axis label
+#' @param col Vector of integers specifying colors for each curve.
+#' @param lty Vector of integers specifying linetypes for each curve.
+#' @param lwd Vector of numeric values for line widths.
 #' @param ... Other arguments passed to \link{plot}
 #'
 #' @export
