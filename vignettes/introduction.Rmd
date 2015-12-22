@@ -310,6 +310,14 @@ $$
 
 ## Additional examples
 
+### Case-control design
+
+```{r ccest}
+cc.fit <- binary.cc + integrate_parametric(S.1 ~ BIP) + 
+  risk_binary(D = 10) + ps_estimate()
+cc.fit
+```
+
 ### Survival outcome
 
 ```{r surv1}

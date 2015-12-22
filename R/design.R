@@ -11,8 +11,6 @@
 #' \link{add_integration} and \link{add_riskmodel} for information on how to
 #' proceed in the analysis.
 #'
-#' @details TODO
-#'
 #' @param data Data frame containing data to be analyzed
 #' @param Z Expression defining the treatment variable which has 2 levels
 #' @param Y Expression defining the outcome variable. For binary events this

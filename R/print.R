@@ -248,6 +248,8 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
 
 #' Summary method for psdesign objects
 #'
+#' @return Invisibly returns the printed table, along with the three estimates of vaccine efficacy. The empirical VE is 1 minus the relative risk comparing the treatment arm to the control arm. The risk is estimated as the proportion in the binary outcome case, or with the Kaplan-Meier estimate at the restricted mean survival in the time-to-event case. The marginal VE estimate is the VE estimate under the specified parametric risk model, ignoring the effect of S.1. The model based average VE is the VE estimate from the specified risk model, averaged over the distribution of S.1. The point of displaying these three is to assess the validity of the parametric model, and to assess the validity of the model estimation. Wild differences among these estimates may indicate problems with the model or convergence.
+#'
 #' @param object An object of class \link{psdesign}
 #' @param digits Number of significant digits to display
 #' @param sig.level Significance level to use for computing bootstrapped confidence intervals
