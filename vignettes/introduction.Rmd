@@ -161,6 +161,8 @@ head(fakedata)
 
 The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = 1, S(1) = -0.5, Z = 0, S(1):Z = -1. The true model for binary is logistic, with the same parameter values. 
 
+In the above table S.obs.cat and BIP.cat are formed as `S.obs.cat <- factor(S.obs,levels=c(-Inf, quantile(c(S.0, S.1), c(.25, .5, .75), na.rm = TRUE), Inf))` and similarly for BIP.cat. Alternatively a user could input arbitrary numeric values to represent different discrete subgroups (e.g., 0s and 1s to denote 2 subgroups).
+
 ### The `psdesign` object
 
 We begin by creating a `psdesign` object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the `svydesign` function in the [survey](https://cran.r-project.org/web/packages/survey/) package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous $S.1$ and the BIP labeled $BIP$. The object has a print method, so we can inspect the result. 
@@ -308,7 +310,35 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 $$
 
 
+Different summary measures are available for plotting. The options are "VE" for vaccine efficacy = $1 - risk_1(s)/risk_0(s)$, "RR" for relative risk = $risk_1(s)/risk_0(s)$, "logRR" for log of the relative risk, "risk" for the risk in each treatment arm, and "RD" for the risk difference = $risk_1(s) - risk_0(s)$. We can also tranform using the `log` option of `plot`. 
+
+```{r logrr}
+plot(binary.boot, summary = "logRR", lwd = 2)
+```
+
 ## Additional examples
+
+
+### Plot both types of CI
+
+```{r plotciag}
+plot(binary.boot, summary = "VE", lwd = 2, CI.type = "band")
+sbs <- VE(binary.boot, CI.type = "pointwise", n.samps = 200)
+lines(VE.lower.CL.2.5 ~ S.1, data = sbs, lty = 3, lwd = 2)
+lines(VE.upper.CL.97.5 ~ S.1, data = sbs, lty = 3, lwd = 2)
+legend("bottomright", lwd = 2, lty = 1:3, legend = c("estimate", "simultaneous CI", "pointwise CI"))
+```
+
+
+### Plot with ggplot2
+
+```{r ggpt}
+library(ggplot2)
+VE.est <- VE(binary.boot, n.samps = 200)
+ggplot(VE.est, 
+       aes(x = S.1, y = VE, ymin = VE.lower.CL.0.95, ymax = VE.upper.CL.0.95)) + 
+  geom_line() + geom_ribbon(alpha = .2)
+```
 
 ### Case-control design
 

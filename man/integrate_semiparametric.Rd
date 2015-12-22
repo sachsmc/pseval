@@ -12,11 +12,10 @@ under treatment. Generally the candidate surrogate will be on the left side
 in the formula, and the BIP or BIPs will be on the right side}
 
 \item{formula.scale}{Formula specifying the integration model for the scale component of the surrogate
-  under treatment. Generally the candidate surrogate will be on the left side
-  in the formula, and the BIP or BIPs will be on the right side
-  @param ... Other parameters passed to \link{sp_locscale}
+under treatment. Generally the candidate surrogate will be on the left side
+in the formula, and the BIP or BIPs will be on the right side}
 
-  @export}
+\item{...}{Other parameters passed to \link{sp_locscale}}
 }
 \description{
 Semiparametric integration model using the location-scale model

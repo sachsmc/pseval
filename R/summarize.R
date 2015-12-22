@@ -163,6 +163,7 @@ VE <- function(psdesign, t, sig.level = .05, CI.type = "band", n.samps = 5000, b
 #' @param estdf Data frame containing full sample estimate
 #' @param sig.level Significance level to use for confidence intervals
 #' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
+#' @export
 
 summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band") {
 

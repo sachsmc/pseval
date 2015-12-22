@@ -7,9 +7,7 @@
 wem_test(x)
 }
 \arguments{
-\item{x}{An object of class \link{psdesign} with bootstrap replicates
-
- @export}
+\item{x}{An object of class \link{psdesign} with bootstrap replicates}
 }
 \description{
 This runs a multivariate Wald test on the interaction terms of the model, using the bootstrap covariance

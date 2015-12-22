@@ -296,7 +296,7 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 #'
 #' @param x An object of class \link{psdesign} with bootstrap replicates
 #'
-#'  @export
+#' @export
 wem_test <- function(x){
 
   testdex <- grep(":Z", x$param.names, fixed = TRUE)

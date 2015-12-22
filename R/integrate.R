@@ -71,7 +71,7 @@ integrate_parametric <- function(formula, family = gaussian, ...){
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side. In this case
 #'   the BIP and the S(1) must be categorical.
-#' @param ... Arguments passed to
+#' @param ... Not currently used
 #'
 #' @export
 
@@ -223,9 +223,9 @@ integrate_bivnorm <- function(x = "S.1", mu = c(0, 0), sd = c(1, 1), rho = .2){
 #' @param formula.scale Formula specifying the integration model for the scale component of the surrogate
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
-#'   @param ... Other parameters passed to \link{sp_locscale}
+#' @param ... Other parameters passed to \link{sp_locscale}
 #'
-#'   @export
+#' @export
 
 integrate_semiparametric <- function(formula.location, formula.scale, ...){
   arglist <- as.list(match.call())
