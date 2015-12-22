@@ -3,7 +3,7 @@
 #' @param start Vector of starting values, if NULL, will come up with starting
 #'   values
 #' @param method Method to use for optimization, can be "pseudo-score" for
-#'   categorical S with nonparametric integration, or any of the methods
+#'   categorical BIP, or any of the methods
 #'   available in \link{optim}. Defaults to "BFGS"
 #' @param control List of control parameters for passed to \link{optim}
 #' @param ... Arguments passed to \link{optim} or \link{pseudo_score}.

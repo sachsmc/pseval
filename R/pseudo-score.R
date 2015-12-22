@@ -10,7 +10,6 @@
 pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
 
     if(psdesign$risk.model$model != "binary") stop("Only binary models supported for pseudo-score")
-    if(psdesign$integration.models$S.1$model$model != "nonparametric") stop("Only nonparametric integration supported for pseudo-score")
 
     if(is.null(start)){
 
@@ -30,7 +29,17 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
     del0 <- aug[is.na(aug$S.1), ]
     del1 <- aug[!is.na(aug$S.1), ]
     del1$glmweights <- 1
-    form <- eval(psdesign$risk.model$args$model)
+    if(is.null(psdesign$risk.model$args$model)){
+      form <- Y ~ S.1 * Z
+    } else {
+      form <- eval(psdesign$risk.model$args$model)
+    }
+
+    ## check that all levels of BIP in del0 have a value in del1, otherwise imputations won't work
+
+    bip0 <- unique(del0$BIP)
+    bipmatch <- sapply(bip0, function(x) x %in% del1$BIP)
+    if(!all(bipmatch)) stop("BIP has too many levels, is it categorical?")
 
     impute <- lapply(1:nrow(del0), function(i){
 
@@ -45,7 +54,11 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
     pz1 <- mean(aug$Z == 1)
     pz0 <- mean(aug$Z == 0)
 
-    link <- strsplit(as.character(psdesign$risk.model$args$risk), ".", fixed = TRUE)[[1]][2]
+    if(is.null(psdesign$risk.model$args$risk)){
+      link <- "logit"
+    } else {
+      link <- strsplit(as.character(psdesign$risk.model$args$risk), ".", fixed = TRUE)[[1]][2]
+    }
     stopifnot(link %in% c("probit", "logit"))
 
     beta0 <- start
