@@ -6,6 +6,7 @@
 #' other variables are present in the risk model, then the risk is computed at
 #' their median value.
 #'
+#'
 #' @return A data frame containing columns for the S values, the VE, R0, and R1
 #'   at those S values, and optionally standard errors and confidence intervals
 #'   computed using bootstrapped estimates.
@@ -19,7 +20,7 @@
 #' @param sig.level Significance level for bootstrap confidence intervals
 #' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
 #' @param n.samps The number of samples to take over the range of S.1 at which the VE is calculated
-#' @param bootstraps If true, will calculate bootstrap standard errors and
+#' @param bootstraps If true, and bootstrapped estimates are present, will calculate bootstrap standard errors and
 #'   confidence bands.
 #'
 #' @export

@@ -4,13 +4,14 @@
 
 ## Installation
 
-`pseval` is an R package aimed at implementing existing methods for surrogate evaluation using a flexible and common interface. It is still in active development and testing. Development will take place on [the Github page](https://github.com/sachsmc/pseval), and the current version of the package can be installed as shown below. First you must install the `devtools` package, if you haven't already `install.packages("devtools")`. 
+`pseval` is an R package aimed at implementing existing methods for surrogate evaluation using a flexible and common interface. It is still in active development and testing. Development will take place here on [the Github page](https://github.com/sachsmc/pseval), and the current version of the package can be installed as shown below. First you must install the `devtools` package, if you haven't already `install.packages("devtools")`. 
 
 ```{r eval = FALSE}
 devtools::install_github("sachsmc/pseval")
 ```
 
-Check out the [vignette](https://sachsmc.github.io/pseval) for methodological details and package information. 
+Check out the [vignette](https://sachsmc.github.io/pseval) for methodological details and information on how to use the package.
+
 ## References
 
 

@@ -93,7 +93,7 @@ The assumptions needed for a BIP to be useful depend on the risk model used. If 
 
 ### CPV
 
-Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing $S(1)$. The assumptions to use CPV as a direct imputation for $S(1)$ are given in @Wolfson10 are: 
+Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing $S(1)$. One set of conservative assumptions to use CPV as a direct imputation for $S(1)$ are given in @Wolfson10 are: 
   
 - Time constancy of the true immune response under active treatment, $S(1)=S_{CPV}$ almost surely, for placebo recipients that are crossed over at the end of the trial
 - No infections during the close-out period
@@ -124,7 +124,7 @@ Closed-form inference is not available for EML estimates, thus we recommend use 
 
 ##Pseudoscore 
 
-@Huang12 suggest a different estimation procedure that does have a closed form variance estimator. Pseudscore estimates were also suggested in @WolfsonDiss and implemented for several special cases in @Huang12. We have implemented here only one of the special cases: categorical $BIP$ and binary $Y$ ($S$ may be continuous or categorical. In addition to having closed form variance estimators, it has been argued that the pseudo-score estimators are more efficient than the EML estimators. The closed form variance estimates are not yet implemented. 
+@Huang12 suggest a different estimation procedure that does have a closed form variance estimator. Pseudscore estimates were also suggested in @WolfsonDiss and implemented for several special cases in @Huang12. We have implemented here only one of the special cases: categorical $BIP$ and binary $Y$ ($S$ may be continuous or categorical). In addition to having closed form variance estimators, it has been argued that the pseudo-score estimators are more efficient than the EML estimators. The closed form variance estimates are not yet implemented. 
 
 
 ## Package features
@@ -315,6 +315,15 @@ Different summary measures are available for plotting. The options are "VE" for 
 ```{r logrr}
 plot(binary.boot, summary = "logRR", lwd = 2)
 ```
+
+The `VE` function is the workhorse that creates the plots. You can call this function directly to obtain estimates, standard errors, and confidence intervals for the estimated risk in each treatment arm and transformations of the risk like VE. The parameter `n.samps` determines the number of points at which to calculate the VE. The points are evenly spaced over the range of S.1. Use this function to compute other summaries, make plots using `ggplot2` or `lattice` and more. 
+
+```{r ve}
+ve.est <- VE(binary.boot, CI.type = "pointwise", n.samps = 200)
+head(ve.est)
+```
+
+
 
 ## Additional examples
 

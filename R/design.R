@@ -32,6 +32,9 @@
 #'   used for integration
 #'
 #' @export
+#' @importFrom graphics lines plot segments
+#' @importFrom stats cov gaussian glm median model.frame model.matrix model.response optim pchisq pnorm predict qnorm quantile quasi quasibinomial rbinom rexp rnorm runif terms
+#' @importFrom utils flush.console head setTxtProgressBar txtProgressBar
 
 psdesign <- function(data, Z, Y, S,
                      BIP = NULL, CPV = NULL, BSM = NULL, weights = NULL, tau, ...){

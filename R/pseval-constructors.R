@@ -72,7 +72,7 @@ add_riskmodel <- function(psdesign, riskmodel){
 #'
 #' @examples
 #' test <- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
-#' test + integrate_parametric(S.1 ~ BIP) + risk_binary() + ps_estimate(method = "BFGS")
+#' test + integrate_parametric(S.1 ~ BIP) + risk_binary(D = 50) + ps_estimate(method = "BFGS")
 
 add_estimate <- function(psdesign, estimate){
 
