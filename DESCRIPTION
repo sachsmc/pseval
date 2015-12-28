@@ -1,8 +1,8 @@
 Package: pseval
 Type: Package
 Title: Methods for Evaluating Principal Surrogates of Treatment Response
-Version: 0.9.1
-Date: 2015-12-22
+Version: 1.0.0
+Date: 2015-12-28
 Author: Michael C Sachs
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Description: Contains the core methods for the evaluation of principal
@@ -23,3 +23,4 @@ Imports:
     survival
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
+Additional_repositories: http://yihui.name/xran

@@ -14,11 +14,11 @@ test_that("Testing bootstrap and VE estimation", {
   expect_true("convergence" %in% colnames(binary.boot$bootstraps))
   expect_true(nrow(binary.boot$bootstraps) == 50)
 
-  pw.ve <- VE(binary.boot, n.samps = 100, CI.type = "pointwise")
-  band.ve <- VE(binary.boot, n.samps = 100, CI.type = "band")
+  pw.ve <- calc_risk(binary.boot, n.samps = 100, CI.type = "pointwise")
+  band.ve <- calc_risk(binary.boot, n.samps = 100, CI.type = "band")
 
-  expect_false("VE.boot.se" %in% colnames(band.ve))
-  expect_true("VE.boot.se" %in% colnames(pw.ve))
+  expect_true("Y.boot.se" %in% colnames(band.ve))
+  expect_true("Y.boot.se" %in% colnames(pw.ve))
 
   smary <- summary(binary.boot)
 

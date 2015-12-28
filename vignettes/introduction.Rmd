@@ -93,7 +93,7 @@ The assumptions needed for a BIP to be useful depend on the risk model used. If 
 
 ### CPV
 
-Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing $S(1)$. The assumptions to use CPV as a direct imputation for $S(1)$ are given in @Wolfson10 are: 
+Under a CPV augmented design, control recipients that do not have events at the end of the follow-up period are given the experimental treatment. Then their intermediate response is measured at some time post treatment. This measurement is then used as a direct imputation for the missing $S(1)$. One set of conservative assumptions to use CPV as a direct imputation for $S(1)$ are given in @Wolfson10 are: 
   
 - Time constancy of the true immune response under active treatment, $S(1)=S_{CPV}$ almost surely, for placebo recipients that are crossed over at the end of the trial
 - No infections during the close-out period
@@ -124,7 +124,7 @@ Closed-form inference is not available for EML estimates, thus we recommend use 
 
 ##Pseudoscore 
 
-@Huang12 suggest a different estimation procedure that does have a closed form variance estimator. Pseudscore estimates were also suggested in @WolfsonDiss and implemented for several special cases in @Huang12. We have implemented here only one of the special cases: categorical $BIP$ and binary $Y$ ($S$ may be continuous or categorical. In addition to having closed form variance estimators, it has been argued that the pseudo-score estimators are more efficient than the EML estimators. The closed form variance estimates are not yet implemented. 
+@Huang12 suggest a different estimation procedure that does have a closed form variance estimator. Pseudscore estimates were also suggested in @WolfsonDiss and implemented for several special cases in @Huang12. We have implemented here only one of the special cases: categorical $BIP$ and binary $Y$ ($S$ may be continuous or categorical). In addition to having closed form variance estimators, it has been argued that the pseudo-score estimators are more efficient than the EML estimators. The closed form variance estimates are not yet implemented. 
 
 
 ## Package features
@@ -276,9 +276,20 @@ We provide summary and plotting methods for the psdesign object. The summary met
 smary <- summary(binary.boot)
 ```
 
+The `calc_risk` function computes the risk in each treatment arm, and contrasts of the risks. By default it computes the vaccine efficacy, but there are other contrast functions available. The contrast function is a function that takes 2 inputs, the $risk_0$ and $risk_1$, and returns some one dimensional function of those two inputs. It must be vectorized. Some built-in functions are "VE" for vaccine efficacy $ = 1 - risk_1(s)/risk_0(s)$, "RR" for relative risk $ = risk_1(s)/risk_0(s)$, "logRR" for log of the relative risk, and "RD" for the risk difference $ = risk_1(s) -risk_0(s)$. You can pass the name of the function, or the function itself. See `?VE` for more information about contrast functions. 
+
+Other arguments of the `calc_risk` function include `t`, the time at which to calculate the risk for time-to-event outcomes, `n.samps` which is the number of samples over the range of S.1 at which the risk will be calculated, and `CI.type`, which can be `"pointwise"` for pointwise confidence intervals or `"band"` for a simultaneous confidence band. `sig.level` is the significance level for the bootstrap confidence intervals. 
+
+```{r calcrisk}
+head(calc_risk(binary.boot, contrast = "VE", n.samps = 20))
+head(calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20))
+```
+
+
+It is easy to plot the risk estimates. 
 
 ```{r plot1}
-plot(binary.boot, summary = "VE", lwd = 2)
+plot(binary.boot, contrast = "VE", lwd = 2)
 abline(h = smary$VE.estimates[2], lty = 2)
 
 expit <- function(x) exp(x)/(1 + exp(x))
@@ -313,8 +324,21 @@ $$
 Different summary measures are available for plotting. The options are "VE" for vaccine efficacy = $1 - risk_1(s)/risk_0(s)$, "RR" for relative risk = $risk_1(s)/risk_0(s)$, "logRR" for log of the relative risk, "risk" for the risk in each treatment arm, and "RD" for the risk difference = $risk_1(s) - risk_0(s)$. We can also tranform using the `log` option of `plot`. 
 
 ```{r logrr}
-plot(binary.boot, summary = "logRR", lwd = 2)
+plot(binary.boot, contrast = "logRR", lwd = 2)
+plot(binary.boot, contrast = "RR", log = "y", lwd = 2)
 ```
+
+The `calc_risk` function is the workhorse that creates the plots. You can call this function directly to obtain estimates, standard errors, and confidence intervals for the estimated risk in each treatment arm and transformations of the risk like VE. The parameter `n.samps` determines the number of points at which to calculate the VE. The points are evenly spaced over the range of S.1. Use this function to compute other summaries, make plots using `ggplot2` or `lattice` and more. 
+
+```{r ve}
+ve.est <- calc_risk(binary.boot, CI.type = "pointwise", n.samps = 200)
+head(ve.est)
+```
+
+## Note about D
+
+In the examples above, `D` was set to a small number so that the vignette can be built in a timely manner. This parameter is the number of samples to use for the empirical integration in the estimated maximum likelihood. In real applications, we recommend using a much larger `D`, a least the sample size, and possibly some multple of the sample size. Note that it will take much longer to run with a higher `D`, but the results will be more accurate. 
+
 
 ## Additional examples
 
@@ -322,10 +346,10 @@ plot(binary.boot, summary = "logRR", lwd = 2)
 ### Plot both types of CI
 
 ```{r plotciag}
-plot(binary.boot, summary = "VE", lwd = 2, CI.type = "band")
-sbs <- VE(binary.boot, CI.type = "pointwise", n.samps = 200)
-lines(VE.lower.CL.2.5 ~ S.1, data = sbs, lty = 3, lwd = 2)
-lines(VE.upper.CL.97.5 ~ S.1, data = sbs, lty = 3, lwd = 2)
+plot(binary.boot, contrast = "VE", lwd = 2, CI.type = "band")
+sbs <- calc_risk(binary.boot, CI.type = "pointwise", n.samps = 200)
+lines(Y.lower.CL.2.5 ~ S.1, data = sbs, lty = 3, lwd = 2)
+lines(Y.upper.CL.97.5 ~ S.1, data = sbs, lty = 3, lwd = 2)
 legend("bottomright", lwd = 2, lty = 1:3, legend = c("estimate", "simultaneous CI", "pointwise CI"))
 ```
 
@@ -334,10 +358,10 @@ legend("bottomright", lwd = 2, lty = 1:3, legend = c("estimate", "simultaneous C
 
 ```{r ggpt}
 library(ggplot2)
-VE.est <- VE(binary.boot, n.samps = 200)
+VE.est <- calc_risk(binary.boot, n.samps = 200)
 ggplot(VE.est, 
-       aes(x = S.1, y = VE, ymin = VE.lower.CL.0.95, ymax = VE.upper.CL.0.95)) + 
-  geom_line() + geom_ribbon(alpha = .2)
+       aes(x = S.1, y = Y, ymin = Y.lower.CL.0.95, ymax = Y.upper.CL.0.95)) + 
+  geom_line() + geom_ribbon(alpha = .2) + ylab(attr(VE.est, "Y.function"))
 ```
 
 ### Case-control design

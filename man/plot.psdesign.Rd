@@ -4,8 +4,8 @@
 \alias{plot.psdesign}
 \title{Plot summary statistics for a psdesign object}
 \usage{
-\method{plot}{psdesign}(x, t, summary = "VE", sig.level = 0.05,
-  CI.type = "band", n.samps = 500, xlab = "S.1", ylab = summary,
+\method{plot}{psdesign}(x, t, contrast = "VE", sig.level = 0.05,
+  CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast,
   col = 1, lty = 1, lwd = 1, ...)
 }
 \arguments{
@@ -16,27 +16,37 @@ model, and valid estimates}
 compute the cumulative distribution function. If not, the restricted mean
 survival time is used. Omit for binary outcomes.}
 
-\item{summary}{Summary statistic to plot. \code{"VE"} for vaccine efficacy =
-1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
+\item{contrast}{Name of contrast function to plot. \code{"VE"} for vaccine
+efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
-risk difference = risk_1(s) - risk_0(s).}
+risk difference = risk_1(s) - risk_0(s). You can also pass a custom
+function directly as long as it takes 2 vectors as input (risk0 and risk1)
+and returns 1 vector of the same length.}
 
 \item{sig.level}{Significance level used for confidence bands on the VE
-curve. This is only used if bootstrapped estimates are available.
-@param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
+curve. This is only used if bootstrapped estimates are available.}
+
+\item{CI.type}{Character string, "pointwise" for pointwise confidence
+intervals, and "band" for simultaneous confidence band.}
 
 \item{n.samps}{Number of samples to use over the range of S.1 for plotting
-the curve
-@param xlab X-axis label
-@param ylab Y-axis label
-@param col Vector of integers specifying colors for each curve.
-@param lty Vector of integers specifying linetypes for each curve.
-@param lwd Vector of numeric values for line widths.}
+the curve}
+
+\item{xlab}{X-axis label}
+
+\item{ylab}{Y-axis label}
+
+\item{col}{Vector of integers specifying colors for each curve.}
+
+\item{lty}{Vector of integers specifying linetypes for each curve.}
+
+\item{lwd}{Vector of numeric values for line widths.}
 
 \item{...}{Other arguments passed to \link{plot}}
 }
 \description{
-Plot the vaccine efficacy versus S.1 for an estimated psdesign object
+Plot the vaccine efficacy or another contrast of risk versus S.1 for an
+estimated psdesign object
 }
 
