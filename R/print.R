@@ -268,9 +268,9 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 
     psdesign2 <- object + do.call(as.character(pdat[[1]]), pdat[-1])
     marg.est <- psdesign2 + ps_estimate()
-    marg.VE <- mean(VE(marg.est, bootstraps = FALSE)[, 2])
+    marg.VE <- mean(calc_risk(marg.est, contrast = "VE", bootstraps = FALSE)[, 2])
     emp.VE <- empirical_VE(object)
-    cond.VE <- VE(object, bootstraps = FALSE)
+    cond.VE <- calc_risk(object, contrast = "VE", bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
 
