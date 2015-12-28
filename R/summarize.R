@@ -1,4 +1,4 @@
-#' Calculate the vaccine efficacy
+#' Calculate the risk and functions of the risk
 #'
 #' Computes the vaccince efficacy (VE) and other functions of the risk in each
 #' treatment arm over the range of surrogate values observed in the data. VE(s)
@@ -35,7 +35,7 @@
 #'
 #' @export
 #'
-VE <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
+calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -110,6 +110,8 @@ VE <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "band", 
 
     bsests <- psdesign$bootstraps
     bootYs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootR0 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootR1 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
 
     for(i in 1:nrow(bsests)){
 
@@ -177,7 +179,7 @@ summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band"
 
   if(CI.type == "pointwise"){
     mary <- function(x){
-      funlist <- list(median = stats::median, mean = base::mean, boot.se = stats::sd,
+      funlist <- list(boot.se = stats::sd,
                     lower.CL = function(x) quantile(x, sig.level/2),
                     upper.CL = function(x) quantile(x, 1 - sig.level/2))
 
@@ -194,8 +196,7 @@ summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band"
     upper.CL <- apply(inCI, MARGIN = 2, FUN = max)
     lower.CL <- apply(inCI, MARGIN = 2, FUN = min)
 
-    table0 <- data.frame(median = sapply(bs, stats::median), mean = sapply(bs, base::mean),
-                         boot.se = sapply(bs, stats::sd))
+    table0 <- data.frame(boot.se = sapply(bs, stats::sd))
     table <- data.frame(upper.CL = upper.CL, lower.CL = lower.CL)
     colnames(table) <- paste(colnames(table), 1-sig.level, sep = ".")
 
@@ -241,3 +242,20 @@ empirical_VE <- function(psdesign, t){
 }
 
 
+#' Vaccine efficacy contrast functions
+
+VE <- function(R0, R1){
+  1 - R1/R0
+}
+
+RR <- function(R0, R1){
+  R1/R0
+}
+
+logRR <- function(R0, R1){
+  log(R1/R0)
+}
+
+RD <- function(R0, R1){
+  R1 - R0
+}

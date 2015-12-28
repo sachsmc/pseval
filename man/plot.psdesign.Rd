@@ -4,8 +4,8 @@
 \alias{plot.psdesign}
 \title{Plot summary statistics for a psdesign object}
 \usage{
-\method{plot}{psdesign}(x, t, summary = "VE", sig.level = 0.05,
-  CI.type = "band", n.samps = 500, xlab = "S.1", ylab = summary,
+\method{plot}{psdesign}(x, t, contrast = "VE", sig.level = 0.05,
+  CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast,
   col = 1, lty = 1, lwd = 1, ...)
 }
 \arguments{
@@ -16,7 +16,7 @@ model, and valid estimates}
 compute the cumulative distribution function. If not, the restricted mean
 survival time is used. Omit for binary outcomes.}
 
-\item{summary}{Summary statistic to plot. \code{"VE"} for vaccine efficacy =
+\item{contrast}{Name of contrast function to plot. \code{"VE"} for vaccine efficacy =
 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
