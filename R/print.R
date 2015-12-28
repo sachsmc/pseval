@@ -8,7 +8,7 @@
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
-#' @param summary Summary statistic to plot. \code{"VE"} for vaccine efficacy =
+#' @param contrast Name of contrast function to plot. \code{"VE"} for vaccine efficacy =
 #'   1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 #'   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 #'   \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
@@ -27,11 +27,11 @@
 #'
 #' @export
 
-plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
+plot.psdesign <- function(x, t, contrast = "VE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast, col = 1, lty = 1, lwd = 1, ...){
 
 
-  VE.me <- VE(x, t, sig.level = sig.level, CI.type = CI.type, n.samps = n.samps)
-  n.curve.base <- ifelse(summary == "risk", 2, 1)
+  VE.me <- VE(x, contrast, t, sig.level = sig.level, CI.type = CI.type, n.samps = n.samps)
+  n.curve.base <- ifelse(contrast == "risk", 2, 1)
   ncurve <- ifelse("VE.boot.se" %in% colnames(VE.me), n.curve.base * 3, n.curve.base)
 
   ## some logic taken from plot.survfit
@@ -50,19 +50,19 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band
     else lwd <- rep(lwd, length.out=3*ncurve)
 
 
-  mainme <- switch(summary, VE = parse(text = "VE"),
+  mainme <- switch(contrast, VE = parse(text = "VE"),
                    RR = parse(text = "1 - VE"),
                    logRR = parse(text = "log(1 - VE)"),
                    risk = parse(text = "list(R1, R0)"),
                    riskdiff = parse(text = "R1 - R0"))
 
-  if(is.null(mainme)) stop(paste("Plots of summary", summary, "are not supported."))
+  if(is.null(mainme)) stop(paste("Plots of contrast", contrast, "are not supported."))
 
   if(is.factor(VE.me[, 1])){
     envir <- unique(VE.me)
   } else envir <- VE.me
 
-  if(summary == "risk"){
+  if(contrast == "risk"){
 
     rlist <- eval(mainme, envir = envir)
     plot(rlist[[1]] ~ envir[, 1], type = 'l', col = col[1], lty = lty[1], lwd = lwd[1],
@@ -88,21 +88,21 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band
 
   if("bootstraps" %in% names(x)){
 
-    lnme <- switch(summary, VE = parse(text = grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)),
+    lnme <- switch(contrast, VE = parse(text = grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)),
                    RR =  parse(text = paste("1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE))),
                    logRR =  parse(text = paste("log(1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
                    risk = parse(text = paste("list(", paste(sapply(c("R1.lower.", "R0.lower."),
                                                                    function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
                    riskdiff = parse(text =grep("Rdiff.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)))
 
-    unme <- switch(summary, VE = parse(text = grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)),
+    unme <- switch(contrast, VE = parse(text = grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)),
                    RR =  parse(text = paste("1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE))),
                    logRR =  parse(text = paste("log(1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
                    risk = parse(text = paste("list(", paste(sapply(c("R1.upper.", "R0.upper."),
                                                                    function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
                    riskdiff = parse(text =grep("Rdiff.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)))
 
-    if(summary == "risk"){
+    if(contrast == "risk"){
 
       rlistl <- eval(lnme, envir = envir)
       rlistu <- eval(unme, envir = envir)
