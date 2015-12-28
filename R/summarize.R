@@ -1,31 +1,47 @@
-#' Calculate the vaccine efficacy
+#' Calculate the risk and functions of the risk
 #'
-#' Computes the vaccince efficacy (VE) and risk in each treatment arm over the
-#' range of surrogate values observed in the data. VE(s) is defined as 1 -
-#' risk(s, z = 1)/risk(s, z = 0), where z is the treatment indicator. If any
-#' other variables are present in the risk model, then the risk is computed at
-#' their median value.
+#' Computes the vaccince efficacy (VE) and other functions of the risk in each
+#' treatment arm over the range of surrogate values observed in the data. VE(s)
+#' is defined as 1 - risk(s, z = 1)/risk(s, z = 0), where z is the treatment
+#' indicator. If any other variables are present in the risk model, then the
+#' risk is computed at their median value.
 #'
+#' @details The contrast function is a function that takes 2 inputs, the risk_0
+#' and risk_1, and returns some one dimensional function of those two inputs. It must be
+#' vectorized. Some built-in functions are \code{"VE"} for vaccine efficacy = 1
+#' - risk_1(s)/risk_0(s), \code{"RR"} for relative risk = risk_1(s)/risk_0(s),
+#' \code{"logRR"} for log of the relative risk, and \code{"RD"} for the risk difference = risk_1(s) -
+#' risk_0(s).
 #'
-#' @return A data frame containing columns for the S values, the VE, R0, and R1
+#' @return A data frame containing columns for the S values, the computed contrast function at S, R0, and R1
 #'   at those S values, and optionally standard errors and confidence intervals
 #'   computed using bootstrapped estimates.
 #'
 #' @param psdesign A psdesign object. It must contain a risk model, an
 #'   integration model, and estimated parameters. Bootstrapped parameters are
 #'   optional
+#' @param contrast The contrast function, or the name of the contrast function.
+#'   See details.
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
 #' @param sig.level Significance level for bootstrap confidence intervals
-#' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
-#' @param n.samps The number of samples to take over the range of S.1 at which the VE is calculated
-#' @param bootstraps If true, and bootstrapped estimates are present, will calculate bootstrap standard errors and
-#'   confidence bands.
+#' @param CI.type Character string, "pointwise" for pointwise confidence
+#'   intervals, and "band" for simultaneous confidence band.
+#' @param n.samps The number of samples to take over the range of S.1 at which
+#'   the VE is calculated
+#' @param bootstraps If true, and bootstrapped estimates are present, will
+#'   calculate bootstrap standard errors and confidence bands.
 #'
 #' @export
 #'
-VE <- function(psdesign, t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
+#' @examples
+#' \dontrun{
+#' # same result passing function name or function
+#' calc_risk(binary.boot, contrast = "VE", n.samps = 20)
+#' calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
+#' }
+calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -94,15 +110,15 @@ VE <- function(psdesign, t, sig.level = .05, CI.type = "band", n.samps = 5000, b
 
   }
 
-  obsVE <- data.frame(S.1 = Splot, VE = 1 - R1/R0, R1 = R1, R0 = R0)
+  obsVE <- data.frame(S.1 = Splot, Y = do.call(contrast, args = list(R0, R1)), R0 = R0, R1 = R1)
 
   if(bootstraps && "bootstraps" %in% names(psdesign)){
 
     bsests <- psdesign$bootstraps
-    bootVEs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
-    bootDiff <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
-    bootR1 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootYs <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
     bootR0 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+    bootR1 <- matrix(NA, ncol = length(Splot) + 1, nrow = nrow(bsests))
+
     for(i in 1:nrow(bsests)){
 
       thispar <- as.numeric(bsests[i, -ncol(bsests)])
@@ -125,33 +141,30 @@ VE <- function(psdesign, t, sig.level = .05, CI.type = "band", n.samps = 5000, b
 
       }
 
-      bootVEs[i, ] <- c(1 - R1/R0, bsests[i, "convergence"])
-      bootDiff[i, ] <- c(R1 - R0, bsests[i, "convergence"])
-      bootR1[i, ] <- c(R1, bsests[i, "convergence"])
+      bootYs[i, ] <- c(do.call(contrast, list(R0, R1)), bsests[i, "convergence"])
       bootR0[i, ] <- c(R0, bsests[i, "convergence"])
+      bootR1[i, ] <- c(R1, bsests[i, "convergence"])
 
     }
 
-    bootVEs <- as.data.frame(bootVEs)
+    bootYs <- as.data.frame(bootYs)
     bootR1 <- as.data.frame(bootR1)
     bootR0 <- as.data.frame(bootR0)
-    bootDiff <- as.data.frame(bootDiff)
 
-    colnames(bootVEs)[ncol(bootVEs)] <- colnames(bootDiff)[ncol(bootDiff)] <- colnames(bootR0)[ncol(bootR0)] <- colnames(bootR1)[ncol(bootR1)] <- "convergence"
+    colnames(bootYs)[ncol(bootYs)] <- colnames(bootR0)[ncol(bootR0)] <- colnames(bootR1)[ncol(bootR1)] <- "convergence"
     A1 <- as.data.frame(summarize_bs(bootR1, obsVE$R1, sig.level = sig.level, CI.type = CI.type)$table)
     A2 <- as.data.frame(summarize_bs(bootR0, obsVE$R0, sig.level = sig.level, CI.type = CI.type)$table)
-    A3 <- as.data.frame(summarize_bs(bootVEs, obsVE$VE, sig.level = sig.level, CI.type = CI.type)$table)
-    A4 <- as.data.frame(summarize_bs(bootDiff, obsVE$R1 - obsVE$R0, sig.level = sig.level, CI.type = CI.type)$table)
+    A3 <- as.data.frame(summarize_bs(bootYs, obsVE$Y, sig.level = sig.level, CI.type = CI.type)$table)
 
     colnames(A1) <- gsub("%", "", paste("R1", colnames(A1), sep = "."), fixed = TRUE)
     colnames(A2) <- gsub("%", "", paste("R0", colnames(A2), sep = "."), fixed = TRUE)
-    colnames(A3) <- gsub("%", "", paste("VE", colnames(A3), sep = "."), fixed = TRUE)
-    colnames(A4) <- gsub("%", "", paste("Rdiff", colnames(A4), sep = "."), fixed = TRUE)
+    colnames(A3) <- gsub("%", "", paste("Y", colnames(A3), sep = "."), fixed = TRUE)
 
-    obsVE <- cbind(obsVE, A3, A2, A1, A4)
+    obsVE <- cbind(obsVE, A3, A2, A1)
 
   }
 
+  attr(obsVE, "Y.function") <- substitute(contrast)
   obsVE
 
 }
@@ -172,7 +185,7 @@ summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band"
 
   if(CI.type == "pointwise"){
     mary <- function(x){
-      funlist <- list(median = stats::median, mean = base::mean, boot.se = stats::sd,
+      funlist <- list(boot.se = stats::sd,
                     lower.CL = function(x) quantile(x, sig.level/2),
                     upper.CL = function(x) quantile(x, 1 - sig.level/2))
 
@@ -189,8 +202,11 @@ summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band"
     upper.CL <- apply(inCI, MARGIN = 2, FUN = max)
     lower.CL <- apply(inCI, MARGIN = 2, FUN = min)
 
+    table0 <- data.frame(boot.se = sapply(bs, stats::sd))
     table <- data.frame(upper.CL = upper.CL, lower.CL = lower.CL)
     colnames(table) <- paste(colnames(table), 1-sig.level, sep = ".")
+
+    table <- cbind(table0, table)
 
   }
 
@@ -232,3 +248,33 @@ empirical_VE <- function(psdesign, t){
 }
 
 
+#' Vaccine efficacy contrast functions
+#'
+#' @param R0 A vector of risks in the control arm
+#' @param R1 A vector of risks in the treatment arm
+#'
+#' @keywords Internal
+#'
+#' @return A vector the same length as R0 and R1.
+#'
+#' @details These functions take the risk in the two treatment arms, and
+#'   computes a one-dimensional summary of those risks. Built-in choices are
+#'   \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
+#'   relative risk = risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative
+#'   risk, and \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
+
+VE <- function(R0, R1){
+  1 - R1/R0
+}
+
+RR <- function(R0, R1){
+  R1/R0
+}
+
+logRR <- function(R0, R1){
+  log(R1/R0)
+}
+
+RD <- function(R0, R1){
+  R1 - R0
+}

@@ -2,39 +2,27 @@
 % Please edit documentation in R/summarize.R
 \name{VE}
 \alias{VE}
-\title{Calculate the vaccine efficacy}
+\title{Vaccine efficacy contrast functions}
 \usage{
-VE(psdesign, t, sig.level = 0.05, CI.type = "band", n.samps = 5000,
-  bootstraps = TRUE)
+VE(R0, R1)
 }
 \arguments{
-\item{psdesign}{A psdesign object. It must contain a risk model, an
-integration model, and estimated parameters. Bootstrapped parameters are
-optional}
+\item{R0}{A vector of risks in the control arm}
 
-\item{t}{For time to event outcomes, a fixed time \code{t} may be provided to
-compute the cumulative distribution function. If not, the restricted mean
-survival time is used. Omit for binary outcomes.}
-
-\item{sig.level}{Significance level for bootstrap confidence intervals}
-
-\item{CI.type}{Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.}
-
-\item{n.samps}{The number of samples to take over the range of S.1 at which the VE is calculated}
-
-\item{bootstraps}{If true, will calculate bootstrap standard errors and
-confidence bands.}
+\item{R1}{A vector of risks in the treatment arm}
 }
 \value{
-A data frame containing columns for the S values, the VE, R0, and R1
-  at those S values, and optionally standard errors and confidence intervals
-  computed using bootstrapped estimates.
+A vector the same length as R0 and R1.
 }
 \description{
-Computes the vaccince efficacy (VE) and risk in each treatment arm over the
-range of surrogate values observed in the data. VE(s) is defined as 1 -
-risk(s, z = 1)/risk(s, z = 0), where z is the treatment indicator. If any
-other variables are present in the risk model, then the risk is computed at
-their median value.
+Vaccine efficacy contrast functions
 }
+\details{
+These functions take the risk in the two treatment arms, and
+  computes a one-dimensional summary of those risks. Built-in choices are
+  \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
+  relative risk = risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative
+  risk, and \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
+}
+\keyword{Internal}
 

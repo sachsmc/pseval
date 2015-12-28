@@ -1,21 +1,25 @@
 
 #' Plot summary statistics for a psdesign object
 #'
-#' Plot the vaccine efficacy versus S.1 for an estimated psdesign object
+#' Plot the vaccine efficacy or another contrast of risk versus S.1 for an
+#' estimated psdesign object
 #'
 #' @param x A \link{psdesign} object that contains a risk model, integration
 #'   model, and valid estimates
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
-#' @param summary Summary statistic to plot. \code{"VE"} for vaccine efficacy =
-#'   1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
+#' @param contrast Name of contrast function to plot. \code{"VE"} for vaccine
+#'   efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 #'   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 #'   \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
-#'   risk difference = risk_1(s) - risk_0(s).
+#'   risk difference = risk_1(s) - risk_0(s). You can also pass a custom
+#'   function directly as long as it takes 2 vectors as input (risk0 and risk1)
+#'   and returns 1 vector of the same length.
 #' @param sig.level Significance level used for confidence bands on the VE
 #'   curve. This is only used if bootstrapped estimates are available.
-#' @param CI.type Character string, "pointwise" for pointwise confidence intervals, and "band" for simultaneous confidence band.
+#' @param CI.type Character string, "pointwise" for pointwise confidence
+#'   intervals, and "band" for simultaneous confidence band.
 #' @param n.samps Number of samples to use over the range of S.1 for plotting
 #'   the curve
 #' @param xlab X-axis label
@@ -27,12 +31,17 @@
 #'
 #' @export
 
-plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = summary, col = 1, lty = 1, lwd = 1, ...){
+plot.psdesign <- function(x, t, contrast = "VE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast, col = 1, lty = 1, lwd = 1, ...){
 
 
-  VE.me <- VE(x, t, sig.level = sig.level, CI.type = CI.type, n.samps = n.samps)
-  n.curve.base <- ifelse(summary == "risk", 2, 1)
-  ncurve <- ifelse("VE.boot.se" %in% colnames(VE.me), n.curve.base * 3, n.curve.base)
+  if(contrast == "risk"){
+    contrast0 <- "VE"
+  } else{
+    contrast0 <- contrast
+  }
+  VE.me <- calc_risk(x, contrast0, t, sig.level = sig.level, CI.type = CI.type, n.samps = n.samps)
+  n.curve.base <- ifelse(contrast == "risk", 2, 1)
+  ncurve <- ifelse("Y.boot.se" %in% colnames(VE.me), n.curve.base * 3, n.curve.base)
 
   ## some logic taken from plot.survfit
 
@@ -50,19 +59,15 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band
     else lwd <- rep(lwd, length.out=3*ncurve)
 
 
-  mainme <- switch(summary, VE = parse(text = "VE"),
-                   RR = parse(text = "1 - VE"),
-                   logRR = parse(text = "log(1 - VE)"),
-                   risk = parse(text = "list(R1, R0)"),
-                   riskdiff = parse(text = "R1 - R0"))
+  mainme <- switch(contrast,
+                   risk = parse(text = "list(R1, R0)"))
 
-  if(is.null(mainme)) stop(paste("Plots of summary", summary, "are not supported."))
 
   if(is.factor(VE.me[, 1])){
     envir <- unique(VE.me)
   } else envir <- VE.me
 
-  if(summary == "risk"){
+  if(contrast == "risk"){
 
     rlist <- eval(mainme, envir = envir)
     plot(rlist[[1]] ~ envir[, 1], type = 'l', col = col[1], lty = lty[1], lwd = lwd[1],
@@ -80,7 +85,7 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band
 
   } else {
 
-    plot(eval(mainme, envir = envir) ~ envir[, 1], col = col[1], lty = lty[1],
+    plot(envir$Y ~ envir$S.1, col = col[1], lty = lty[1],
          lwd = lwd[1], type = 'l', ylab = ylab, xlab = xlab, ...)
 
   }
@@ -88,21 +93,15 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band
 
   if("bootstraps" %in% names(x)){
 
-    lnme <- switch(summary, VE = parse(text = grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)),
-                   RR =  parse(text = paste("1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE))),
-                   logRR =  parse(text = paste("log(1 - ", grep("VE.lower.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
+    lnme <- switch(contrast,
                    risk = parse(text = paste("list(", paste(sapply(c("R1.lower.", "R0.lower."),
-                                                                   function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
-                   riskdiff = parse(text =grep("Rdiff.lower.", colnames(VE.me), fixed = TRUE, value = TRUE)))
+                                                                   function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")))
 
-    unme <- switch(summary, VE = parse(text = grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)),
-                   RR =  parse(text = paste("1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE))),
-                   logRR =  parse(text = paste("log(1 - ", grep("VE.upper.", colnames(VE.me), fixed = TRUE, value = TRUE), ")")),
+    unme <- switch(contrast,
                    risk = parse(text = paste("list(", paste(sapply(c("R1.upper.", "R0.upper."),
-                                                                   function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")),
-                   riskdiff = parse(text =grep("Rdiff.upper.", colnames(VE.me), fixed = TRUE, value = TRUE)))
+                                                                   function(x) grep(x, colnames(VE.me), fixed = TRUE, value = TRUE)), collapse = ", "), ")")))
 
-    if(summary == "risk"){
+    if(contrast == "risk"){
 
       rlistl <- eval(lnme, envir = envir)
       rlistu <- eval(unme, envir = envir)
@@ -131,15 +130,15 @@ plot.psdesign <- function(x, t, summary = "VE", sig.level = .05, CI.type = "band
 
       if(is.factor(VE.me[, 1])){
 
-        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(eval(unme, envir = envir), 2),
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(envir[, 6], 2),
                  x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[2], lty = lty[2], lwd = lwd[2], ...)
-        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(eval(lnme, envir = envir), 2),
+        segments(rep.int(as.integer(envir[, 1]), 2) - .4, rep.int(envir[, 7], 2),
                  x1 = rep.int(as.integer(envir[, 1]), 2) + .4, col = col[3], lty = lty[3], lwd = lwd[3], ...)
 
       } else {
 
-        lines(eval(unme, envir = envir) ~ envir[, 1], col = col[2], lty = lty[2], lwd = lwd[2], type = 'l')
-        lines(eval(lnme, envir = envir) ~ envir[, 1], col = col[3], lty = lty[3], lwd = lwd[3], type = 'l')
+        lines(envir[, 6] ~ envir[, 1], col = col[2], lty = lty[2], lwd = lwd[2], type = 'l')
+        lines(envir[, 7] ~ envir[, 1], col = col[3], lty = lty[3], lwd = lwd[3], type = 'l')
       }
     }
 
@@ -269,9 +268,9 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 
     psdesign2 <- object + do.call(as.character(pdat[[1]]), pdat[-1])
     marg.est <- psdesign2 + ps_estimate()
-    marg.VE <- mean(VE(marg.est, bootstraps = FALSE)[, 2])
+    marg.VE <- mean(calc_risk(marg.est, contrast = "VE", bootstraps = FALSE)[, 2])
     emp.VE <- empirical_VE(object)
-    cond.VE <- VE(object, bootstraps = FALSE)
+    cond.VE <- calc_risk(object, contrast = "VE", bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
 
