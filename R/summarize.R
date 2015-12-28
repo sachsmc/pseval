@@ -35,6 +35,12 @@
 #'
 #' @export
 #'
+#' @examples
+#' \dontrun{
+#' # same result passing function name or function
+#' calc_risk(binary.boot, contrast = "VE", n.samps = 20)
+#' calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
+#' }
 calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
@@ -243,6 +249,19 @@ empirical_VE <- function(psdesign, t){
 
 
 #' Vaccine efficacy contrast functions
+#'
+#' @param R0 A vector of risks in the control arm
+#' @param R1 A vector of risks in the treatment arm
+#'
+#' @keywords Internal
+#'
+#' @return A vector the same length as R0 and R1.
+#'
+#' @details These functions take the risk in the two treatment arms, and
+#'   computes a one-dimensional summary of those risks. Built-in choices are
+#'   \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
+#'   relative risk = risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative
+#'   risk, and \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
 
 VE <- function(R0, R1){
   1 - R1/R0

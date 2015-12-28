@@ -50,4 +50,11 @@ vectorized. Some built-in functions are \code{"VE"} for vaccine efficacy = 1
 \code{"logRR"} for log of the relative risk, and \code{"RD"} for the risk difference = risk_1(s) -
 risk_0(s).
 }
+\examples{
+\dontrun{
+# same result passing function name or function
+calc_risk(binary.boot, contrast = "VE", n.samps = 20)
+calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
+}
+}
 

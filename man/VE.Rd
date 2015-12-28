@@ -6,7 +6,23 @@
 \usage{
 VE(R0, R1)
 }
+\arguments{
+\item{R0}{A vector of risks in the control arm}
+
+\item{R1}{A vector of risks in the treatment arm}
+}
+\value{
+A vector the same length as R0 and R1.
+}
 \description{
 Vaccine efficacy contrast functions
 }
+\details{
+These functions take the risk in the two treatment arms, and
+  computes a one-dimensional summary of those risks. Built-in choices are
+  \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
+  relative risk = risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative
+  risk, and \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
+}
+\keyword{Internal}
 
