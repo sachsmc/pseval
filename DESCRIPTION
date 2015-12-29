@@ -23,4 +23,5 @@ Imports:
     survival
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
-Additional_repositories: http://yihui.name/xran
+Additional_repositories:
+    http://yihui.name/xran
