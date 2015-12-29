@@ -1,3 +1,7 @@
+This is a resubmission. The following change was made: 
+
+https://cran.r-project.org/web/packages/survey was changed to https://cran.r-project.org/package=survey in inst/doc/introduction.html.
+
 ## Test environments
 * local OS X install, R 3.2.3
 * ubuntu 12.04 (on travis-ci), R 3.2.3
