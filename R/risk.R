@@ -230,13 +230,13 @@ risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
         beta.o <- beta
       }
 
-      lambda <- exp(trtmat %*% beta.o)
+      lambda <- 1/exp(trtmat %*% beta.o)
 
       trtlike <- dpois(Y.trt, lambda, log = TRUE)
 
       if(!is.null(untrt.expand) & !is.null(Y.untrt)){
 
-        lambda.untrt <- exp(untrt.expand %*% beta.o)
+        lambda.untrt <- 1/exp(untrt.expand %*% beta.o)
         untrted <- matrix(dpois(Y.untrt, lambda.untrt, log = TRUE), nrow = D, byrow = TRUE)
       } else untrted <- matrix(1)
 
@@ -244,11 +244,11 @@ risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
     }
 
-    psdesign$risk.function <- function(data, beta, t){ # P(Y <= t | S, Z)
+    psdesign$risk.function <- function(data, beta, t = 0){ # P(Y <= t | S, Z)
 
       lambda <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
 
-      ppois(t, lambda)
+      ppois(t, 1/lambda, lower.tail = FALSE)
 
     }
 
@@ -340,7 +340,7 @@ expand_augdata <- function(model, psdesign, D = 500){
   if(all(noimpdex)){
 
     rt <- list(noimp = trtmat, noimp.Y = Y.trt, imp = NULL, imp.Y = NULL)
-    attr(tr, "hasoffset") <- hasoffset
+    attr(rt, "hasoffset") <- hasoffset
     return(rt)
 
   } else {
