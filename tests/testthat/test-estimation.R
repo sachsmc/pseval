@@ -120,5 +120,23 @@ test_that("Testing all combinations of integration and risk models", {
   expect_error(surv.ps + integrate_parametric(S.1 ~ BIP) + risk_weibull(D = 10) + ps_estimate(method = "pseudo-score"))
 
 
+  ## count data
+
+  fakedata.count <- fakedata
+  fakedata.count$Yct <- with(fakedata.count, floor(time.obs * 100))
+
+  count.ps <- psdesign(data = fakedata.count, Z = Z, Y = Yct, S = S.obs, BIP = BIP, timeon = time.obs)
+
+  expect_is(count.ps + integrate_parametric(S.1 ~ BIP) +
+              risk_poisson(D = 10) +
+              ps_estimate(), "psdesign")
+
+  ## include offset
+
+  expect_is(count.ps + integrate_parametric(S.1 ~ BIP) +
+              risk_poisson(model = Y ~ S.1 * Z + offset(log(timeon)), D = 10) +
+              ps_estimate(), "psdesign")
+
+
 
 })

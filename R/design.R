@@ -67,9 +67,9 @@ psdesign <- function(data, Z, Y, S,
   trt <- verify_trt(eval(substitute(Z), envir = data))
 
   oot <- eval(substitute(Y), envir = data)
-  if(!inherits(oot, "Surv")){
-    oot <- verify_trt(oot)
-  }
+  #if(!inherits(oot, "Surv")){
+  #  oot <- verify_trt(oot)
+  #}
 
   cand <- eval(substitute(S), envir = data)
 
