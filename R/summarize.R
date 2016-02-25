@@ -89,28 +89,11 @@ calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "
 
   }
 
-  if(inherits(psdesign$augdata$Y, "Surv") && missing(t)){
+  obsrisks <- riskcalc(psdesign$risk.function, psdesign$augdata$Y, psdesign$estimates$par,
+                       t, dat0, dat1)
 
-    ttt <- summary(survival::survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
-
-    warning(sprintf("No time given for time to event outcome, using restricted mean survival: %.1f", ttt))
-    R1 <- psdesign$risk.function(dat1, psdesign$estimates$par, t = ttt)
-    R0 <- psdesign$risk.function(dat0, psdesign$estimates$par, t = ttt)
-
-
-  } else if(inherits(psdesign$augdata$Y, "Surv")) {
-
-    R1 <- psdesign$risk.function(dat1, psdesign$estimates$par, t)
-    R0 <- psdesign$risk.function(dat0, psdesign$estimates$par, t)
-
-  } else {
-
-    R1 <- psdesign$risk.function(dat1, psdesign$estimates$par)
-    R0 <- psdesign$risk.function(dat0, psdesign$estimates$par)
-
-  }
-
-  obsVE <- data.frame(S.1 = Splot, Y = do.call(contrast, args = list(R0, R1)), R0 = R0, R1 = R1)
+  obsVE <- data.frame(S.1 = Splot, Y = do.call(contrast, args = list(obsrisks$R0, obsrisks$R1)),
+                      R0 = obsrisks$R0, R1 = obsrisks$R1)
 
   if(bootstraps && "bootstraps" %in% names(psdesign)){
 
@@ -122,28 +105,12 @@ calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "
     for(i in 1:nrow(bsests)){
 
       thispar <- as.numeric(bsests[i, -ncol(bsests)])
-      if(inherits(psdesign$augdata$Y, "Surv") && missing(t)){
+      thisrisks <- riskcalc(psdesign$risk.function, psdesign$augdata$Y, thispar,
+                       t, dat0, dat1)
 
-        ttt <- summary(survival::survfit(psdesign$augdata$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
-        R1 <- psdesign$risk.function(dat1, thispar, t = ttt)
-        R0 <- psdesign$risk.function(dat0, thispar, t = ttt)
-
-
-      } else if(inherits(psdesign$augdata$Y, "Surv")) {
-
-        R1 <- psdesign$risk.function(dat1, thispar, t)
-        R0 <- psdesign$risk.function(dat0, thispar, t)
-
-      } else {
-
-        R1 <- psdesign$risk.function(dat1, thispar)
-        R0 <- psdesign$risk.function(dat0, thispar)
-
-      }
-
-      bootYs[i, ] <- c(do.call(contrast, list(R0, R1)), bsests[i, "convergence"])
-      bootR0[i, ] <- c(R0, bsests[i, "convergence"])
-      bootR1[i, ] <- c(R1, bsests[i, "convergence"])
+      bootYs[i, ] <- c(do.call(contrast, list(thisrisks$R0, thisrisks$R1)), bsests[i, "convergence"])
+      bootR0[i, ] <- c(thisrisks$R0, bsests[i, "convergence"])
+      bootR1[i, ] <- c(thisrisks$R1, bsests[i, "convergence"])
 
     }
 
@@ -277,4 +244,41 @@ logRR <- function(R0, R1){
 
 RD <- function(R0, R1){
   R1 - R0
+}
+
+#' Calculate risks with handlers for survival data
+#' @keywords Internal
+#' @param risk.function Function taking three arguments, a data.frame, parameters, and time. It should return a vector the same number of rows as the data frame
+#' @param Y The outcome variable
+#' @param par the vector of parameter values
+#' @param t Time for a survival outcome, may be missing
+#' @param dat0
+#' @param dat1
+#'
+
+riskcalc <- function(risk.function, Y, par, t, dat0, dat1){
+
+    if(inherits(Y, "Surv") && missing(t)){
+
+    ttt <- summary(survival::survfit(Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+
+    warning(sprintf("No time given for time to event outcome, using restricted mean survival: %.1f", ttt))
+    R1 <- risk.function(dat1, par, t = ttt)
+    R0 <- risk.function(dat0, par, t = ttt)
+
+
+  } else if(inherits(Y, "Surv")) {
+
+    R1 <- risk.function(dat1, par, t)
+    R0 <- risk.function(dat0, par, t)
+
+  } else {
+
+    R1 <- risk.function(dat1, par)
+    R0 <- risk.function(dat0, par)
+
+  }
+
+  list(R0 = R0, R1 = R1)
+
 }
