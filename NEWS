@@ -1,0 +1,9 @@
+pseval 1.1.0
+-------------
+* Add poisson risk model for count data
+* Total gain estimation
+
+
+pseval 1.0.0
+------------
+* Initial release
