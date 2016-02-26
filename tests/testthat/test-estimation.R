@@ -3,7 +3,7 @@ library(survival)
 
 test_that("Testing all combinations of integration and risk models", {
 
-  set.seed(52000)
+  set.seed(500)
   fakedata <- generate_example_data(n = 200)
 
   binary.ps <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
@@ -16,8 +16,10 @@ test_that("Testing all combinations of integration and risk models", {
     risk_binary(D = 10, risk = risk.logit) +
     ps_estimate()
 
-  expect_is(calc_STG(binfit1), "numeric")
-  expect_true(calc_STG(binfit1) > 0)
+  #stg <- calc_STG(binfit1, permute.times = 1000)
+
+  expect_is(calc_STG(binfit1, permute = FALSE)$obsSTG, "numeric")
+  expect_true(calc_STG(binfit1, permute = FALSE)$obsSTG > 0)
 
   expect_is(psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, BSM = BSM) + integrate_parametric(S.1 ~ BIP) +
               risk_binary(D = 10, risk = risk.logit) +

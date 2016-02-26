@@ -4,14 +4,14 @@
 \alias{stg}
 \title{Compute the standardized total gain}
 \usage{
-stg(R1, R0, S)
+stg(R1, R0, stand = FALSE)
 }
 \arguments{
 \item{R1}{Risk in the treatment group}
 
 \item{R0}{Risk in the control group}
 
-\item{S}{Values of S at which risk is calculated}
+\item{stand}{Standardize?}
 }
 \description{
 Compute the standardized total gain

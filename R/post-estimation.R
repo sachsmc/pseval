@@ -13,10 +13,12 @@
 #'   the VE is calculated
 #' @param bootstraps If true, and bootstrapped estimates are present, will
 #'   calculate bootstrap standard errors and confidence bands.
+#' @param permute If true, will do permutation test for whether the STG is different from 0
+#' @param permute.times Numeric, number of permutations to run
 #'
 #' @export
 #'
-calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE){
+calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE, permute = TRUE, permute.times = 2000){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -69,7 +71,9 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
   obsdelta <- data.frame(S.1 = Splot, delta = risks$R1 - risks$R0)
   obstheta <- mean(obsdelta$delta)
 
-  obsSTG <- stg(risks$R1, risks$R0, Splot)
+  obsSTG <- stg(risks$R1, risks$R0, FALSE)
+
+  retSTG <- list(obsSTG = obsSTG, bootstraps = NULL, permutation = NULL)
 
   if(bootstraps && "bootstraps" %in% names(psdesign)){
 
@@ -83,7 +87,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
       thisrisk <- riskcalc(psdesign$risk.function, psdesign$augdata$Y,
                            thispar, t, dat0, dat1)
 
-      bootSTGs[i, ] <- c(stg(thisrisk$R1, thisrisk$R0, Splot), bsests[i, "convergence"])
+      bootSTGs[i, ] <- c(stg(thisrisk$R1, thisrisk$R0, FALSE), bsests[i, "convergence"])
 
     }
 
@@ -93,24 +97,75 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
 
     colnames(A1) <- gsub("%", "", paste("STG", colnames(A1), sep = "."), fixed = TRUE)
 
-    obsSTG <- cbind(obsSTG, A1)
+    retSTG$bootstraps <- A1
 
   }
 
-  obsSTG
+  if(permute){
+
+    cat(paste("Permuting", permute.times, "replicates:\n"))
+    pb <- txtProgressBar(min = 1, max = permute.times)
+
+    perm.STG <- rep(NA, permute.times)
+    for(i in 1:length(perm.STG)){
+      env.copy <- new.env(parent = parent.env(environment(psdesign$likelihood)))
+      ps.copy <- psdesign
+
+      objs <- ls(environment(psdesign$likelihood))
+      for(j in objs){
+        assign(j, get(j, environment(psdesign$likelihood)), envir = env.copy)
+      }
+
+      assign("Y.trt", mixup(env.copy$Y.trt), envir = env.copy)
+      assign("Y.untrt", mixup(env.copy$Y.untrt), envir = env.copy)
+
+      environment(ps.copy$likelihood) <- env.copy
+      perm.est <- ps.copy + eval(ps.copy$estimate.call)
+      risks.perm <- riskcalc(perm.est$risk.function, perm.est$augdata$Y, perm.est$estimates$par, t, dat0, dat1)
+
+      perm.STG[i] <- stg(risks.perm$R1, risks.perm$R0, FALSE)
+
+      setTxtProgressBar(pb, value = i)
+      flush.console()
+    }
+    close(pb)
+
+    perm.p <- mean(perm.STG > abs(obsSTG))
+    retSTG$permutation <- structure(list(p.value = perm.p, permuted.stats = perm.STG), class = "permutation")
+
+
+  }
+
+  retSTG
 
 }
 
 
+print.permutation <- function(x, ...){
+
+  print(paste0("permutation p = ", x$p.value))
+
+}
+
+mixup <- function(x){
+
+  x[sample(1:length(x), length(x), replace = FALSE)]
+
+}
+
 #' Compute the standardized total gain
 #' @param R1 Risk in the treatment group
 #' @param R0 Risk in the control group
-#' @param S Values of S at which risk is calculated
+#' @param stand Standardize?
 
-stg <- function(R1, R0, S){
+stg <- function(R1, R0, stand = FALSE){
 
   delt <- R0 - R1
-  theta <- mean(delt)
-  mean(abs(delt - theta)) / (2 * theta * (1 - theta))
+  if(stand){
+    den <- mean(delt) * (1 - mean(delt)) * 2
+  } else {
+    den <- 1
+  }
+  mean(abs(delt - mean(delt))) / den
 
 }
