@@ -100,3 +100,15 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
   obsSTG
 
 }
+
+
+#' Compute the standardized total gain
+#' @param R1 Risk in the treatment group
+#' @param R0 Risk in the control group
+#' @param S Values of S at which risk is calculated
+
+stg <- function(R1, R0, S){
+
+
+
+}
