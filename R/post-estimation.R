@@ -91,7 +91,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
     colnames(bootSTGs)[ncol(bootSTGs)] <- "convergence"
     A1 <- as.data.frame(summarize_bs(bootSTGs, obsSTG, sig.level = sig.level, CI.type = "pointwise")$table)
 
-    colnames(A1) <- gsub("%", "", paste("R1", colnames(A1), sep = "."), fixed = TRUE)
+    colnames(A1) <- gsub("%", "", paste("STG", colnames(A1), sep = "."), fixed = TRUE)
 
     obsSTG <- cbind(obsSTG, A1)
 
@@ -109,6 +109,8 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
 
 stg <- function(R1, R0, S){
 
-
+  delt <- R0 - R1
+  theta <- mean(delt)
+  mean(abs(delt - theta)) / (2 * theta * (1 - theta))
 
 }

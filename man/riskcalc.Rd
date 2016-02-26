@@ -15,7 +15,9 @@ riskcalc(risk.function, Y, par, t, dat0, dat1)
 
 \item{t}{Time for a survival outcome, may be missing}
 
-\item{dat1}{}
+\item{dat0}{Data frame containing S and Z = 1}
+
+\item{dat1}{Data frame containing S and Z = 0}
 }
 \description{
 Calculate risks with handlers for survival data

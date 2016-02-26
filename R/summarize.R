@@ -148,7 +148,7 @@ calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "
 
 summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band") {
 
-  bs <- bootdf[bootdf$convergence == 0, -which(colnames(bootdf) == "convergence")]
+  bs <- bootdf[bootdf$convergence == 0, -which(colnames(bootdf) == "convergence"), drop = FALSE]
 
   if(CI.type == "pointwise"){
     mary <- function(x){
@@ -227,8 +227,8 @@ empirical_VE <- function(psdesign, t){
 #' @details These functions take the risk in the two treatment arms, and
 #'   computes a one-dimensional summary of those risks. Built-in choices are
 #'   \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
-#'   relative risk = risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative
-#'   risk, and \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
+#'   relative risk = risk_0(s)/risk_1(s), \code{"logRR"} for log of the relative
+#'   risk, and \code{"RD"} for the risk difference = risk_0(s) - risk_1(s).
 
 VE <- function(R0, R1){
   1 - R1/R0
@@ -252,8 +252,8 @@ RD <- function(R0, R1){
 #' @param Y The outcome variable
 #' @param par the vector of parameter values
 #' @param t Time for a survival outcome, may be missing
-#' @param dat0
-#' @param dat1
+#' @param dat0 Data frame containing S and Z = 1
+#' @param dat1 Data frame containing S and Z = 0
 #'
 
 riskcalc <- function(risk.function, Y, par, t, dat0, dat1){

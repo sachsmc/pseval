@@ -12,6 +12,13 @@ test_that("Testing all combinations of integration and risk models", {
     risk_binary(D = 10, risk = risk.logit) +
     ps_estimate(), "psdesign")
 
+  binfit1 <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, CPV = CPV) + integrate_parametric(S.1 ~ BIP) +
+    risk_binary(D = 10, risk = risk.logit) +
+    ps_estimate()
+
+  expect_is(calc_STG(binfit1), "numeric")
+  expect_true(calc_STG(binfit1) > 0)
+
   expect_is(psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, BSM = BSM) + integrate_parametric(S.1 ~ BIP) +
               risk_binary(D = 10, risk = risk.logit) +
               ps_estimate(), "psdesign")
