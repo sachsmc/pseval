@@ -71,7 +71,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
   obsdelta <- data.frame(S.1 = Splot, delta = risks$R1 - risks$R0)
   obstheta <- mean(obsdelta$delta)
 
-  obsSTG <- stg(risks$R1, risks$R0, FALSE)
+  obsSTG <- stg(risks$R1, risks$R0, TRUE)
 
   retSTG <- list(obsSTG = obsSTG, bootstraps = NULL, permutation = NULL)
 
@@ -87,7 +87,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
       thisrisk <- riskcalc(psdesign$risk.function, psdesign$augdata$Y,
                            thispar, t, dat0, dat1)
 
-      bootSTGs[i, ] <- c(stg(thisrisk$R1, thisrisk$R0, FALSE), bsests[i, "convergence"])
+      bootSTGs[i, ] <- c(stg(thisrisk$R1, thisrisk$R0, TRUE), bsests[i, "convergence"])
 
     }
 
@@ -116,14 +116,14 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
         assign(j, get(j, environment(psdesign$likelihood)), envir = env.copy)
       }
 
-      assign("Y.trt", mixup(env.copy$Y.trt), envir = env.copy)
-      assign("Y.untrt", mixup(env.copy$Y.untrt), envir = env.copy)
+      assign("Y.trt", mixup(env.copy$Y.trt, env.copy$trtmat[, "Z"]), envir = env.copy)
+      assign("Y.untrt", mixup(env.copy$Y.untrt, env.copy$untrt.expand[, "Z"]), envir = env.copy)
 
       environment(ps.copy$likelihood) <- env.copy
       perm.est <- ps.copy + eval(ps.copy$estimate.call)
       risks.perm <- riskcalc(perm.est$risk.function, perm.est$augdata$Y, perm.est$estimates$par, t, dat0, dat1)
 
-      perm.STG[i] <- stg(risks.perm$R1, risks.perm$R0, FALSE)
+      perm.STG[i] <- stg(risks.perm$R1, risks.perm$R0, TRUE)
 
       setTxtProgressBar(pb, value = i)
       flush.console()
@@ -147,9 +147,14 @@ print.permutation <- function(x, ...){
 
 }
 
-mixup <- function(x){
+mixup <- function(x, z){
 
-  x[sample(1:length(x), length(x), replace = FALSE)]
+  z0 <- x[z == 0]
+  z1 <- x[z == 1]
+
+  x[z == 0] <- z0[sample(1:length(z0), length(z0), replace = FALSE)]
+  x[z == 1] <- z1[sample(1:length(z1), length(z1), replace = FALSE)]
+  x
 
 }
 
@@ -158,7 +163,7 @@ mixup <- function(x){
 #' @param R0 Risk in the control group
 #' @param stand Standardize?
 
-stg <- function(R1, R0, stand = FALSE){
+stg <- function(R1, R0, stand = TRUE){
 
   delt <- R0 - R1
   if(stand){

@@ -23,11 +23,11 @@ generate_example_data <- function(n){
   S.0 <- X + rnorm(n, sd = .1)
   S.1 <- 1 + X + rnorm(n, sd = .1)
 
-  beta <- .25
+  beta <- .75
 
-  risk.obs <- (1 - 0.0 * S.1 - 0 * Z - beta * S.1 * Z)
-  risk.0 <- (1 - 0.0 * S.1)
-  risk.1 <- (1 - beta * S.1)
+  risk.obs <- (-1 - 0.0 * S.1 - 0 * Z - beta * S.1 * Z)
+  risk.0 <- (-1 - 0.0 * S.1)
+  risk.1 <- (-1 - beta * S.1)
 
   time.0 <- rexp(n, 1/exp(risk.0))
   time.1 <- rexp(n, 1/exp(risk.1))

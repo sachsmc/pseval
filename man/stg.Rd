@@ -4,7 +4,7 @@
 \alias{stg}
 \title{Compute the standardized total gain}
 \usage{
-stg(R1, R0, stand = FALSE)
+stg(R1, R0, stand = TRUE)
 }
 \arguments{
 \item{R1}{Risk in the treatment group}
