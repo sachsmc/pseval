@@ -5,7 +5,7 @@
 \title{Calculate the Standardized total gain}
 \usage{
 calc_STG(psdesign, t, sig.level = 0.05, n.samps = 5000, bootstraps = TRUE,
-  permute = TRUE, permute.times = 2000)
+  permute = TRUE, permute.times = 2000, progress.bar = TRUE)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
@@ -27,6 +27,8 @@ calculate bootstrap standard errors and confidence bands.}
 \item{permute}{If true, will do permutation test for whether the STG is different from 0}
 
 \item{permute.times}{Numeric, number of permutations to run}
+
+\item{progress.bar}{Logical, if true will display a progress bar in the console}
 }
 \description{
 Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors, and permutation test statistic. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference.

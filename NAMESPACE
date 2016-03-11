@@ -2,6 +2,7 @@
 
 S3method("+",ps)
 S3method(plot,psdesign)
+S3method(print,permutation)
 S3method(print,psdesign)
 S3method(summary,psdesign)
 export(add_integration)

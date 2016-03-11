@@ -15,10 +15,11 @@
 #'   calculate bootstrap standard errors and confidence bands.
 #' @param permute If true, will do permutation test for whether the STG is different from 0
 #' @param permute.times Numeric, number of permutations to run
+#' @param progress.bar Logical, if true will display a progress bar in the console
 #'
 #' @export
 #'
-calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE, permute = TRUE, permute.times = 2000){
+calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = TRUE, permute = TRUE, permute.times = 2000, progress.bar = TRUE){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -103,33 +104,67 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
 
   if(permute){
 
-    cat(paste("Permuting", permute.times, "replicates:\n"))
-    pb <- txtProgressBar(min = 1, max = permute.times)
+    if(progress.bar){
+      cat(paste("Permuting", permute.times, "replicates:\n"))
+      pb <- txtProgressBar(min = 1, max = permute.times)
+    }
 
     perm.STG <- rep(NA, permute.times)
     for(i in 1:length(perm.STG)){
-      env.copy <- new.env(parent = parent.env(environment(psdesign$likelihood)))
-      ps.copy <- psdesign
 
-      objs <- ls(environment(psdesign$likelihood))
-      for(j in objs){
-        assign(j, get(j, environment(psdesign$likelihood)), envir = env.copy)
+#       env.copy <- new.env(parent = parent.env(environment(psdesign$likelihood)))
+#       ps.copy <- psdesign
+#
+#       objs <- ls(environment(psdesign$likelihood))
+#       for(j in objs){
+#         assign(j, get(j, environment(psdesign$likelihood)), envir = env.copy)
+#       }
+#
+#       assign("Y.trt", mixup(env.copy$Y.trt, env.copy$trtmat[, "Z"]), envir = env.copy)
+#       assign("Y.untrt", mixup(env.copy$Y.untrt, env.copy$untrt.expand[, "Z"]), envir = env.copy)
+#
+#       environment(ps.copy$likelihood) <- env.copy
+#       perm.est <- ps.copy + eval(ps.copy$estimate.call)
+
+      psdesign.0 <- psdesign
+      psdesign.0$augdata$Y <- mixup(psdesign.0$augdata$Y, psdesign.0$augdata$Z)
+
+      if(is.factor(psdesign.0$augdata$S.1)){
+
+        if(length(unique(as.numeric(psdesign.0$augdata$S.1))) != length(unique(as.numeric(psdesign$augdata$S.1)))){
+          bootpar[[i]] <- c(rep(NA, psdesign$nparam), convergence = 11)
+          next
+        }
+
+      }
+      ## re-call integration models
+
+      psdesign2 <- psdesign.0
+      for(intj in psdesign$integration.models){
+        psdesign2 <- psdesign2 + do.call(as.character(intj$model$args[[1]]), intj$model$args[-1])
       }
 
-      assign("Y.trt", mixup(env.copy$Y.trt, env.copy$trtmat[, "Z"]), envir = env.copy)
-      assign("Y.untrt", mixup(env.copy$Y.untrt, env.copy$untrt.expand[, "Z"]), envir = env.copy)
+      ## re-call risk model
 
-      environment(ps.copy$likelihood) <- env.copy
-      perm.est <- ps.copy + eval(ps.copy$estimate.call)
+      psdesign3 <- psdesign2 + do.call(as.character(psdesign$risk.model$args[[1]]), psdesign$risk.model$args[-1])
+
+      # estimate
+
+      perm.est <- psdesign3 + eval(psdesign$estimate.call)
+
       risks.perm <- riskcalc(perm.est$risk.function, perm.est$augdata$Y, perm.est$estimates$par, t, dat0, dat1)
 
       perm.STG[i] <- stg(risks.perm$R1, risks.perm$R0, TRUE)
 
-      setTxtProgressBar(pb, value = i)
-      flush.console()
-    }
-    close(pb)
+      if(progress.bar){
+        setTxtProgressBar(pb, value = i)
+        flush.console()
+        }
 
+    }
+    if(progress.bar){
+      close(pb)
+  }
     perm.p <- mean(perm.STG > abs(obsSTG))
     retSTG$permutation <- structure(list(p.value = perm.p, permuted.stats = perm.STG), class = "permutation")
 
@@ -140,6 +175,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
 
 }
 
+#' @export
 
 print.permutation <- function(x, ...){
 
