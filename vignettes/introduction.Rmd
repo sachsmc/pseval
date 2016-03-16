@@ -295,8 +295,8 @@ abline(h = smary$VE.estimates[2], lty = 2)
 expit <- function(x) exp(x)/(1 + exp(x))
 trueVE <- function(s){
   
-  r0 <- expit(1 - .5 * s)
-  r1 <- expit(1 - 1.5 * s)
+  r0 <- expit(-1 - 0 * s)
+  r1 <- expit(-1 - .75 * s)
   1 - r1/r0
   
 }

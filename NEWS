@@ -1,3 +1,7 @@
+pseval 1.1.1
+-------------
+* Bugfix for lty and col in plot.psdesign
+
 pseval 1.1.0
 -------------
 * Add poisson risk model for count data
