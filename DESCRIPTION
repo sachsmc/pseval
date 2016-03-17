@@ -20,9 +20,10 @@ Suggests:
     ggplot2,
     testthat,
     knitr,
-    printr
+    printr,
+    rmarkdown
 Imports:
     survival
-VignetteBuilder: knitr
+VignetteBuilder: rmarkdown
 RoxygenNote: 5.0.1
 Additional_repositories: http://yihui.name/xran
