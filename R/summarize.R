@@ -197,7 +197,7 @@ empirical_VE <- function(psdesign, t){
 
     if(missing(t)){
 
-      ttt <- summary(survival::survfit(pd$Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+      ttt <- summary(survival::survfit(pd$Y ~ 1), rmean = "common")$table[["*rmean"]]
 
     } else ttt <- t
 
@@ -260,7 +260,7 @@ riskcalc <- function(risk.function, Y, par, t, dat0, dat1){
 
     if(inherits(Y, "Surv") && missing(t)){
 
-    ttt <- summary(survival::survfit(Y ~ 1), rmean = TRUE)$table[["*rmean"]]
+    ttt <- summary(survival::survfit(Y ~ 1), rmean = "common")$table[["*rmean"]]
 
     warning(sprintf("No time given for time to event outcome, using restricted mean survival: %.1f", ttt))
     R1 <- risk.function(dat1, par, t = ttt)

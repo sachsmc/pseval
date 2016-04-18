@@ -52,10 +52,10 @@ plot.psdesign <- function(x, t, contrast = "VE", sig.level = .05, CI.type = "ban
       lty <- rep(rep(lty, each=3), length.out=(ncurve*3))
     else lty <- rep(lty, length.out= ncurve*3)
 
-    if (length(col) < ncurve) col <- rep(rep(col, each=3), length.out=3*ncurve)
+    if (length(col) <= ncurve) col <- rep(rep(col, each=3), length.out=3*ncurve)
     else col <- rep(col, length.out=3*ncurve)
 
-    if (length(lwd) < ncurve) lwd <- rep(rep(lwd, each=3), length.out=3*ncurve)
+    if (length(lwd) <= ncurve) lwd <- rep(rep(lwd, each=3), length.out=3*ncurve)
     else lwd <- rep(lwd, length.out=3*ncurve)
 
 

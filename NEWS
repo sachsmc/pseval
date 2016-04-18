@@ -1,5 +1,6 @@
 pseval 1.1.1
 -------------
+* Bugfix for restricted mean survival
 * Bugfix for lty and col in plot.psdesign
 
 pseval 1.1.0
