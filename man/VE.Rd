@@ -21,8 +21,8 @@ Vaccine efficacy contrast functions
 These functions take the risk in the two treatment arms, and
   computes a one-dimensional summary of those risks. Built-in choices are
   \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
-  relative risk = risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative
-  risk, and \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
+  relative risk = risk_0(s)/risk_1(s), \code{"logRR"} for log of the relative
+  risk, and \code{"RD"} for the risk difference = risk_0(s) - risk_1(s).
 }
 \keyword{Internal}
 

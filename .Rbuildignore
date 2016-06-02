@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 index.html
 ^\.travis\.yml$
+cran-comments.md

@@ -1,10 +1,11 @@
 [![Travis-CI Build Status](https://travis-ci.org/sachsmc/pseval.svg?branch=master)](https://travis-ci.org/sachsmc/pseval)
+[![](http://cranlogs.r-pkg.org/badges/pseval)](http://cran.r-project.org/package=pseval)
 
 # pseval: Methods for Evaluting Principal Surrogates of Treatment Response
 
 ## Installation
 
-`pseval` is an R package aimed at implementing existing methods for surrogate evaluation using a flexible and common interface. It is still in active development and testing. Development will take place here on [the Github page](https://github.com/sachsmc/pseval), and the current version of the package can be installed as shown below. First you must install the `devtools` package, if you haven't already `install.packages("devtools")`. 
+`pseval` is an R package aimed at implementing existing methods for surrogate evaluation using a flexible and common interface. Development will take place  on [the Github page](https://github.com/sachsmc/pseval), and the current version of the package can be installed as shown below. First you must install the `devtools` package, if you haven't already `install.packages("devtools")`. 
 
 ```{r eval = FALSE}
 devtools::install_github("sachsmc/pseval")

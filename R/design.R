@@ -33,7 +33,7 @@
 #'
 #' @export
 #' @importFrom graphics lines plot segments
-#' @importFrom stats cov gaussian glm median model.frame model.matrix model.response optim pchisq pnorm predict qnorm quantile quasi quasibinomial rbinom rexp rnorm runif terms
+#' @importFrom stats cov dpois gaussian glm median model.frame model.matrix model.offset model.response optim pchisq pnorm ppois predict qnorm quantile quasi quasibinomial rbinom rexp rnorm runif terms
 #' @importFrom utils flush.console head setTxtProgressBar txtProgressBar
 
 psdesign <- function(data, Z, Y, S,
@@ -67,9 +67,9 @@ psdesign <- function(data, Z, Y, S,
   trt <- verify_trt(eval(substitute(Z), envir = data))
 
   oot <- eval(substitute(Y), envir = data)
-  if(!inherits(oot, "Surv")){
-    oot <- verify_trt(oot)
-  }
+  #if(!inherits(oot, "Surv")){
+  #  oot <- verify_trt(oot)
+  #}
 
   cand <- eval(substitute(S), envir = data)
 

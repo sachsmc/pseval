@@ -81,9 +81,14 @@ ps_bootstrap <- function(n.boots = 200, progress.bar = TRUE, start = NULL, metho
 
     psdesign.0 <- psdesign
     for(i in 1:n.boots){
-      # resample augdata
+      # resample augdata stratified by Y
 
-      sampdex <- sample(1:nrow(psdesign$augdata), nrow(psdesign$augdata), replace = TRUE)
+
+        Z0 <- (1:nrow(psdesign$augdata))[psdesign$augdata$Z == 0]
+        Z1 <- (1:nrow(psdesign$augdata))[psdesign$augdata$Z == 1]
+
+
+      sampdex <- c(sample(Z0, length(Z0), replace = TRUE), sample(Z1, length(Z1), replace = TRUE))
       psdesign.0$augdata <- psdesign$augdata[sampdex, ]
 
       if(is.factor(psdesign.0$augdata$S.1)){

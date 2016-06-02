@@ -1,0 +1,18 @@
+pseval 1.2.0
+------------
+* Added newdata argument to calc_risk
+
+pseval 1.1.1
+-------------
+* Bugfix for restricted mean survival
+* Bugfix for lty and col in plot.psdesign
+
+pseval 1.1.0
+-------------
+* Add poisson risk model for count data
+* Total gain estimation
+
+
+pseval 1.0.0
+------------
+* Initial release

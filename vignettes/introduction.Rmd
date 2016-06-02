@@ -8,9 +8,9 @@ output:
         fig_height: 5
 bibliography: psreferences.bib
 vignette: >
-  %\VignetteIndexEntry{introduction}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{introduction}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r knitup, include = FALSE}
@@ -165,7 +165,7 @@ In the above table S.obs.cat and BIP.cat are formed as `S.obs.cat <- factor(S.ob
 
 ### The `psdesign` object
 
-We begin by creating a `psdesign` object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the `svydesign` function in the [survey](https://cran.r-project.org/web/packages/survey/) package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous $S.1$ and the BIP labeled $BIP$. The object has a print method, so we can inspect the result. 
+We begin by creating a `psdesign` object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is analogous to the `svydesign` function in the [survey](https://cran.r-project.org/package=survey) package. The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if any. Our first analysis will use the binary version of the outcome, with continuous $S.1$ and the BIP labeled $BIP$. The object has a print method, so we can inspect the result. 
 
 ```{r psdesign}
 binary.ps <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
@@ -270,13 +270,21 @@ binary.est <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) 
 
 ### Plots and summaries
 
-We provide summary and plotting methods for the psdesign object. The summary method computes the marginal vaccine efficacy and compares it to the average conditional vaccine efficacy. This is an indication of model fit. A warning will be given if the two estimates are dramatically different. 
+We provide summary and plotting methods for the psdesign object. If bootstrap replicates are present, the summary method does a test for wide effect modification. Under the parametric risk models implemented in this package, the test for wide effect modification is equivalent to a test that the $S(1):Z$ coefficient is different from 0. This is implemented using a Wald test using the bootstrap estimate of the variance. 
+
+Another way to assess wide effect modification is to compute the standardized total gain (STG) [@Gabriel15]. This is implemented in the `calc_STG` function. The standardized total gain can be interpreted as the area sandwiched between the risk difference curve and the horizontal line at the marginal risk difference. It is a measure of the spread of the distribution of the risk difference, and is a less parametric way to test for wide effect modification. The `calc_STG` function computes the STG at the estimated parameters, at the bootstrap samples, if present, and conducts a permutation test that the STG is different from 0. The permutation test randomly permutes the labels of the outcome variable to simulate the null distribution and provides a p-value. The function prints the results and invisibly returns a list containing the observed STG, the bootstrapped STGS, and the permuted STGs.
+
+```{r stg, cache = TRUE}
+calc_STG(binary.boot, permute.times = 100, progress.bar = FALSE)
+```
+
+The summary method also computes the marginal vaccine efficacy marginalized over $S(1)$ and compares it to the average vaccine efficacy conditional on $S(1)$. This is an assessment of model fit. A warning will be given if the two estimates are dramatically different. These estimates are presented in the summary along with the empirical marginal vaccine efficacy. 
 
 ```{r summary}
 smary <- summary(binary.boot)
 ```
 
-The `calc_risk` function computes the risk in each treatment arm, and contrasts of the risks. By default it computes the vaccine efficacy, but there are other contrast functions available. The contrast function is a function that takes 2 inputs, the $risk_0$ and $risk_1$, and returns some one dimensional function of those two inputs. It must be vectorized. Some built-in functions are "VE" for vaccine efficacy $ = 1 - risk_1(s)/risk_0(s)$, "RR" for relative risk $ = risk_1(s)/risk_0(s)$, "logRR" for log of the relative risk, and "RD" for the risk difference $ = risk_1(s) -risk_0(s)$. You can pass the name of the function, or the function itself. See `?VE` for more information about contrast functions. 
+The `calc_risk` function computes the risk in each treatment arm, and contrasts of the risks. By default it computes the vaccine efficacy, but there are other contrast functions available. The contrast function is a function that takes 2 inputs, the $risk_0$ and $risk_1$, and returns some one dimensional function of those two inputs. It must be vectorized. Some built-in functions are "VE" for vaccine efficacy $= 1 - risk_1(s)/risk_0(s)$, "RR" for relative risk $= risk_1(s)/risk_0(s)$, "logRR" for log of the relative risk, and "RD" for the risk difference $= risk_1(s) -risk_0(s)$. You can pass the name of the function, or the function itself to `calc_risk`. See `?calc_risk` for more information about contrast functions. 
 
 Other arguments of the `calc_risk` function include `t`, the time at which to calculate the risk for time-to-event outcomes, `n.samps` which is the number of samples over the range of S.1 at which the risk will be calculated, and `CI.type`, which can be `"pointwise"` for pointwise confidence intervals or `"band"` for a simultaneous confidence band. `sig.level` is the significance level for the bootstrap confidence intervals. 
 
@@ -295,8 +303,8 @@ abline(h = smary$VE.estimates[2], lty = 2)
 expit <- function(x) exp(x)/(1 + exp(x))
 trueVE <- function(s){
   
-  r0 <- expit(1 - .5 * s)
-  r1 <- expit(1 - 1.5 * s)
+  r0 <- expit(-1 - 0 * s)
+  r1 <- expit(-1 - .75 * s)
   1 - r1/r0
   
 }

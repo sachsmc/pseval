@@ -3,14 +3,27 @@ library(survival)
 
 test_that("Testing all combinations of integration and risk models", {
 
-  set.seed(52000)
-  fakedata <- generate_example_data(n = 200)
+  set.seed(500)
+  fakedata <- generate_example_data(n = 500)
 
   binary.ps <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
 
   expect_is(psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, CPV = CPV) + integrate_parametric(S.1 ~ BIP) +
     risk_binary(D = 10, risk = risk.logit) +
     ps_estimate(), "psdesign")
+
+  binfit1 <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, CPV = CPV) + integrate_parametric(S.1 ~ BIP) +
+    risk_binary(D = 10, risk = risk.logit) +
+    ps_estimate() #+ ps_bootstrap()
+
+  #stg <- calc_STG(binfit1, permute.times = 1000)
+
+  #plot(binfit1, contrast = "RD")
+  #stg
+  #hist(stg$permutation$permuted.stats)
+
+  expect_is(calc_STG(binfit1, permute = FALSE)$obsSTG, "numeric")
+  expect_true(calc_STG(binfit1, permute = FALSE)$obsSTG > 0)
 
   expect_is(psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP, BSM = BSM) + integrate_parametric(S.1 ~ BIP) +
               risk_binary(D = 10, risk = risk.logit) +
@@ -118,6 +131,24 @@ test_that("Testing all combinations of integration and risk models", {
               risk_weibull(D = 10) + ps_estimate(), "psdesign")
 
   expect_error(surv.ps + integrate_parametric(S.1 ~ BIP) + risk_weibull(D = 10) + ps_estimate(method = "pseudo-score"))
+
+
+  ## count data
+
+  fakedata.count <- fakedata
+  fakedata.count$Yct <- with(fakedata.count, floor(time.obs * 100))
+
+  count.ps <- psdesign(data = fakedata.count, Z = Z, Y = Yct, S = S.obs, BIP = BIP, timeon = time.obs)
+
+  expect_is(count.ps + integrate_parametric(S.1 ~ BIP) +
+              risk_poisson(D = 10) +
+              ps_estimate(), "psdesign")
+
+  ## include offset
+
+  expect_is(count.ps + integrate_parametric(S.1 ~ BIP) +
+              risk_poisson(model = Y ~ S.1 * Z + offset(log(timeon)), D = 10) +
+              ps_estimate(), "psdesign")
 
 
 

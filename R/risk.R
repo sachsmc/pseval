@@ -198,6 +198,76 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
 }
 
+
+#' Poisson risk model for count outcomes
+#'
+#' @param model Formula specifying the risk model. The outcome should be an integer of counts. This right side of the formula may contain an \link{offset} term.
+#' @param D number of samples for simulated annealing
+#'
+#' @export
+
+risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
+
+  arglist <- as.list(match.call())
+  rval <- function(psdesign){
+
+    expanded <- expand_augdata(model, psdesign, D = D)
+
+    trtmat <- expanded$noimp
+    Y.trt <- expanded$noimp.Y
+
+    untrt.expand <- expanded$imp
+    Y.untrt <- expanded$imp.Y
+
+    attr(trtmat, "hasoffset") <- attr(expanded, "hasoffset")
+
+    likelihood <- function(beta){
+
+
+      if(attr(trtmat, "hasoffset")){
+        beta.o <- c(beta, 1)
+      } else{
+        beta.o <- beta
+      }
+
+      lambda <- 1/exp(trtmat %*% beta.o)
+
+      trtlike <- dpois(Y.trt, lambda, log = TRUE)
+
+      if(!is.null(untrt.expand) & !is.null(Y.untrt)){
+
+        lambda.untrt <- 1/exp(untrt.expand %*% beta.o)
+        untrted <- matrix(dpois(Y.untrt, lambda.untrt, log = TRUE), nrow = D, byrow = TRUE)
+      } else untrted <- matrix(1)
+
+      -1 * (sum(trtlike) + sum(colMeans(untrted)))
+
+    }
+
+    psdesign$risk.function <- function(data, beta, t = 0){ # P(Y <= t | S, Z)
+
+      lambda <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
+
+      ppois(t, 1/lambda, lower.tail = FALSE)
+
+    }
+
+    psdesign$likelihood <- likelihood
+    psdesign$risk.model <- list(model = "poisson", args = arglist )
+    psdesign$nparam <- ncol(trtmat) + ifelse(attr(trtmat, "hasoffset"), -1, 0)
+    psdesign$param.names <- colnames(model.matrix(model, psdesign$augdata))
+
+    psdesign
+
+  }
+  ## return a likelihood closure
+
+  class(rval) <- c("ps", "riskmodel")
+  rval
+
+}
+
+
 #' Logit link function
 #'
 #' @param x A vector of linear predictors
@@ -242,14 +312,36 @@ expand_augdata <- function(model, psdesign, D = 500){
     } else return(NULL)
   }))
 
+  ## check for offset
+
+  mf.c <- model.frame(model, psdesign$augdata)
+  hasoffset <- ("offset" %in% names(attributes(terms(mf.c))))
+
   noimpdex <- rowSums(is.na(psdesign$augdata[, vars, drop = FALSE])) == 0
 
   trtmat <- model.matrix(model, psdesign$augdata[noimpdex, ])
   Y.trt <- psdesign$augdata[noimpdex, ]$Y
 
+  if(hasoffset){
+    vars0 <- sapply(attr(terms(model), "variables"), deparse)[-c(1,2)]
+    vars <- unlist(lapply(colnames(psdesign$augdata), function(x){
+      if(length(grep(x, vars0, fixed = TRUE) > 0)){
+        return(x)
+      } else return(NULL)
+    }))
+
+    noimpdex <- rowSums(is.na(psdesign$augdata[, vars, drop = FALSE])) == 0
+
+    trtmat <- cbind(trtmat, model.offset(model.frame(model, psdesign$augdata[noimpdex, ])))
+
+
+  }
+
   if(all(noimpdex)){
 
-    return(list(noimp = trtmat, noimp.Y = Y.trt, imp = NULL, imp.Y = NULL))
+    rt <- list(noimp = trtmat, noimp.Y = Y.trt, imp = NULL, imp.Y = NULL)
+    attr(rt, "hasoffset") <- hasoffset
+    return(rt)
 
   } else {
 
@@ -265,12 +357,20 @@ expand_augdata <- function(model, psdesign, D = 500){
       untrtsamp <- c(psdesign$integration.models[[j]]$icdf_sbarw(runif(D)))
       untrtobs[, j] <- untrtsamp
 
-      untrt.expand <- model.matrix(model, untrtobs)
-      Y.untrt <- untrtobs$Y
+    }
+
+    untrt.expand <- model.matrix(model, untrtobs)
+    Y.untrt <- untrtobs$Y
+
+    if(hasoffset){
+      untrt.expand <- cbind(untrt.expand, model.offset(model.frame(model, untrtobs)))
 
     }
 
-    list(noimp = trtmat, noimp.Y = Y.trt, imp = untrt.expand, imp.Y = Y.untrt)
+    rt <- list(noimp = trtmat, noimp.Y = Y.trt, imp = untrt.expand, imp.Y = Y.untrt)
+    attr(rt, "hasoffset") <- hasoffset
+    return(rt)
+
   }
 
 }
