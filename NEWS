@@ -1,3 +1,7 @@
+pseval 1.2.0
+------------
+* Added newdata argument to calc_risk
+
 pseval 1.1.1
 -------------
 * Bugfix for restricted mean survival

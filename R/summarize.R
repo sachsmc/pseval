@@ -7,15 +7,16 @@
 #' risk is computed at their median value.
 #'
 #' @details The contrast function is a function that takes 2 inputs, the risk_0
-#' and risk_1, and returns some one dimensional function of those two inputs. It must be
-#' vectorized. Some built-in functions are \code{"VE"} for vaccine efficacy = 1
-#' - risk_1(s)/risk_0(s), \code{"RR"} for relative risk = risk_1(s)/risk_0(s),
-#' \code{"logRR"} for log of the relative risk, and \code{"RD"} for the risk difference = risk_1(s) -
-#' risk_0(s).
+#'   and risk_1, and returns some one dimensional function of those two inputs.
+#'   It must be vectorized. Some built-in functions are \code{"VE"} for vaccine
+#'   efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
+#'   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk, and
+#'   \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
 #'
-#' @return A data frame containing columns for the S values, the computed contrast function at S, R0, and R1
-#'   at those S values, and optionally standard errors and confidence intervals
-#'   computed using bootstrapped estimates.
+#' @return A data frame containing columns for the S values, the computed
+#'   contrast function at S, R0, and R1 at those S values, and optionally
+#'   standard errors and confidence intervals computed using bootstrapped
+#'   estimates.
 #'
 #' @param psdesign A psdesign object. It must contain a risk model, an
 #'   integration model, and estimated parameters. Bootstrapped parameters are
@@ -32,6 +33,8 @@
 #'   the VE is calculated
 #' @param bootstraps If true, and bootstrapped estimates are present, will
 #'   calculate bootstrap standard errors and confidence bands.
+#' @param newdata Vector of S values. If present, will calculate the contrast
+#'   function at values of newdata instead of the observed S.1
 #'
 #' @export
 #'
@@ -41,7 +44,8 @@
 #' calc_risk(binary.boot, contrast = "VE", n.samps = 20)
 #' calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
 #' }
-calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "band", n.samps = 5000, bootstraps = TRUE){
+calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05,
+                      CI.type = "band", n.samps = 5000, bootstraps = TRUE, newdata = NULL){
 
   stopifnot("estimates" %in% names(psdesign))
 
@@ -59,6 +63,12 @@ calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05, CI.type = "
     integrated <- factor(integrated, levels = levels(obss))
   }
   Splot <- sort(unlist(list(integrated, trueobs)))
+
+  if(!is.null(newdata)){
+
+    Splot <- newdata[!is.na(newdata)]
+
+  }
 
   dat1 <- data.frame(S.1 = Splot, Z = 1)
   dat0 <- data.frame(S.1 = Splot, Z = 0)
