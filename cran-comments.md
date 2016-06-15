@@ -10,13 +10,9 @@ There were no ERRORs or WARNINGs.
 
 There was 1 NOTE:
 
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: ‘Michael C Sachs <sachsmc@gmail.com>’
-Components with restrictions and base license permitting such:
-  MIT + file LICENSE
-File 'LICENSE':
-  YEAR: 2015
-  COPYRIGHT HOLDER: Michael C Sachs
+Package suggested but not available for checking: ‘printr’
+
+printr is suggested but not required. It enhances the vignette appearence but the vignette runs without it. 
 
 ## Downstream dependencies
 There are no downstream dependencies.

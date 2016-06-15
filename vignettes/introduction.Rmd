@@ -155,6 +155,7 @@ library(survival)
 First let's create an example dataset. The pseval package provides the function `generate_example_data` which takes a single argument: the sample size. 
 
 ```{r}
+set.seed(500)
 fakedata <- generate_example_data(n = 500)
 head(fakedata)
 ```
