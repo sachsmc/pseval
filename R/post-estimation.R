@@ -1,6 +1,6 @@
 #' Calculate the Standardized total gain
 #'
-#' Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors, and Wald test statistic based on the bootstrap standard error. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference.
+#' Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors and confidence intervals. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference. If the outcome is time to event then the STG is time-dependent, and a time point for evaluation is needed. If one is not provided then the restricted mean survival is estimated from the data and used.
 #'
 #' @param psdesign A psdesign object. It must contain a risk model, an
 #'   integration model, and estimated parameters. Bootstrapped parameters are
@@ -12,7 +12,7 @@
 #' @param n.samps The number of samples to take over the range of S.1 at which
 #'   the VE is calculated
 #' @param bootstraps If true, and bootstrapped estimates are present, will
-#'   calculate bootstrap standard errors and confidence bands.
+#'   calculate bootstrap standard errors and confidence interval.
 #' @param permute Not used, included for backwards compatibility
 #' @param permute.times Not used, included for backwards compatibility
 #' @param progress.bar Not used, included for backwards compatibility
@@ -74,7 +74,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
 
   obsSTG <- stg(risks$R1, risks$R0, TRUE)
 
-  retSTG <- list(obsSTG = obsSTG, bootstraps = NULL, permutation = NULL)
+  retSTG <- list(obsSTG = obsSTG, bootstraps = NULL)
 
   if(bootstraps && "bootstraps" %in% names(psdesign)){
 
@@ -100,12 +100,7 @@ calc_STG <- function(psdesign, t, sig.level = .05, n.samps = 5000, bootstraps = 
 
     retSTG$bootstraps <- A1
 
-    retSTG$Waldtest <- c(statistic = obsSTG / A1[1, 1],
-                         p.value = 2 * pnorm(-abs(obsSTG / A1[1, 1])))
-
   }
-
-  retSTG$permutation <- NULL ## backwards compatibility
 
   retSTG
 

@@ -1,6 +1,6 @@
 pseval 1.2.1
 ------------
-* Bugfix: permutation test for STG does not have correct type 1 error in some scenarios. This functionality was removed until we can resolve it. The permutation test was replace with a Wald test using the bootstrap standard error.
+* Bugfix: permutation test for STG does not have correct type 1 error in some scenarios. This functionality was removed until we can resolve it.
 
 pseval 1.2.0
 ------------

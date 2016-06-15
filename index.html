@@ -328,7 +328,96 @@ binary.cc</code></pre>
 <h3>Integration models</h3>
 <p>The EML procedure requires an estimate of <span class="math">\(F_{S(1) | W}\)</span>, this is referred to as the integration model. Let’s see the help page for <code>add_integration</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">?add_integration</code></pre>
-<pre><code>## Using development documentation for add_integration</code></pre>
+<div class="r-help-page">
+<table width="100%" summary="page for add_integration">
+<tr>
+<td>
+add_integration
+</td>
+<td style="text-align: right;">
+R Documentation
+</td>
+</tr>
+</table>
+<h2>
+Integration models
+</h2>
+<h3>
+Description
+</h3>
+<p>
+Add integration model to a psdesign object
+</p>
+<h3>
+Usage
+</h3>
+<pre class="r">
+add_integration(psdesign, integration)
+</pre>
+<h3>
+Arguments
+</h3>
+<table summary="R argblock">
+<tr valign="top">
+<td>
+<code>psdesign</code>
+</td>
+<td>
+<p>
+A psdesign object
+</p>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<code>integration</code>
+</td>
+<td>
+<p>
+An integration object
+</p>
+</td>
+</tr>
+</table>
+<h3>
+Details
+</h3>
+<p>
+This is a list of the available integration models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we integrate likelihood contributions over each non-missing S(1) given their value of W, and average over the contributions.
+</p>
+<ul>
+<li>
+<p>
+integrate_parametric This is a parametric integration model that fits a linear model for the mean of S(1) | W and assumes a Gaussian distribution.
+</p>
+</li>
+<li>
+<p>
+integrate_bivnorm This is another parametric integration model that assumes that S(1) and W are jointly normally distributed. The user must specify their mean, variances and correlation.
+</p>
+</li>
+<li>
+<p>
+integrate_nonparametric This is a non-parametric integration model that is only valid for categorical S(1) and W. It uses the observed proportions to estimate the joint distribution of S(1), W.
+</p>
+</li>
+<li>
+<p>
+integrate_semiparametric This is a semi-parametric model that uses the semi-parametric location scale model of Heagerty and Pepe (1999). Models are specified for the location of S(1) | W and the scale of S(1) | W. Then integrations are drawn from the empirical distribution of the residuals from that model, which are then transformed to the appropriate location and scale.
+</p>
+</li>
+</ul>
+<h3>
+Examples
+</h3>
+<pre class="r">
+
+test &lt;- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP)
+add_integration(test, integrate_parametric(S.1 ~ BIP))
+test + integrate_parametric(S.1 ~ BIP)  # same as above
+
+</pre>
+</div>
 <p>For this first example, let’s use the parametric integration model. We specify the mean model for <span class="math">\(S(1) | W\)</span> as a formula. We can add the integration model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset.</p>
 <pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> ~<span class="st"> </span>BIP)
 binary.ps</code></pre>
@@ -447,7 +536,95 @@ binary.ps +<span class="st"> </span><span class="kw">integrate_parametric</span>
 <h3>Risk models and likelihoods</h3>
 <p>Let’s see how to add a risk model:</p>
 <pre class="sourceCode r"><code class="sourceCode r">?add_riskmodel</code></pre>
-<pre><code>## Using development documentation for add_riskmodel</code></pre>
+<div class="r-help-page">
+<table width="100%" summary="page for add_riskmodel">
+<tr>
+<td>
+add_riskmodel
+</td>
+<td style="text-align: right;">
+R Documentation
+</td>
+</tr>
+</table>
+<h2>
+Add risk model to a psdesign object
+</h2>
+<h3>
+Description
+</h3>
+<p>
+Add risk model to a psdesign object
+</p>
+<h3>
+Usage
+</h3>
+<pre class="r">
+add_riskmodel(psdesign, riskmodel)
+</pre>
+<h3>
+Arguments
+</h3>
+<table summary="R argblock">
+<tr valign="top">
+<td>
+<code>psdesign</code>
+</td>
+<td>
+<p>
+A psdesign object
+</p>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<code>riskmodel</code>
+</td>
+<td>
+<p>
+A risk model object, from the list above
+</p>
+</td>
+</tr>
+</table>
+<h3>
+Details
+</h3>
+<p>
+The risk model component specifies the likelihood for the data. This involves specifying the distribution of the outcome variable, whether it is binary or time-to-event, and specifying how the surrogate S(1) and the treatment Z interact and affect the outcome. We use the formula notation to be consistent with other regression type models in R. Below is a list of available risk models.
+</p>
+<ul>
+<li>
+<p>
+risk_binary This is a generic risk model for binary outcomes. The user can specify the formula, and link function using either risk.logit for the logistic link, or risk.probit for the probit link. Custom link functions may also be specified, which take a single numeric vector argument, and returns a vector of corresponding probabilities.
+</p>
+</li>
+<li>
+<p>
+risk_weibull This is a parameterization of the Weibull model for time-to-event outcomes that is consistent with that of rweibull. The user specifies the formula for the linear predictor of the scale parameter.
+</p>
+</li>
+<li>
+<p>
+risk_exponential This is a simple exponential model for a time-to-event outcome.
+</p>
+</li>
+<li>
+<p>
+risk_poisson This is a Poisson model for count outcomes. It allows for offsets in the formula.
+</p>
+</li>
+</ul>
+<h3>
+Examples
+</h3>
+<pre class="r">
+test &lt;- psdesign(generate_example_data(n = 100), Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) +
+     integrate_parametric(S.1 ~ BIP)
+add_riskmodel(test, risk_binary())
+test + risk_binary() # same as above
+</pre>
+</div>
 <p>Let’s add a simple binary risk model using the logit link. The argument <code>D</code> specifies the number of samples to use for the simulated annealing aka empirical integration in the EML procedure. In general, D should be set to something reasonably large, like 2 or 3 times the sample size. We use a smaller D so that this vignette builds in a reasonable amount of time.</p>
 <pre class="sourceCode r"><code class="sourceCode r">binary.ps &lt;-<span class="st"> </span>binary.ps +<span class="st"> </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y ~<span class="st"> </span>S<span class="fl">.1</span> *<span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">50</span>, <span class="dt">risk =</span> risk.logit)
 binary.ps</code></pre>
@@ -537,18 +714,14 @@ binary.boot</code></pre>
 <div id="plots-and-summaries" class="section level3">
 <h3>Plots and summaries</h3>
 <p>We provide summary and plotting methods for the psdesign object. If bootstrap replicates are present, the summary method does a test for wide effect modification. Under the parametric risk models implemented in this package, the test for wide effect modification is equivalent to a test that the <span class="math">\(S(1):Z\)</span> coefficient is different from 0. This is implemented using a Wald test using the bootstrap estimate of the variance.</p>
-<p>Another way to assess wide effect modification is to compute the standardized total gain (STG) <span class="citation">(Erin E. Gabriel, Sachs, and Gilbert 2015)</span>. This is implemented in the <code>calc_STG</code> function. The standardized total gain can be interpreted as the area sandwiched between the risk difference curve and the horizontal line at the marginal risk difference. It is a measure of the spread of the distribution of the risk difference, and is a less parametric way to test for wide effect modification. The <code>calc_STG</code> function computes the STG at the estimated parameters, at the bootstrap samples, if present, and conducts a Wald test that the STG is different from 0. The function prints the results and invisibly returns a list containing the observed STG, the bootstrapped STGS, and the test statistic.</p>
+<p>Another way to assess wide effect modification is to compute the standardized total gain (STG) <span class="citation">(Erin E. Gabriel, Sachs, and Gilbert 2015)</span>. This is implemented in the <code>calc_STG</code> function. The standardized total gain can be interpreted as the area sandwiched between the risk difference curve and the horizontal line at the marginal risk difference. It is a measure of the spread of the distribution of the risk difference, and is a less parametric way to test for wide effect modification. The <code>calc_STG</code> function computes the STG at the estimated parameters, at the bootstrap samples, if present and provides a 95% percentile CI. It should be noted that as pointed out in <span class="citation">Erin E. Gabriel and Gilbert (2014)</span>, this CI will almost never include 0, as STG is always positive and therefore is not of great use for the evaluation of surrogates having any value. The CI instead can be used to compare surrogates. <em>In a future update we will include a p-value and bootstrap for the comparison of STGs between surrogates.</em> The function prints the results and invisibly returns a list containing the observed STG and the bootstrapped STGs. If the outcome is time to event the STG is time-dependent, and a time point for evaluation is needed, if one is not provided then the restricted mean survival is estimated from the data and used.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">calc_STG</span>(binary.boot)</code></pre>
 <pre><code>## $obsSTG
 ## [1] 0.414973
 ## 
 ## $bootstraps
 ##    STG.boot.se STG.lower.CL.2.5 STG.upper.CL.97.5
-## V1   0.1484837        0.1587935          0.731445
-## 
-## $Waldtest
-##  statistic    p.value 
-## 2.79473859 0.00519417</code></pre>
+## V1   0.1484837        0.1587935          0.731445</code></pre>
 <p>The summary method also computes the marginal vaccine efficacy marginalized over <span class="math">\(S(1)\)</span> and compares it to the average vaccine efficacy conditional on <span class="math">\(S(1)\)</span>. This is an assessment of model fit. A warning will be given if the two estimates are dramatically different. These estimates are presented in the summary along with the empirical marginal vaccine efficacy.</p>
 <pre class="sourceCode r"><code class="sourceCode r">smary &lt;-<span class="st"> </span><span class="kw">summary</span>(binary.boot)</code></pre>
 <pre><code>## Augmented data frame:  500  obs. by  6  variables. 
