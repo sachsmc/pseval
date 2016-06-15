@@ -16,7 +16,7 @@ test_that("Testing all combinations of integration and risk models", {
     risk_binary(D = 10, risk = risk.logit) +
     ps_estimate() #+ ps_bootstrap()
 
-  #stg <- calc_STG(binfit1, permute.times = 1000)
+  #stg <- calc_STG(binfit1)
 
   #plot(binfit1, contrast = "RD")
   #stg

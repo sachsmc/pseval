@@ -24,13 +24,13 @@ the VE is calculated}
 \item{bootstraps}{If true, and bootstrapped estimates are present, will
 calculate bootstrap standard errors and confidence bands.}
 
-\item{permute}{If true, will do permutation test for whether the STG is different from 0}
+\item{permute}{Not used, included for backwards compatibility}
 
-\item{permute.times}{Numeric, number of permutations to run}
+\item{permute.times}{Not used, included for backwards compatibility}
 
-\item{progress.bar}{Logical, if true will display a progress bar in the console}
+\item{progress.bar}{Not used, included for backwards compatibility}
 }
 \description{
-Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors, and permutation test statistic. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference.
+Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors, and Wald test statistic based on the bootstrap standard error. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference.
 }
 

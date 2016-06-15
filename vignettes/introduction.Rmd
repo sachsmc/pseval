@@ -272,10 +272,10 @@ binary.est <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) 
 
 We provide summary and plotting methods for the psdesign object. If bootstrap replicates are present, the summary method does a test for wide effect modification. Under the parametric risk models implemented in this package, the test for wide effect modification is equivalent to a test that the $S(1):Z$ coefficient is different from 0. This is implemented using a Wald test using the bootstrap estimate of the variance. 
 
-Another way to assess wide effect modification is to compute the standardized total gain (STG) [@Gabriel15]. This is implemented in the `calc_STG` function. The standardized total gain can be interpreted as the area sandwiched between the risk difference curve and the horizontal line at the marginal risk difference. It is a measure of the spread of the distribution of the risk difference, and is a less parametric way to test for wide effect modification. The `calc_STG` function computes the STG at the estimated parameters, at the bootstrap samples, if present, and conducts a permutation test that the STG is different from 0. The permutation test randomly permutes the labels of the outcome variable to simulate the null distribution and provides a p-value. The function prints the results and invisibly returns a list containing the observed STG, the bootstrapped STGS, and the permuted STGs.
+Another way to assess wide effect modification is to compute the standardized total gain (STG) [@Gabriel15]. This is implemented in the `calc_STG` function. The standardized total gain can be interpreted as the area sandwiched between the risk difference curve and the horizontal line at the marginal risk difference. It is a measure of the spread of the distribution of the risk difference, and is a less parametric way to test for wide effect modification. The `calc_STG` function computes the STG at the estimated parameters, at the bootstrap samples, if present, and conducts a Wald test that the STG is different from 0. The function prints the results and invisibly returns a list containing the observed STG, the bootstrapped STGS, and the test statistic.
 
 ```{r stg, cache = TRUE}
-calc_STG(binary.boot, permute.times = 100, progress.bar = FALSE)
+calc_STG(binary.boot)
 ```
 
 The summary method also computes the marginal vaccine efficacy marginalized over $S(1)$ and compares it to the average vaccine efficacy conditional on $S(1)$. This is an assessment of model fit. A warning will be given if the two estimates are dramatically different. These estimates are presented in the summary along with the empirical marginal vaccine efficacy. 
@@ -388,7 +388,7 @@ surv.fit <- psdesign(fakedata, Z = Z, Y = Surv(time.obs, event.obs),
   integrate_semiparametric(formula.location = S.1 ~ BIP, formula.scale = S.1 ~ 1) + 
   risk_exponential(D = 10) + ps_estimate(method = "BFGS") + ps_bootstrap(n.boots = 20)
 surv.fit
-plot(surv.fit)
+plot(surv.fit, t = .4)
 ```
 
 ### Categorical S
