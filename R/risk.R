@@ -177,7 +177,7 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
     psdesign$risk.function <- function(data, beta, t){ # P(T < t | S, Z)
 
-      scale <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
+      scale <- 1/as.vector(exp(model.matrix(model[-2], data) %*% beta))
 
       1 - exp(-scale * t)
 

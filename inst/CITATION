@@ -9,5 +9,5 @@ citEntry(entry = "Manual",
   year = year,
   note = vers,
   url = meta$URL,
-  textVersion = paste('Michael C. Sachs (', year, '). pseval: ', meta$Title, '. ', vers, '.', sep = '')
+  textVersion = paste('Michael C. Sachs and Erin E. Gabriel (', year, '). pseval: ', meta$Title, '. ', vers, '.', sep = '')
 )

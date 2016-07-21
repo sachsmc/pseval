@@ -404,7 +404,7 @@ with(fakedata, table(S.obs.cat, BIP.cat))
 cat.fit <- psdesign(fakedata, Z = Z, Y = Y.obs, 
                      S = S.obs.cat, BIP = BIP.cat) + 
   integrate_nonparametric(formula = S.1 ~ BIP) + 
-  risk_binary(Y ~ S.1 * Z, D = 10, risk = risk.probit) + ps_estimate(method = "BFGS")
+  risk_binary(Y ~ S.1 * Z, D = 10, risk = risk.probit) + ps_estimate(method = "pseudo-score")
 cat.fit
 plot(cat.fit)
 ```
