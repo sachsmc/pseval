@@ -303,7 +303,7 @@ wem_test <- function(x){
 
   if(length(testdex) == 1){
 
-    bsse <- bscov[testdex, testdex]
+    bsse <- sqrt(bscov[testdex, testdex])
     bsmu <- x$estimates$par[testdex]
     Xstat <- bsmu/bsse
     list(stat = Xstat, df = 1, p.value = 2 * pnorm(-abs(Xstat)))

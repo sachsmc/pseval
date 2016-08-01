@@ -1,3 +1,7 @@
+pseval 1.2.3
+------------
+* bugfix: missing sqrt in univariate wald test for WEM.
+
 pseval 1.2.2
 ------------
 * bugfix: inversion of exponential scale parameter.
