@@ -1,8 +1,8 @@
-This is a update that adds some new features and include bugfixes.
+This is a update that contains some important bugfixes and improvements to documentation.
 
 ## Test environments
-* local OS X install, R 3.3.0
-* ubuntu 12.04 (on travis-ci), R 3.3.0
+* local Windows install, R 3.3.1
+* ubuntu 12.04 (on travis-ci), R 3.3.1
 * win-builder (devel and release)
 
 ## R CMD check results
