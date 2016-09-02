@@ -230,13 +230,13 @@ risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
         beta.o <- beta
       }
 
-      lambda <- 1/exp(trtmat %*% beta.o)
+      lambda <- exp(trtmat %*% beta.o)
 
       trtlike <- dpois(Y.trt, lambda, log = TRUE)
 
       if(!is.null(untrt.expand) & !is.null(Y.untrt)){
 
-        lambda.untrt <- 1/exp(untrt.expand %*% beta.o)
+        lambda.untrt <- exp(untrt.expand %*% beta.o)
         untrted <- matrix(dpois(Y.untrt, lambda.untrt, log = TRUE), nrow = D, byrow = TRUE)
       } else untrted <- matrix(1)
 
@@ -248,7 +248,7 @@ risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
       lambda <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
 
-      ppois(t, 1/lambda, lower.tail = FALSE)
+      ppois(t, lambda, lower.tail = FALSE)
 
     }
 
