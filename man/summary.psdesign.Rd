@@ -16,7 +16,7 @@
 \item{...}{Currently unused}
 }
 \value{
-Invisibly returns the printed table, along with the three estimates of vaccine efficacy. The empirical VE is 1 minus the relative risk comparing the treatment arm to the control arm. The risk is estimated as the proportion in the binary outcome case, or with the Kaplan-Meier estimate at the restricted mean survival in the time-to-event case. The marginal VE estimate is the VE estimate under the specified parametric risk model, ignoring the effect of S.1. The model based average VE is the VE estimate from the specified risk model, averaged over the distribution of S.1. The point of displaying these three is to assess the validity of the parametric model, and to assess the validity of the model estimation. Wild differences among these estimates may indicate problems with the model or convergence.
+Invisibly returns the printed table, along with the three estimates of vaccine efficacy. The empirical TE is 1 minus the relative risk comparing the treatment arm to the control arm. The risk is estimated as the proportion in the binary outcome case, or with the Kaplan-Meier estimate at the restricted mean survival in the time-to-event case. The marginal TE estimate is the TE estimate under the specified parametric risk model, ignoring the effect of S.1. The model based average TE is the TE estimate from the specified risk model, averaged over the distribution of S.1. The point of displaying these three is to assess the validity of the parametric model, and to assess the validity of the model estimation. Wild differences among these estimates may indicate problems with the model or convergence.
 }
 \description{
 Summary method for psdesign objects

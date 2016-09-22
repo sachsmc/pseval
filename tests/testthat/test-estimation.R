@@ -16,7 +16,7 @@ test_that("Testing all combinations of integration and risk models", {
     risk_binary(D = 10, risk = risk.logit) +
     ps_estimate() #+ ps_bootstrap()
 
-  #stg <- calc_STG(binfit1, permute.times = 1000)
+  #stg <- calc_STG(binfit1)
 
   #plot(binfit1, contrast = "RD")
   #stg
@@ -150,6 +150,17 @@ test_that("Testing all combinations of integration and risk models", {
               risk_poisson(model = Y ~ S.1 * Z + offset(log(timeon)), D = 10) +
               ps_estimate(), "psdesign")
 
+  ## continuous data
+  fakedata$Y.cont <- log(fakedata$time.obs + 0.01)
+  cont.ps <- psdesign(fakedata, Z = Z, Y = Y.cont, S = S.obs, BIP = BIP)
 
+  expect_is(cont.test <- cont.ps + integrate_parametric(S.1 ~ BIP) +
+              risk_continuous(D = 10) + ps_estimate(),
+            "psdesign")
+  expect_is(cont.ps + integrate_semiparametric(S.1 ~ BIP, S.1 ~ BIP) +
+              risk_continuous(D = 10) + ps_estimate(),
+            "psdesign")
+  #plot(cont.test)
+  #plot(cont.test, contrast = "risk")
 
 })

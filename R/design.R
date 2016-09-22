@@ -33,7 +33,7 @@
 #'
 #' @export
 #' @importFrom graphics lines plot segments
-#' @importFrom stats cov dpois gaussian glm median model.frame model.matrix model.offset model.response optim pchisq pnorm ppois predict qnorm quantile quasi quasibinomial rbinom rexp rnorm runif terms
+#' @importFrom stats cov dpois dnorm gaussian glm median model.frame model.matrix model.offset model.response optim pchisq pnorm ppois predict qnorm quantile quasi quasibinomial rbinom rexp rnorm runif terms
 #' @importFrom utils flush.console head setTxtProgressBar txtProgressBar
 
 psdesign <- function(data, Z, Y, S,

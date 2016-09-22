@@ -1,7 +1,7 @@
 
 #' Plot summary statistics for a psdesign object
 #'
-#' Plot the vaccine efficacy or another contrast of risk versus S.1 for an
+#' Plot the treatment efficacy or another contrast of risk versus S.1 for an
 #' estimated psdesign object
 #'
 #' @param x A \link{psdesign} object that contains a risk model, integration
@@ -9,14 +9,14 @@
 #' @param t For time to event outcomes, a fixed time \code{t} may be provided to
 #'   compute the cumulative distribution function. If not, the restricted mean
 #'   survival time is used. Omit for binary outcomes.
-#' @param contrast Name of contrast function to plot. \code{"VE"} for vaccine
+#' @param contrast Name of contrast function to plot. \code{"TE"} or \code{"VE"} for treatment (vaccine)
 #'   efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 #'   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 #'   \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
 #'   risk difference = risk_1(s) - risk_0(s). You can also pass a custom
 #'   function directly as long as it takes 2 vectors as input (risk0 and risk1)
 #'   and returns 1 vector of the same length.
-#' @param sig.level Significance level used for confidence bands on the VE
+#' @param sig.level Significance level used for confidence bands on the contrast
 #'   curve. This is only used if bootstrapped estimates are available.
 #' @param CI.type Character string, "pointwise" for pointwise confidence
 #'   intervals, and "band" for simultaneous confidence band.
@@ -31,11 +31,11 @@
 #'
 #' @export
 
-plot.psdesign <- function(x, t, contrast = "VE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast, col = 1, lty = 1, lwd = 1, ...){
+plot.psdesign <- function(x, t, contrast = "TE", sig.level = .05, CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast, col = 1, lty = 1, lwd = 1, ...){
 
 
   if(contrast == "risk"){
-    contrast0 <- "VE"
+    contrast0 <- "TE"
   } else{
     contrast0 <- contrast
   }
@@ -165,7 +165,7 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
   cat("Augmented data frame: ", nrow(x$augdata), " obs. by ", ncol(x$augdata), " variables. \n")
   print(head(x$augdata), digits = digits)
 
-  cat("\nEmpirical VE: ", round(empirical_VE(x), digits), "\n")
+  cat("\nEmpirical TE: ", round(empirical_TE(x), digits), "\n")
 
   cat("\nMapped variables: \n")
   temp <- lapply(names(x$mapping), function(ln){
@@ -225,7 +225,9 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
 
     cat("Bootstrap replicates:\n")
     sbs <- summarize_bs(x$bootstraps, x$estimates$par, sig.level = sig.level, CI.type = "pointwise")
-    print(sbs$table, digits = digits)
+    stabls <- data.frame(Estimate = x$estimates$par, sbs$table)
+    stabls$p.value <- 2 * pnorm(-abs(stabls$Estimate / stabls$boot.se))
+    print(stabls, digits = digits)
     cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
 
     ## WEM test
@@ -247,7 +249,7 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
 
 #' Summary method for psdesign objects
 #'
-#' @return Invisibly returns the printed table, along with the three estimates of vaccine efficacy. The empirical VE is 1 minus the relative risk comparing the treatment arm to the control arm. The risk is estimated as the proportion in the binary outcome case, or with the Kaplan-Meier estimate at the restricted mean survival in the time-to-event case. The marginal VE estimate is the VE estimate under the specified parametric risk model, ignoring the effect of S.1. The model based average VE is the VE estimate from the specified risk model, averaged over the distribution of S.1. The point of displaying these three is to assess the validity of the parametric model, and to assess the validity of the model estimation. Wild differences among these estimates may indicate problems with the model or convergence.
+#' @return Invisibly returns the printed table, along with the three estimates of vaccine efficacy. The empirical TE is 1 minus the relative risk comparing the treatment arm to the control arm. The risk is estimated as the proportion in the binary outcome case, or with the Kaplan-Meier estimate at the restricted mean survival in the time-to-event case. The marginal TE estimate is the TE estimate under the specified parametric risk model, ignoring the effect of S.1. The model based average TE is the TE estimate from the specified risk model, averaged over the distribution of S.1. The point of displaying these three is to assess the validity of the parametric model, and to assess the validity of the model estimation. Wild differences among these estimates may indicate problems with the model or convergence.
 #'
 #' @param object An object of class \link{psdesign}
 #' @param digits Number of significant digits to display
@@ -260,7 +262,7 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 
   pout <- print(object, digits = digits, sig.level = sig.level)
 
-  ## compute marginal model and summarize VE
+  ## compute marginal model and summarize TE
 
   if("risk.model" %in% names(object)){
     pdat <- object$risk.model$args
@@ -268,21 +270,21 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 
     psdesign2 <- object + do.call(as.character(pdat[[1]]), pdat[-1])
     marg.est <- psdesign2 + ps_estimate()
-    marg.VE <- mean(calc_risk(marg.est, contrast = "VE", bootstraps = FALSE)[, 2])
-    emp.VE <- empirical_VE(object)
-    cond.VE <- calc_risk(object, contrast = "VE", bootstraps = FALSE)
+    marg.VE <- mean(calc_risk(marg.est, contrast = "TE", bootstraps = FALSE)[, 2])
+    emp.VE <- empirical_TE(object)
+    cond.VE <- calc_risk(object, contrast = "TE", bootstraps = FALSE)
     cond.VE.est <- 1 - mean(cond.VE$R1)/mean(cond.VE$R0)
     VEtab <- c(empirical = emp.VE, marginal = marg.VE, model = cond.VE.est)
 
     empdiff <- 100 * VEtab[3]/VEtab[1] - 100
     mardiff <- 100 * VEtab[3]/VEtab[2] - 100
 
-    cat("\nVaccine Efficacy: \n")
+    cat("\nTreatment Efficacy: \n")
     print(VEtab, digits = digits)
-    cat(sprintf("\tModel-based average VE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
+    cat(sprintf("\tModel-based average TE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
     if(abs(mardiff) > 100) warning("Check model and results carefully!")
 
-    invisible(list(print = pout, VE.estimates = VEtab))
+    invisible(list(print = pout, TE.estimates = VEtab, VE.estimates = VEtab))
 
   }
 }
@@ -303,7 +305,7 @@ wem_test <- function(x){
 
   if(length(testdex) == 1){
 
-    bsse <- bscov[testdex, testdex]
+    bsse <- sqrt(bscov[testdex, testdex])
     bsmu <- x$estimates$par[testdex]
     Xstat <- bsmu/bsse
     list(stat = Xstat, df = 1, p.value = 2 * pnorm(-abs(Xstat)))

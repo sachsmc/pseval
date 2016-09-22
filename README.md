@@ -13,6 +13,8 @@ devtools::install_github("sachsmc/pseval")
 
 Check out the [vignette](https://sachsmc.github.io/pseval) for methodological details and information on how to use the package.
 
+Check out the [cheat sheet](https://sachsmc.github.io/pseval-course/pseval-cheatsheet.pdf) for a quick reference. 
+
 ## References
 
 

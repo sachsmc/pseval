@@ -4,7 +4,7 @@
 \alias{plot.psdesign}
 \title{Plot summary statistics for a psdesign object}
 \usage{
-\method{plot}{psdesign}(x, t, contrast = "VE", sig.level = 0.05,
+\method{plot}{psdesign}(x, t, contrast = "TE", sig.level = 0.05,
   CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast,
   col = 1, lty = 1, lwd = 1, ...)
 }
@@ -16,7 +16,7 @@ model, and valid estimates}
 compute the cumulative distribution function. If not, the restricted mean
 survival time is used. Omit for binary outcomes.}
 
-\item{contrast}{Name of contrast function to plot. \code{"VE"} for vaccine
+\item{contrast}{Name of contrast function to plot. \code{"TE"} or \code{"VE"} for treatment (vaccine)
 efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk,
 \code{"risk"} for the risk in each treatment arm, and \code{"RD"} for the
@@ -24,7 +24,7 @@ risk difference = risk_1(s) - risk_0(s). You can also pass a custom
 function directly as long as it takes 2 vectors as input (risk0 and risk1)
 and returns 1 vector of the same length.}
 
-\item{sig.level}{Significance level used for confidence bands on the VE
+\item{sig.level}{Significance level used for confidence bands on the contrast
 curve. This is only used if bootstrapped estimates are available.}
 
 \item{CI.type}{Character string, "pointwise" for pointwise confidence
@@ -46,7 +46,7 @@ the curve}
 \item{...}{Other arguments passed to \link{plot}}
 }
 \description{
-Plot the vaccine efficacy or another contrast of risk versus S.1 for an
+Plot the treatment efficacy or another contrast of risk versus S.1 for an
 estimated psdesign object
 }
 

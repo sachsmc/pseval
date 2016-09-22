@@ -177,7 +177,7 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
     psdesign$risk.function <- function(data, beta, t){ # P(T < t | S, Z)
 
-      scale <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
+      scale <- 1/as.vector(exp(model.matrix(model[-2], data) %*% beta))
 
       1 - exp(-scale * t)
 
@@ -230,13 +230,13 @@ risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
         beta.o <- beta
       }
 
-      lambda <- 1/exp(trtmat %*% beta.o)
+      lambda <- exp(trtmat %*% beta.o)
 
       trtlike <- dpois(Y.trt, lambda, log = TRUE)
 
       if(!is.null(untrt.expand) & !is.null(Y.untrt)){
 
-        lambda.untrt <- 1/exp(untrt.expand %*% beta.o)
+        lambda.untrt <- exp(untrt.expand %*% beta.o)
         untrted <- matrix(dpois(Y.untrt, lambda.untrt, log = TRUE), nrow = D, byrow = TRUE)
       } else untrted <- matrix(1)
 
@@ -248,7 +248,7 @@ risk_poisson <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
       lambda <- as.vector(exp(model.matrix(model[-2], data) %*% beta))
 
-      ppois(t, 1/lambda, lower.tail = FALSE)
+      ppois(t, lambda, lower.tail = FALSE)
 
     }
 
@@ -375,3 +375,68 @@ expand_augdata <- function(model, psdesign, D = 500){
 
 }
 
+#' Risk model for continuous outcome
+#'
+#' This model assumes that the outcome Y is normally distributed conditional on
+#' S.1 and Z, with mean determined by the model formula. It also assumes that
+#' larger values of Y are more indicative of poor outcomes, e.g., blood
+#' pressure.
+#'
+#' @param model Formula specifying the risk model for the mean
+#' @param D number of samples for the simulated annealing integration
+#' @export
+
+
+risk_continuous <- function(model = Y ~ S.1 * Z, D = 5000){
+
+  arglist <- as.list(match.call())
+  rval <- function(psdesign){
+
+    expanded <- expand_augdata(model, psdesign, D = D)
+
+    trtmat <- expanded$noimp
+    Y.trt <- expanded$noimp.Y
+
+    untrt.expand <- expanded$imp
+    Y.untrt <- expanded$imp.Y
+
+    likelihood <- function(beta){
+      sigma <- exp(beta[1])
+      gamma <- beta[-1]
+
+      trted <- dnorm(Y.trt, mean = trtmat %*% gamma, sd = sigma)
+
+      # for each W in untrted, sample a bunch from cdf_sbarw and take the mean
+
+      if(!is.null(untrt.expand) & !is.null(Y.untrt)){
+
+        untrted <- matrix(dnorm(Y.untrt, mean = untrt.expand %*% gamma, sd = sigma),
+                          nrow = D, byrow = TRUE)
+
+      } else untrted <- matrix(1)
+
+      -1 * (sum(log(trted)) + sum(log(colMeans(untrted))))
+
+    }
+
+    psdesign$risk.function <- function(data, beta){  ## E(Y | S, Z)
+      sigma <- exp(beta[1])
+      gamma <- beta[-1]
+
+      as.vector(model.matrix(model[-2], data) %*% gamma)
+
+    }
+
+    psdesign$likelihood <- likelihood
+    psdesign$risk.model <- list(model = "continuous", args = arglist)
+    psdesign$nparam <- ncol(trtmat) + 1
+    psdesign$param.names <- c("sigma", colnames(trtmat))
+
+    psdesign
+
+  }
+  ## return a likelihood closure
+
+  class(rval) <- c("ps", "riskmodel")
+  rval
+}

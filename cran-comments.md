@@ -1,3 +1,18 @@
-This is a resubmission. The following change was made: 
+This is a update that contains some important bugfixes and enhancements suggested by a review of a submission to the R Journal.
 
-Added   importFrom("stats", "dpois", "model.offset", "ppois") to the NAMESPACE
+## Test environments
+* local Windows install, R 3.3.1
+* ubuntu 12.04 (on travis-ci), R 3.3.1
+* win-builder (devel and release)
+
+## R CMD check results
+There were no ERRORs or WARNINGs.
+
+There was 1 NOTE:
+
+Package suggested but not available for checking: 'printr'
+
+printr is suggested but not required. It enhances the vignette appearence but the vignette runs without it. 
+
+## Downstream dependencies
+There are no downstream dependencies.

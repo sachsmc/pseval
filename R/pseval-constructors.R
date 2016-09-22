@@ -43,6 +43,7 @@ add_integration <- function(psdesign, integration){
 #' \item \link{risk_weibull} This is a parameterization of the Weibull model for time-to-event outcomes that is consistent with that of \link{rweibull}. The user specifies the formula for the linear predictor of the scale parameter.
 #' \item \link{risk_exponential} This is a simple exponential model for a time-to-event outcome.
 #' \item \link{risk_poisson} This is a Poisson model for count outcomes. It allows for offsets in the formula.
+#' \item \link{risk_continuous} This is a Gaussian model for continuous outcomes. It assumes that larger values of the outcome are harmful (e.g. blood pressure)
 #' }
 #'
 #' @param psdesign A psdesign object

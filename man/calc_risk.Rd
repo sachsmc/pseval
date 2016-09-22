@@ -4,7 +4,7 @@
 \alias{calc_risk}
 \title{Calculate the risk and functions of the risk}
 \usage{
-calc_risk(psdesign, contrast = "VE", t, sig.level = 0.05,
+calc_risk(psdesign, contrast = "TE", t, sig.level = 0.05,
   CI.type = "band", n.samps = 5000, bootstraps = TRUE, newdata = NULL)
 }
 \arguments{
@@ -25,7 +25,7 @@ survival time is used. Omit for binary outcomes.}
 intervals, and "band" for simultaneous confidence band.}
 
 \item{n.samps}{The number of samples to take over the range of S.1 at which
-the VE is calculated}
+the contrast is calculated}
 
 \item{bootstraps}{If true, and bootstrapped estimates are present, will
 calculate bootstrap standard errors and confidence bands.}
@@ -40,8 +40,8 @@ A data frame containing columns for the S values, the computed
   estimates.
 }
 \description{
-Computes the vaccince efficacy (VE) and other functions of the risk in each
-treatment arm over the range of surrogate values observed in the data. VE(s)
+Computes the treatment efficacy (TE) and other functions of the risk in each
+treatment arm over the range of surrogate values observed in the data. TE(s)
 is defined as 1 - risk(s, z = 1)/risk(s, z = 0), where z is the treatment
 indicator. If any other variables are present in the risk model, then the
 risk is computed at their median value.
@@ -49,7 +49,7 @@ risk is computed at their median value.
 \details{
 The contrast function is a function that takes 2 inputs, the risk_0
   and risk_1, and returns some one dimensional function of those two inputs.
-  It must be vectorized. Some built-in functions are \code{"VE"} for vaccine
+  It must be vectorized. Some built-in functions are \code{"TE"} for treatment
   efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk, and
   \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
@@ -57,7 +57,7 @@ The contrast function is a function that takes 2 inputs, the risk_0
 \examples{
 \dontrun{
 # same result passing function name or function
-calc_risk(binary.boot, contrast = "VE", n.samps = 20)
+calc_risk(binary.boot, contrast = "TE", n.samps = 20)
 calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
 }
 }

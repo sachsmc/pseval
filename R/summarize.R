@@ -1,14 +1,14 @@
 #' Calculate the risk and functions of the risk
 #'
-#' Computes the vaccince efficacy (VE) and other functions of the risk in each
-#' treatment arm over the range of surrogate values observed in the data. VE(s)
+#' Computes the treatment efficacy (TE) and other functions of the risk in each
+#' treatment arm over the range of surrogate values observed in the data. TE(s)
 #' is defined as 1 - risk(s, z = 1)/risk(s, z = 0), where z is the treatment
 #' indicator. If any other variables are present in the risk model, then the
 #' risk is computed at their median value.
 #'
 #' @details The contrast function is a function that takes 2 inputs, the risk_0
 #'   and risk_1, and returns some one dimensional function of those two inputs.
-#'   It must be vectorized. Some built-in functions are \code{"VE"} for vaccine
+#'   It must be vectorized. Some built-in functions are \code{"TE"} for treatment
 #'   efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for relative risk =
 #'   risk_1(s)/risk_0(s), \code{"logRR"} for log of the relative risk, and
 #'   \code{"RD"} for the risk difference = risk_1(s) - risk_0(s).
@@ -30,7 +30,7 @@
 #' @param CI.type Character string, "pointwise" for pointwise confidence
 #'   intervals, and "band" for simultaneous confidence band.
 #' @param n.samps The number of samples to take over the range of S.1 at which
-#'   the VE is calculated
+#'   the contrast is calculated
 #' @param bootstraps If true, and bootstrapped estimates are present, will
 #'   calculate bootstrap standard errors and confidence bands.
 #' @param newdata Vector of S values. If present, will calculate the contrast
@@ -41,10 +41,10 @@
 #' @examples
 #' \dontrun{
 #' # same result passing function name or function
-#' calc_risk(binary.boot, contrast = "VE", n.samps = 20)
+#' calc_risk(binary.boot, contrast = "TE", n.samps = 20)
 #' calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
 #' }
-calc_risk <- function(psdesign, contrast = "VE", t, sig.level = .05,
+calc_risk <- function(psdesign, contrast = "TE", t, sig.level = .05,
                       CI.type = "band", n.samps = 5000, bootstraps = TRUE, newdata = NULL){
 
   stopifnot("estimates" %in% names(psdesign))
@@ -194,10 +194,42 @@ summarize_bs <- function(bootdf, estdf = NULL, sig.level = .05, CI.type = "band"
 }
 
 
-#' Compute the empirical Vaccine Efficacy
+#' Compute the empirical Treatment Efficacy
 #'
 #' @param psdesign An object of class \link{psdesign}
-#' @param t Fixed time for time to event outcomes to compute VE. If missing, uses restricted mean survival.
+#' @param t Fixed time for time to event outcomes to compute TE. If missing, uses restricted mean survival.
+#'
+#' @export
+empirical_TE <- function(psdesign, t){
+
+  pd <- psdesign$augdata
+  if(inherits(pd$Y, "Surv")){
+
+    if(missing(t)){
+
+      ttt <- summary(survival::survfit(pd$Y ~ 1), rmean = "common")$table[["*rmean"]]
+
+    } else ttt <- t
+
+    sf <- survival::survfit(pd$Y ~ pd$Z)
+    sfs <- 1 - summary(sf, times = ttt, extend = TRUE)$surv
+
+    1 - sfs[2]/sfs[1]
+
+  } else {
+
+    1 - mean(pd$Y[pd$Z == 1])/mean(pd$Y[pd$Z == 0])
+
+  }
+
+}
+
+#' Compute the empirical Treatment Efficacy
+#'
+#' Included for backwards compatibility
+#'
+#' @param psdesign An object of class \link{psdesign}
+#' @param t Fixed time for time to event outcomes to compute TE. If missing, uses restricted mean survival.
 #'
 #' @export
 empirical_VE <- function(psdesign, t){
@@ -225,7 +257,8 @@ empirical_VE <- function(psdesign, t){
 }
 
 
-#' Vaccine efficacy contrast functions
+
+#' Treatment efficacy contrast functions
 #'
 #' @param R0 A vector of risks in the control arm
 #' @param R1 A vector of risks in the treatment arm
@@ -236,11 +269,11 @@ empirical_VE <- function(psdesign, t){
 #'
 #' @details These functions take the risk in the two treatment arms, and
 #'   computes a one-dimensional summary of those risks. Built-in choices are
-#'   \code{"VE"} for vaccine efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
+#'   \code{"TE"} for treatment efficacy = 1 - risk_1(s)/risk_0(s), \code{"RR"} for
 #'   relative risk = risk_0(s)/risk_1(s), \code{"logRR"} for log of the relative
 #'   risk, and \code{"RD"} for the risk difference = risk_0(s) - risk_1(s).
 
-VE <- function(R0, R1){
+TE <- VE <- function(R0, R1){
   1 - R1/R0
 }
 

@@ -1,7 +1,7 @@
 library(pseval)
 library(survival)
 
-test_that("Testing bootstrap and VE estimation", {
+test_that("Testing bootstrap and TE estimation", {
 
   set.seed(52001)
   fakedata <- generate_example_data(n = 200)
@@ -22,13 +22,13 @@ test_that("Testing bootstrap and VE estimation", {
 
   smary <- summary(binary.boot)
 
-  expect_equal(names(smary), c("print", "VE.estimates"))
+  expect_equal(names(smary), c("print", "TE.estimates", "VE.estimates"))
   expect_equal(names(smary$print), c("wem.test", "boot.table"))
 
   expect_less_than(smary$print$wem.test$p.value, 1)
   expect_more_than(smary$print$wem.test$p.value, 0)
 
   expect_true(smary$print$boot.table$conv[1] == 50)
-  expect_true(length(smary$VE.estimates) == 3)
+  expect_true(length(smary$TE.estimates) == 3)
 
 })

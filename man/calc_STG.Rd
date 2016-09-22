@@ -22,15 +22,15 @@ survival time is used. Omit for binary outcomes.}
 the VE is calculated}
 
 \item{bootstraps}{If true, and bootstrapped estimates are present, will
-calculate bootstrap standard errors and confidence bands.}
+calculate bootstrap standard errors and confidence interval.}
 
-\item{permute}{If true, will do permutation test for whether the STG is different from 0}
+\item{permute}{Not used, included for backwards compatibility}
 
-\item{permute.times}{Numeric, number of permutations to run}
+\item{permute.times}{Not used, included for backwards compatibility}
 
-\item{progress.bar}{Logical, if true will display a progress bar in the console}
+\item{progress.bar}{Not used, included for backwards compatibility}
 }
 \description{
-Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors, and permutation test statistic. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference.
+Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors and confidence intervals. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference. If the outcome is time to event then the STG is time-dependent, and a time point for evaluation is needed. If one is not provided then the restricted mean survival is estimated from the data and used.
 }
 
