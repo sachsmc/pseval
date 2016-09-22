@@ -376,10 +376,6 @@ Our package uses the `+` sign to combine function calls into a single object. Th
 
 ## Additional examples
 
-```{r appen, include = FALSE}
-opts_chunk$set(eval = FALSE)
-```
-
 ### Plot both types of CI
 
 ```{r plotciag}
@@ -423,7 +419,7 @@ plot(surv.fit)
 
 ### Continuous outcome
 
-```{r surv1}
+```{r cont1}
 fakedata$Y.cont <- log(fakedata$time.obs + 0.01)
 cont.fit <- psdesign(fakedata, Z = Z, Y = Y.cont, 
                      S = S.obs, BIP = BIP, CPV = CPV) + 
@@ -435,7 +431,7 @@ plot(cont.fit, contrast = "risk")
 
 ### Categorical S
 
-`S.obs.cat} and \code{BIP.cat` are factors:
+`S.obs.cat` and `BIP.cat` are factors:
 
 ```{r}
 with(fakedata, table(S.obs.cat, BIP.cat))

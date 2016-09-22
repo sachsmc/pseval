@@ -1,4 +1,4 @@
-This is a update that contains some important bugfixes and improvements to documentation.
+This is a update that contains some important bugfixes and enhancements suggested by a review of a submission to the R Journal.
 
 ## Test environments
 * local Windows install, R 3.3.1
