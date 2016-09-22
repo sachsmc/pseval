@@ -225,7 +225,9 @@ print.psdesign <- function(x, digits = 3, sig.level = .05, ...){
 
     cat("Bootstrap replicates:\n")
     sbs <- summarize_bs(x$bootstraps, x$estimates$par, sig.level = sig.level, CI.type = "pointwise")
-    print(sbs$table, digits = digits)
+    stabls <- data.frame(Estimate = x$estimates$par, sbs$table)
+    stabls$p.value <- 2 * pnorm(-abs(stabls$Estimate / stabls$boot.se))
+    print(stabls, digits = digits)
     cat("\n\t Out of", sbs$conv[1], "bootstraps, ", sbs$conv[2], "converged (", round(100 * sbs$conv[2]/sbs$conv[1], 1), "%)\n")
 
     ## WEM test
