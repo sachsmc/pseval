@@ -277,7 +277,7 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
     empdiff <- 100 * VEtab[3]/VEtab[1] - 100
     mardiff <- 100 * VEtab[3]/VEtab[2] - 100
 
-    cat("\nVaccine Efficacy: \n")
+    cat("\nTreatment Efficacy: \n")
     print(VEtab, digits = digits)
     cat(sprintf("\tModel-based average TE is %.1f %% different from the empirical and %.1f %% different from the marginal.\n", empdiff, mardiff))
     if(abs(mardiff) > 100) warning("Check model and results carefully!")
