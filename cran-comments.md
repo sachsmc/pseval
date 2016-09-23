@@ -6,7 +6,13 @@ This is a update that contains some important bugfixes and enhancements suggeste
 * win-builder (devel and release)
 
 ## R CMD check results
-There were no ERRORs or WARNINGs.
+There were no ERRORs. There was 1 WARNING, on R-devel:
+
+* checking files in 'vignettes' ... WARNING
+Files in the 'vignettes' directory newer than all files in 'inst/doc':
+  'introduction.Rmd', 'psreferences.bib'
+  
+I don't understand this warning, as the files in inst/doc were created after the files in vignettes. I also see this warning on the CRAN R-devel checks but can't explain it or fix it. Sorry!
 
 There was 1 NOTE:
 
