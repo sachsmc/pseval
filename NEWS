@@ -5,6 +5,7 @@ pseval 1.3.0
 * enhancement: Printed results output more closely match that of lm/glm
 * new feature: risk model for continuous outcomes
 * enhancement: improved documentation for joint versus marginal estimands
+* enhancement: Added cheatsheet
 
 pseval 1.2.3
 ------------
