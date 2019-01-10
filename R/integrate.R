@@ -128,6 +128,7 @@ integrate_nonparametric <- function(formula, ...){
     psdesign$integration.models[[outname]]$icdf_sbarw <-
       function(U.1){
 
+
         dex <- c(list(lookup), list(TRUE), as.list(impwith))
         res <- do.call("[", dex)
 
@@ -136,6 +137,8 @@ integrate_nonparametric <- function(formula, ...){
           sample(outvect, size = length(U.1), prob = res[, i], replace = TRUE)
 
         }))
+
+
 
       }
 

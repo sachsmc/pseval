@@ -69,6 +69,7 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
       weighteddf <- lapply(impute, function(df){
 
         risk <- psdesign$risk.function(data = df, beta = beta0)
+        lhood <- risk ^ df$Y * (1 - risk) ^ (1 - df$Y)
         df1 <- df0 <- df
         df1$Z <- 1
         df0$Z <- 0
@@ -78,7 +79,7 @@ pseudo_score <- function(psdesign, start = NULL, epsilon = 1e-5, maxit = 50){
                      del.lookup[3, "Pr"] * (psdesign$risk.function(data = df0, beta = beta0)) * pz0 +
                      del.lookup[4, "Pr"] * (psdesign$risk.function(data = df1, beta = beta0)) * pz1)
 
-        df$glmweights <- (risk / prDelt) / sum(risk / prDelt)
+        df$glmweights <- (lhood / prDelt) / sum(lhood / prDelt)
         df
 
       })
