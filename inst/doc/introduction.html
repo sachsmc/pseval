@@ -19,7 +19,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
@@ -83,7 +83,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -399,103 +421,27 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1492</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">fakedata &lt;-<span class="st"> </span><span class="kw">generate_example_data</span>(<span class="dt">n =</span> <span class="dv">800</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw">head</span>(fakedata)</a></code></pre></div>
-<table>
-<thead>
-<tr class="header">
-<th align="right">Z</th>
-<th align="right">BIP</th>
-<th align="right">CPV</th>
-<th align="right">BSM</th>
-<th align="right">S.obs</th>
-<th align="right">time.obs</th>
-<th align="right">event.obs</th>
-<th align="right">Y.obs</th>
-<th align="left">S.obs.cat</th>
-<th align="left">BIP.cat</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">0.3353179</td>
-<td align="right">1.4851399</td>
-<td align="right">0.4596161</td>
-<td align="right">0.3526810</td>
-<td align="right">0.3301972</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">(-0.198,0.503]</td>
-<td align="left">(0.0574,0.766]</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="right">1.4536863</td>
-<td align="right">2.6379400</td>
-<td align="right">1.3959104</td>
-<td align="right">1.4668891</td>
-<td align="right">0.1195136</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">(1.36, Inf]</td>
-<td align="left">(0.766, Inf]</td>
-</tr>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">-0.7243934</td>
-<td align="right">NA</td>
-<td align="right">-0.6272350</td>
-<td align="right">-0.7319076</td>
-<td align="right">0.2631222</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="left">(-Inf,-0.198]</td>
-<td align="left">(-Inf,-0.678]</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="right">-0.1183592</td>
-<td align="right">0.9421504</td>
-<td align="right">0.0773831</td>
-<td align="right">-0.0183341</td>
-<td align="right">0.1373458</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">(-0.198,0.503]</td>
-<td align="left">(-0.678,0.0574]</td>
-</tr>
-<tr class="odd">
-<td align="right">0</td>
-<td align="right">-0.2352566</td>
-<td align="right">NA</td>
-<td align="right">-0.1497145</td>
-<td align="right">-0.1847024</td>
-<td align="right">0.8543703</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="left">(-0.198,0.503]</td>
-<td align="left">(-0.678,0.0574]</td>
-</tr>
-<tr class="even">
-<td align="right">0</td>
-<td align="right">-0.7782851</td>
-<td align="right">0.1159434</td>
-<td align="right">-0.6572161</td>
-<td align="right">-0.6631371</td>
-<td align="right">0.2200481</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">(-Inf,-0.198]</td>
-<td align="left">(-Inf,-0.678]</td>
-</tr>
-</tbody>
-</table>
+<pre><code>##   Z        BIP       CPV         BSM       S.obs  time.obs event.obs Y.obs
+## 1 0  0.3353179 1.4851399  0.45961614  0.35268095 0.3301972         0     0
+## 2 0  1.4536863 2.6379400  1.39591042  1.46688905 0.1195136         1     0
+## 3 0 -0.7243934        NA -0.62723499 -0.73190763 0.2631222         1     1
+## 4 0 -0.1183592 0.9421504  0.07738308 -0.01833409 0.1373458         1     0
+## 5 0 -0.2352566        NA -0.14971448 -0.18470242 0.8543703         1     1
+## 6 0 -0.7782851 0.1159434 -0.65721609 -0.66313714 0.2200481         1     0
+##        S.obs.cat         BIP.cat
+## 1 (-0.198,0.503]  (0.0574,0.766]
+## 2    (1.36, Inf]    (0.766, Inf]
+## 3  (-Inf,-0.198]   (-Inf,-0.678]
+## 4 (-0.198,0.503] (-0.678,0.0574]
+## 5 (-0.198,0.503] (-0.678,0.0574]
+## 6  (-Inf,-0.198]   (-Inf,-0.678]</code></pre>
 <p>The example data includes both a time-to-event outcome, a binary outcome, a surrogate, a BIP, CPV, and BSM, and a categorical version of the surrogate. The true model for the time is exponential, with parameters (intercept) = -1, S(1) = 0.0, Z = 0.0, S(1):Z = -0.75. The true model for binary is logistic, with the same parameter values.</p>
 <p>In the above table S.obs.cat and BIP.cat are formed as <code>S.obs.cat &lt;- factor(S.obs,levels=c(-Inf, quantile(c(S.0, S.1), c(.25, .5, .75), na.rm = TRUE), Inf))</code> and similarly for BIP.cat. Alternatively a user could input arbitrary numeric values to represent different discrete subgroups (e.g., 0s and 1s to denote 2 subgroups).</p>
 <div id="the-psdesign-object" class="section level3">
 <h3>The <code>&quot;psdesign&quot;</code> object</h3>
 <p>We begin by creating a <code>&quot;psdesign&quot;</code> object with the synonymous function. This is the object that combines the raw dataset with information about the study design and the structure of the data. Subsequent analysis will operate on this psdesign object. It is designed to be analogous to the <code>svydesign</code> function in the <strong>survey</strong> package (<a href="https://CRAN.R-project.org/package=survey" class="uri">https://CRAN.R-project.org/package=survey</a>). The first argument is the data frame where the data are stored. All subsequent arguments describe the mappings from the variable names in the data frame to important variables in the PS analysis, using the same notation as above. An optional weights argument describes the sampling weights, if present. Our first analysis will use the binary version of the outcome, with continuous <span class="math inline">\(S.1\)</span> and the BIP labeled <span class="math inline">\(BIP\)</span>. The object has a print method, so we can inspect the result.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">binary.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">binary.ps</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">binary.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">binary.ps</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights    BIP
 ## 1 0 0  NA  0.3527          1  0.335
@@ -523,18 +469,18 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <p>The printout displays a brief description of the data, including the empirical treatment efficacy estimate, the variables used in the analysis and their corresponding variables in the original dataset. Finally the printout invites the user to see the help page for <code>add_integration</code>, in order to add an integration model to the psdesign object, the next step in the analysis.</p>
 <p>Missing values in the <span class="math inline">\(S\)</span> variable are allowed. Note that any cases where <span class="math inline">\(S(1)\)</span> is missing will be integrated over in the likelihood or score equations. Thus any cases that experienced an event prior to the time <span class="math inline">\(\tau\)</span> when the surrogate was measured should be excluded from the dataset. The equal individual risk assumption allows us to make causal inferences even after excluding such cases.</p>
 <p><code>psdesign</code> easily accommodates case-control or case-cohort sampling. In this case, the surrogate <span class="math inline">\(S\)</span> is only measured on a subset of the data, inducing missingness in <span class="math inline">\(S\)</span> by design. Let’s modify the fake dataset to see how it works. We’re going to sample all of the cases, and 20% of the controls for measurement of <span class="math inline">\(S\)</span>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">fakedata.cc &lt;-<span class="st"> </span>fakedata</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">missdex &lt;-<span class="st"> </span><span class="kw">sample</span>((<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(fakedata.cc))[fakedata.cc<span class="op">$</span>Y.obs <span class="op">==</span><span class="st"> </span><span class="dv">0</span>], </a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">       <span class="dt">size =</span> <span class="kw">floor</span>(<span class="kw">sum</span>(fakedata.cc<span class="op">$</span>Y.obs <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span><span class="fl">.8</span>))</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">fakedata.cc[missdex, ]<span class="op">$</span>S.obs &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">fakedata.cc<span class="op">$</span>weights &lt;-<span class="st"> </span><span class="kw">ifelse</span>(fakedata.cc<span class="op">$</span>Y.obs <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">.2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">fakedata.cc &lt;-<span class="st"> </span>fakedata</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">missdex &lt;-<span class="st"> </span><span class="kw">sample</span>((<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(fakedata.cc))[fakedata.cc<span class="op">$</span>Y.obs <span class="op">==</span><span class="st"> </span><span class="dv">0</span>], </a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">       <span class="dt">size =</span> <span class="kw">floor</span>(<span class="kw">sum</span>(fakedata.cc<span class="op">$</span>Y.obs <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">*</span><span class="st"> </span><span class="fl">.8</span>))</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">fakedata.cc[missdex, ]<span class="op">$</span>S.obs &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">fakedata.cc<span class="op">$</span>weights &lt;-<span class="st"> </span><span class="kw">ifelse</span>(fakedata.cc<span class="op">$</span>Y.obs <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">.2</span>)</a></code></pre></div>
 <p>Now we can create the <code>&quot;psdesign&quot;</code> object, using the entire dataset (including those missing <code>S.obs</code>) and passing the weights to the <code>weights</code> field.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">binary.cc &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata.cc, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, </a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">                      <span class="dt">BIP =</span> BIP, <span class="dt">weights =</span> weights)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">binary.cc &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata.cc, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, </a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">                      <span class="dt">BIP =</span> BIP, <span class="dt">weights =</span> weights)</a></code></pre></div>
 <p>The other augmentation types can be defined by mapping variables to the names <code>BIP</code>, <code>CPV</code>, and/or <code>BSM</code>. The augmentations are handled as described in the previous section: CPV is used as a direct imputation for <span class="math inline">\(S(1)\)</span>, and BSM is used as a direct imputation for <span class="math inline">\(S(0)\)</span>. BIPs and BSMs are made available in the augmented dataset for use in the integration models which we describe in the next subsection.</p>
 <p>For survival outcomes, a key assumption is that the potential surrogate is measured at a fixed time <span class="math inline">\(\tau\)</span> after entry into the study. Any subjects who have a clinical outcome prior to <span class="math inline">\(\tau\)</span> will be removed from the analysis, with a warning. If <code>tau</code> is not specified in the <code>psdesign</code> object, then it is assumed to be 0. Survival outcomes are specified by mapping <code>Y</code> to a <code>Surv</code> object, which requires the <strong>survival</strong> package:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">surv.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> <span class="kw">Surv</span>(time.obs, event.obs), <span class="dt">S =</span> S.obs, </a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">                        <span class="dt">BIP =</span> BIP, <span class="dt">CPV =</span> CPV, <span class="dt">BSM =</span> BSM)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">surv.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> <span class="kw">Surv</span>(time.obs, event.obs), <span class="dt">S =</span> S.obs, </a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">                        <span class="dt">BIP =</span> BIP, <span class="dt">CPV =</span> CPV, <span class="dt">BSM =</span> BSM)</a></code></pre></div>
 <pre><code>## Warning in psdesign(data = fakedata, Z = Z, Y = Surv(time.obs,
 ## event.obs), : tau missing in psdesign: assuming that the surrogate S was
 ## measured at time 0.</code></pre>
@@ -542,7 +488,7 @@ risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 <div id="integration-models" class="section level3">
 <h3>Integration models</h3>
 <p>The EML procedure requires an estimate of <span class="math inline">\(F_{S(1) | W}\)</span>, and we refer to this as the integration model. Details are available in the help page for <code>add_integration</code>, shown below. Several integration models are implemented, including a parametric model that uses a formula interface to define a regression model, a semiparametric model that specifies a location and a scale model is robust to the specification of the distribution, and a non-parametric model that uses empirical conditional probability estimates for discrete <span class="math inline">\(W\)</span> and <span class="math inline">\(S(1)\)</span>.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">?add_integration</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">?add_integration</a></code></pre></div>
 <div class="r-help-page">
 <table width="100%" summary="page for add_integration">
 <tr>
@@ -598,7 +544,7 @@ An integration object
 Details
 </h3>
 <p>
-This is a list of the available integration models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate reponses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we integrate likelihood contributions over each non-missing S(1) given their value of W, and average over the contributions.
+This is a list of the available integration models. The fundamental problem in surrogate evaluation is that there are unobserved values of the counterfactual surrogate responses S(1). In the estimated maximum likelihood framework, for subjects missing the S(1) values, we use an auxiliary pre-treatment variable or set of variables W that is observed for every subject to estimate the distribution of S(1) | W. Typically, this W is a BIP. Then for each missing S(1), we integrate likelihood contributions over each non-missing S(1) given their value of W, and average over the contributions.
 </p>
 <ul>
 <li>
@@ -634,8 +580,8 @@ test + integrate_parametric(S.1 ~ BIP)  # same as above
 </pre>
 </div>
 <p>For this first example, let’s use the parametric integration model. We specify the mean model for <span class="math inline">\(S(1) | W\)</span> as a formula. The predictor is generally a function of the BIP and the BSM, if available. We can add the integration model directly to the psdesign object and inspect the results. Note that in the formula, we refer to the variable names in the augmented dataset.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">binary.ps &lt;-<span class="st"> </span>binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">binary.ps</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">binary.ps &lt;-<span class="st"> </span>binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP)</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">binary.ps</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights    BIP
 ## 1 0 0  NA  0.3527          1  0.335
@@ -662,7 +608,7 @@ test + integrate_parametric(S.1 ~ BIP)  # same as above
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
 <p>We can add multiple integration models to a psdesign object, say we want a model for <span class="math inline">\(S(0) | W\)</span>:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.0</span> <span class="op">~</span><span class="st"> </span>BIP)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.0</span> <span class="op">~</span><span class="st"> </span>BIP)</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights    BIP
 ## 1 0 0  NA  0.3527          1  0.335
@@ -691,17 +637,17 @@ test + integrate_parametric(S.1 ~ BIP)  # same as above
 ##  No estimates present, see ?ps_estimate.
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
 <p>In a future version of the package, we will allow for estimation of the joint risk estimands that depend on both <span class="math inline">\(S(0)\)</span> and <span class="math inline">\(S(1)\)</span>. We can also use splines, other transformations, and other variables in the formula:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">library</span>(splines)</a>
-<a class="sourceLine" id="cb16-2" data-line-number="2">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP<span class="op">^</span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb16-3" data-line-number="3">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span><span class="kw">bs</span>(BIP, <span class="dt">df =</span> <span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb16-4" data-line-number="4">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP <span class="op">+</span><span class="st"> </span>BSM <span class="op">+</span><span class="st"> </span>BSM<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">library</span>(splines)</a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb17-3" data-line-number="3">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span><span class="kw">bs</span>(BIP, <span class="dt">df =</span> <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb17-4" data-line-number="4">binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP <span class="op">+</span><span class="st"> </span>BSM <span class="op">+</span><span class="st"> </span>BSM<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
 <p>These are shown as examples, we will proceed with the simple linear model for integration. The other integration models are called <code>integrate_bivnorm</code>, <code>integrate_nonparametric</code>, and <code>integrate_semiparametric</code>. See their help files for details on the models and their specification.</p>
 <p>The next step is to define the risk model. We will proceed with the simple parametric integration model.</p>
 </div>
 <div id="risk-models-and-likelihoods" class="section level3">
 <h3>Risk models and likelihoods</h3>
 <p>The risk model is the specification of the distribution for the outcome <span class="math inline">\(Y\)</span> given <span class="math inline">\(S(1)\)</span> and <span class="math inline">\(Z\)</span>. We accommodate a variety of flexible specifications for this model, for binary, time-to-event, and count outcomes. We have implemented exponential and weibull survival models, and a flexible specification for binary models, allowing for standard or custom link functions. See the help file for <code>add_riskmodel</code> for more details.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">?add_riskmodel</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">?add_riskmodel</a></code></pre></div>
 <div class="r-help-page">
 <table width="100%" summary="page for add_riskmodel">
 <tr>
@@ -797,8 +743,8 @@ test + risk_binary() # same as above
 </pre>
 </div>
 <p>Let’s add a simple binary risk model using the logit link. The argument <code>D</code> specifies the number of samples to use for the simulated annealing, also known as empirical integration, in the EML procedure. In general, D should be set to something reasonably large, like 2 or 3 times the sample size.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">binary.ps &lt;-<span class="st"> </span>binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">50</span>, <span class="dt">risk =</span> risk.logit)</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2">binary.ps</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">binary.ps &lt;-<span class="st"> </span>binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">50</span>, <span class="dt">risk =</span> risk.logit)</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">binary.ps</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights    BIP
 ## 1 0 0  NA  0.3527          1  0.335
@@ -830,10 +776,10 @@ test + risk_binary() # same as above
 <h3>Estimation and Bootstrap</h3>
 <p>We estimate the parameters and bootstrap using the same type of syntax. We can add a <code>&quot;ps_estimate&quot;</code> object, which takes optional arguments <code>start</code> for starting values, and other arguments that are passed to the <code>optim</code> function. The <code>method</code> argument determines the optimization method, we have found that “BFGS” works well in these types of problems and it is the default. Use <code>&quot;pseudo-score&quot;</code> as the <code>method</code> argument for pseudo-score estimation for binary risk models with categorical BIPs.</p>
 <p>The <code>ps_bootstrap</code> function takes the additional arguments <code>n.boots</code> for the number of bootstrap replicates, and <code>progress.bar</code> which is a logical that displays a progress bar in the R console if true. It is helpful to pass the estimates as starting values in the bootstrap resampling. With estimates and bootstrap replicates present, printing the psdesign object displays additional information.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">binary.est &lt;-<span class="st"> </span>binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2">binary.boot &lt;-<span class="st"> </span>binary.est <span class="op">+</span><span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">500</span>, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb20-3" data-line-number="3">                            <span class="dt">start =</span> binary.est<span class="op">$</span>estimates<span class="op">$</span>par, <span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">binary.boot</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">binary.est &lt;-<span class="st"> </span>binary.ps <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">binary.boot &lt;-<span class="st"> </span>binary.est <span class="op">+</span><span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">500</span>, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">                            <span class="dt">start =</span> binary.est<span class="op">$</span>estimates<span class="op">$</span>par, <span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">binary.boot</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights    BIP
 ## 1 0 0  NA  0.3527          1  0.335
@@ -877,16 +823,16 @@ test + risk_binary() # same as above
 <div id="do-it-all-at-once" class="section level3">
 <h3>Do it all at once</h3>
 <p>The next code chunk shows how the model can be defined and estimated all at once.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">binary.est &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="st">  </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="st">  </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">50</span>, <span class="dt">risk =</span> risk.logit) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-4" data-line-number="4"><span class="st">  </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">binary.est &lt;-<span class="st"> </span><span class="kw">psdesign</span>(<span class="dt">data =</span> fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="st">  </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-3" data-line-number="3"><span class="st">  </span><span class="kw">risk_binary</span>(<span class="dt">model =</span> Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">50</span>, <span class="dt">risk =</span> risk.logit) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-4" data-line-number="4"><span class="st">  </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a></code></pre></div>
 </div>
 <div id="plots-and-summaries" class="section level3">
 <h3>Plots and summaries</h3>
 <p>We provide summary and plotting methods for the psdesign object. If bootstrap replicates are present, the summary method does a test for wide effect modification. Under the parametric risk models implemented in this package, the test for wide effect modification is equivalent to a test that the <span class="math inline">\(S(1):Z\)</span> coefficient is different from 0. This is implemented using a Wald test using the bootstrap estimate of the variance.</p>
 <p>Another way to assess wide effect modification is to compute the standardized total gain (STG) <span class="citation">(Gabriel, Sachs, and Gilbert 2015)</span>. This is implemented in the <code>calc_STG</code> function. The standardized total gain can be interpreted as the area sandwiched between the risk difference curve and the horizontal line at the marginal risk difference. It is a measure of the spread of the distribution of the risk difference, and is a less parametric way to test for wide effect modification. The <code>calc_STG</code> function computes the STG at the estimated parameters, at the bootstrap samples, if present. The function prints the results and invisibly returns a list containing the observed STG, and the bootstrapped STGS.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw">calc_STG</span>(binary.boot, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">calc_STG</span>(binary.boot, <span class="dt">progress.bar =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## $obsSTG
 ## [1] 0.3397774
 ## 
@@ -894,7 +840,7 @@ test + risk_binary() # same as above
 ##    STG.boot.se STG.lower.CL.2.5 STG.upper.CL.97.5
 ## V1   0.1243311        0.1573031         0.6382418</code></pre>
 <p>The summary method also computes the marginal treatment efficacy marginalized over <span class="math inline">\(S(1)\)</span> and compares it to the average treatment efficacy conditional on <span class="math inline">\(S(1)\)</span>. This is an assessment of model fit. A warning will be given if the two estimates are dramatically different. These estimates are presented in the summary along with the empirical marginal treatment efficacy.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">smary &lt;-<span class="st"> </span><span class="kw">summary</span>(binary.boot)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">smary &lt;-<span class="st"> </span><span class="kw">summary</span>(binary.boot)</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights    BIP
 ## 1 0 0  NA  0.3527          1  0.335
@@ -941,165 +887,49 @@ test + risk_binary() # same as above
 ##  Model-based average TE is 2.3 % different from the empirical and 2.3 % different from the marginal.</code></pre>
 <p>The <code>calc_risk</code> function computes the risk in each treatment arm, and contrasts of the risks. By default it computes the treatment efficacy, but there are other contrast functions available. The contrast function is a function that takes 2 inputs, the <span class="math inline">\(risk_0\)</span> and <span class="math inline">\(risk_1\)</span>, and returns some one dimensional function of those two inputs. It must be vectorized. Some built-in functions are “TE” for treatment efficacy <span class="math inline">\(= 1 - risk_1(s)/risk_0(s)\)</span>, “RR” for relative risk <span class="math inline">\(= risk_1(s)/risk_0(s)\)</span>, “logRR” for log of the relative risk, and “RD” for the risk difference <span class="math inline">\(= risk_1(s) -risk_0(s)\)</span>. You can pass the name of the function, or the function itself to <code>calc_risk</code>. See <code>?calc_risk</code> for more information about contrast functions.</p>
 <p>Other arguments of the <code>calc_risk</code> function include <code>t</code>, the time at which to calculate the risk for time-to-event outcomes, <code>n.samps</code> which is the number of samples over the range of S.1 at which the risk will be calculated, and <code>CI.type</code>, which can be set to <code>&quot;pointwise&quot;</code> for pointwise confidence intervals or <code>&quot;band&quot;</code> for a simultaneous confidence band. <code>sig.level</code> is the significance level for the bootstrap confidence intervals. If the outcome is time-to-event and <span class="math inline">\(t\)</span> is not present, then it will use the restricted mean survival time.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">calc_risk</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;TE&quot;</span>, <span class="dt">n.samps =</span> <span class="dv">20</span>), <span class="dv">3</span>)</a></code></pre></div>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">S.1</th>
-<th align="right">Y</th>
-<th align="right">R0</th>
-<th align="right">R1</th>
-<th align="right">Y.boot.se</th>
-<th align="right">Y.upper.CL.0.95</th>
-<th align="right">Y.lower.CL.0.95</th>
-<th align="right">R0.boot.se</th>
-<th align="right">R0.upper.CL.0.95</th>
-<th align="right">R0.lower.CL.0.95</th>
-<th align="right">R1.boot.se</th>
-<th align="right">R1.upper.CL.0.95</th>
-<th align="right">R1.lower.CL.0.95</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>V1</td>
-<td align="right">-2.2756987</td>
-<td align="right">-1.7437221</td>
-<td align="right">0.2980453</td>
-<td align="right">0.8177536</td>
-<td align="right">1.1622104</td>
-<td align="right">-0.3045511</td>
-<td align="right">-3.780389</td>
-<td align="right">0.0899424</td>
-<td align="right">0.4766278</td>
-<td align="right">0.1188411</td>
-<td align="right">0.0691131</td>
-<td align="right">0.9368827</td>
-<td align="right">0.6720409</td>
-</tr>
-<tr class="even">
-<td>V2</td>
-<td align="right">-1.4262708</td>
-<td align="right">-1.1360482</td>
-<td align="right">0.2930970</td>
-<td align="right">0.6260692</td>
-<td align="right">0.6957994</td>
-<td align="right">-0.0554174</td>
-<td align="right">-2.556452</td>
-<td align="right">0.0690166</td>
-<td align="right">0.4331237</td>
-<td align="right">0.1468385</td>
-<td align="right">0.0759251</td>
-<td align="right">0.7762517</td>
-<td align="right">0.4768403</td>
-</tr>
-<tr class="odd">
-<td>V3</td>
-<td align="right">-0.5973759</td>
-<td align="right">-0.3532827</td>
-<td align="right">0.2883149</td>
-<td align="right">0.3901715</td>
-<td align="right">0.3328793</td>
-<td align="right">0.2967597</td>
-<td align="right">-1.275280</td>
-<td align="right">0.0494169</td>
-<td align="right">0.4007098</td>
-<td align="right">0.1734875</td>
-<td align="right">0.0507982</td>
-<td align="right">0.5248493</td>
-<td align="right">0.2834909</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">calc_risk</span>(binary.boot, <span class="dt">contrast =</span> <span class="cf">function</span>(R0, R1) <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>R1<span class="op">/</span>R0, <span class="dt">n.samps =</span> <span class="dv">20</span>), <span class="dv">3</span>)</a></code></pre></div>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">S.1</th>
-<th align="right">Y</th>
-<th align="right">R0</th>
-<th align="right">R1</th>
-<th align="right">Y.boot.se</th>
-<th align="right">Y.upper.CL.0.95</th>
-<th align="right">Y.lower.CL.0.95</th>
-<th align="right">R0.boot.se</th>
-<th align="right">R0.upper.CL.0.95</th>
-<th align="right">R0.lower.CL.0.95</th>
-<th align="right">R1.boot.se</th>
-<th align="right">R1.upper.CL.0.95</th>
-<th align="right">R1.lower.CL.0.95</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>V1</td>
-<td align="right">-0.9741799</td>
-<td align="right">-0.7132778</td>
-<td align="right">0.2904830</td>
-<td align="right">0.4976780</td>
-<td align="right">0.4840781</td>
-<td align="right">0.1395560</td>
-<td align="right">-1.6775172</td>
-<td align="right">0.0581589</td>
-<td align="right">0.4084405</td>
-<td align="right">0.1763127</td>
-<td align="right">0.0653127</td>
-<td align="right">0.6258814</td>
-<td align="right">0.3695242</td>
-</tr>
-<tr class="even">
-<td>V2</td>
-<td align="right">-0.1187534</td>
-<td align="right">0.0596636</td>
-<td align="right">0.2855748</td>
-<td align="right">0.2685364</td>
-<td align="right">0.1882398</td>
-<td align="right">0.4746753</td>
-<td align="right">-0.4357974</td>
-<td align="right">0.0390355</td>
-<td align="right">0.3909614</td>
-<td align="right">0.2043944</td>
-<td align="right">0.0326022</td>
-<td align="right">0.3454742</td>
-<td align="right">0.1923057</td>
-</tr>
-<tr class="odd">
-<td>V3</td>
-<td align="right">-0.0923648</td>
-<td align="right">0.0800934</td>
-<td align="right">0.2854242</td>
-<td align="right">0.2625636</td>
-<td align="right">0.1820450</td>
-<td align="right">0.4835707</td>
-<td align="right">-0.4036444</td>
-<td align="right">0.0384982</td>
-<td align="right">0.3904263</td>
-<td align="right">0.2053113</td>
-<td align="right">0.0317698</td>
-<td align="right">0.3379838</td>
-<td align="right">0.1879937</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">calc_risk</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;TE&quot;</span>, <span class="dt">n.samps =</span> <span class="dv">20</span>), <span class="dv">3</span>)</a></code></pre></div>
+<pre><code>##           S.1          Y        R0        R1 Y.boot.se Y.upper.CL.0.95
+## V1 -2.2756987 -1.7437221 0.2980453 0.8177536 1.1622104     -0.30455106
+## V2 -1.4262708 -1.1360482 0.2930970 0.6260692 0.6957994     -0.05541741
+## V3 -0.5973759 -0.3532827 0.2883149 0.3901715 0.3328793      0.29675970
+##    Y.lower.CL.0.95 R0.boot.se R0.upper.CL.0.95 R0.lower.CL.0.95 R1.boot.se
+## V1       -3.780389 0.08994238        0.4766278        0.1188411 0.06911306
+## V2       -2.556452 0.06901664        0.4331237        0.1468385 0.07592515
+## V3       -1.275280 0.04941685        0.4007098        0.1734875 0.05079824
+##    R1.upper.CL.0.95 R1.lower.CL.0.95
+## V1        0.9368827        0.6720409
+## V2        0.7762517        0.4768403
+## V3        0.5248493        0.2834909</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">calc_risk</span>(binary.boot, <span class="dt">contrast =</span> <span class="cf">function</span>(R0, R1) <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>R1<span class="op">/</span>R0, <span class="dt">n.samps =</span> <span class="dv">20</span>), <span class="dv">3</span>)</a></code></pre></div>
+<pre><code>##            S.1           Y        R0        R1 Y.boot.se Y.upper.CL.0.95
+## V1 -0.97417991 -0.71327775 0.2904830 0.4976780 0.4840781       0.1395560
+## V2 -0.11875337  0.05966359 0.2855748 0.2685364 0.1882398       0.4746753
+## V3 -0.09236484  0.08009338 0.2854242 0.2625636 0.1820450       0.4835707
+##    Y.lower.CL.0.95 R0.boot.se R0.upper.CL.0.95 R0.lower.CL.0.95 R1.boot.se
+## V1      -1.6775172 0.05815888        0.4084405        0.1763127 0.06531273
+## V2      -0.4357974 0.03903555        0.3909614        0.2043944 0.03260224
+## V3      -0.4036444 0.03849822        0.3904263        0.2053113 0.03176977
+##    R1.upper.CL.0.95 R1.lower.CL.0.95
+## V1        0.6258814        0.3695242
+## V2        0.3454742        0.1923057
+## V3        0.3379838        0.1879937</code></pre>
 <p>It is easy to plot the risk estimates. By default, the plot method displays the TE contrast, but this can be changed using the same syntax as in <code>calc_risk</code>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;TE&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="kw">abline</span>(<span class="dt">h =</span> smary<span class="op">$</span>TE.estimates[<span class="dv">2</span>], <span class="dt">lty =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb29-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb29-4" data-line-number="4">expit &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">exp</span>(x)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(x))</a>
-<a class="sourceLine" id="cb29-5" data-line-number="5">trueTE &lt;-<span class="st"> </span><span class="cf">function</span>(s){</a>
-<a class="sourceLine" id="cb29-6" data-line-number="6">  </a>
-<a class="sourceLine" id="cb29-7" data-line-number="7">  r0 &lt;-<span class="st"> </span><span class="kw">expit</span>(<span class="op">-</span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">0</span> <span class="op">*</span><span class="st"> </span>s)</a>
-<a class="sourceLine" id="cb29-8" data-line-number="8">  r1 &lt;-<span class="st"> </span><span class="kw">expit</span>(<span class="op">-</span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="fl">.75</span> <span class="op">*</span><span class="st"> </span>s)</a>
-<a class="sourceLine" id="cb29-9" data-line-number="9">  <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>r1<span class="op">/</span>r0</a>
-<a class="sourceLine" id="cb29-10" data-line-number="10">  </a>
-<a class="sourceLine" id="cb29-11" data-line-number="11">}</a>
-<a class="sourceLine" id="cb29-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb29-13" data-line-number="13"><span class="kw">rug</span>(binary.boot<span class="op">$</span>augdata<span class="op">$</span>S<span class="fl">.1</span>)</a>
-<a class="sourceLine" id="cb29-14" data-line-number="14"><span class="kw">curve</span>(<span class="kw">trueTE</span>(x), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb29-15" data-line-number="15"><span class="kw">legend</span>(<span class="st">&quot;bottomright&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;estimated TE&quot;</span>, <span class="st">&quot;95</span><span class="ch">\\</span><span class="st">% CB&quot;</span>, <span class="st">&quot;marginal TE&quot;</span>, <span class="st">&quot;true TE&quot;</span>), </a>
-<a class="sourceLine" id="cb29-16" data-line-number="16">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">1</span>), <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;TE&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="kw">abline</span>(<span class="dt">h =</span> smary<span class="op">$</span>TE.estimates[<span class="dv">2</span>], <span class="dt">lty =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb32-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb32-4" data-line-number="4">expit &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">exp</span>(x)<span class="op">/</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(x))</a>
+<a class="sourceLine" id="cb32-5" data-line-number="5">trueTE &lt;-<span class="st"> </span><span class="cf">function</span>(s){</a>
+<a class="sourceLine" id="cb32-6" data-line-number="6">  </a>
+<a class="sourceLine" id="cb32-7" data-line-number="7">  r0 &lt;-<span class="st"> </span><span class="kw">expit</span>(<span class="op">-</span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">0</span> <span class="op">*</span><span class="st"> </span>s)</a>
+<a class="sourceLine" id="cb32-8" data-line-number="8">  r1 &lt;-<span class="st"> </span><span class="kw">expit</span>(<span class="op">-</span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="fl">.75</span> <span class="op">*</span><span class="st"> </span>s)</a>
+<a class="sourceLine" id="cb32-9" data-line-number="9">  <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>r1<span class="op">/</span>r0</a>
+<a class="sourceLine" id="cb32-10" data-line-number="10">  </a>
+<a class="sourceLine" id="cb32-11" data-line-number="11">}</a>
+<a class="sourceLine" id="cb32-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb32-13" data-line-number="13"><span class="kw">rug</span>(binary.boot<span class="op">$</span>augdata<span class="op">$</span>S<span class="fl">.1</span>)</a>
+<a class="sourceLine" id="cb32-14" data-line-number="14"><span class="kw">curve</span>(<span class="kw">trueTE</span>(x), <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)</a>
+<a class="sourceLine" id="cb32-15" data-line-number="15"><span class="kw">legend</span>(<span class="st">&quot;bottomright&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;estimated TE&quot;</span>, <span class="st">&quot;95</span><span class="ch">\\</span><span class="st">% CB&quot;</span>, <span class="st">&quot;marginal TE&quot;</span>, <span class="st">&quot;true TE&quot;</span>), </a>
+<a class="sourceLine" id="cb32-16" data-line-number="16">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">1</span>), <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>))</a></code></pre></div>
 <div class="figure">
 <img src="data:image/png;base64,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" alt="Plot showing the estimates using the example data, along with confidence bands (CB), and the true treatment efficacy (TE) curve." />
 <p class="caption">Plot showing the estimates using the example data, along with confidence bands (CB), and the true treatment efficacy (TE) curve.</p>
@@ -1113,88 +943,30 @@ P\left\{\sup_{s \in B} | \hat{VE}(s) - VE(s) | \leq L_\alpha \right\} \leq 1 - \
 P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \mbox{ for all } s. 
 \]</span></p>
 <p>Different summary measures are available for plotting. The options are “TE” for treatment efficacy = <span class="math inline">\(1 - risk_1(s)/risk_0(s)\)</span>, “RR” for relative risk = <span class="math inline">\(risk_1(s)/risk_0(s)\)</span>, “logRR” for log of the relative risk, “risk” for the risk in each treatment arm, and “RD” for the risk difference = <span class="math inline">\(risk_1(s) - risk_0(s)\)</span>. We can also transform using the <code>log</code> option of <code>plot</code>.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;logRR&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</a>
-<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;RR&quot;</span>, <span class="dt">log =</span> <span class="st">&quot;y&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</a>
-<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;RD&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</a>
-<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;risk&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb30-5" data-line-number="5"><span class="kw">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;R0&quot;</span>, <span class="st">&quot;R1&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">lwd =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;logRR&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;RR&quot;</span>, <span class="dt">log =</span> <span class="st">&quot;y&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</a>
+<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;RD&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</a>
+<a class="sourceLine" id="cb33-4" data-line-number="4"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;risk&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb33-5" data-line-number="5"><span class="kw">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;R0&quot;</span>, <span class="st">&quot;R1&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">lwd =</span> <span class="dv">2</span>)</a></code></pre></div>
 <div class="figure">
 <img src="data:image/png;base64,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" alt="Plot illustrating ways that different risk contrast functions can be plotted." />
 <p class="caption">Plot illustrating ways that different risk contrast functions can be plotted.</p>
 </div>
 <p>The <code>calc_risk</code> function is the workhorse that creates the plots. You can call this function directly to obtain estimates, standard errors, and confidence intervals for the estimated risk in each treatment arm and transformations of the risk like TE. The parameter <code>n.samps</code> determines the number of points at which to calculate the risk. The points are evenly spaced over the range of S.1. Use this function to compute other summaries, make plots using <strong>ggplot2</strong> or <strong>lattice</strong> and more.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">te.est &lt;-<span class="st"> </span><span class="kw">calc_risk</span>(binary.boot, <span class="dt">CI.type =</span> <span class="st">&quot;pointwise&quot;</span>, <span class="dt">n.samps =</span> <span class="dv">200</span>)</a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="kw">head</span>(te.est, <span class="dv">3</span>)</a></code></pre></div>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">S.1</th>
-<th align="right">Y</th>
-<th align="right">R0</th>
-<th align="right">R1</th>
-<th align="right">Y.boot.se</th>
-<th align="right">Y.lower.CL.2.5</th>
-<th align="right">Y.upper.CL.97.5</th>
-<th align="right">R0.boot.se</th>
-<th align="right">R0.lower.CL.2.5</th>
-<th align="right">R0.upper.CL.97.5</th>
-<th align="right">R1.boot.se</th>
-<th align="right">R1.lower.CL.2.5</th>
-<th align="right">R1.upper.CL.97.5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>V1</td>
-<td align="right">-2.328509</td>
-<td align="right">-1.770900</td>
-<td align="right">0.2983546</td>
-<td align="right">0.8267105</td>
-<td align="right">1.1943792</td>
-<td align="right">-4.768551</td>
-<td align="right">-0.6276106</td>
-<td align="right">0.0912532</td>
-<td align="right">0.1460172</td>
-<td align="right">0.4890998</td>
-<td align="right">0.0678696</td>
-<td align="right">0.6663453</td>
-<td align="right">0.9237321</td>
-</tr>
-<tr class="even">
-<td>V2</td>
-<td align="right">-2.275699</td>
-<td align="right">-1.743722</td>
-<td align="right">0.2980453</td>
-<td align="right">0.8177536</td>
-<td align="right">1.1622104</td>
-<td align="right">-4.671015</td>
-<td align="right">-0.6184582</td>
-<td align="right">0.0899424</td>
-<td align="right">0.1475266</td>
-<td align="right">0.4856823</td>
-<td align="right">0.0691131</td>
-<td align="right">0.6556765</td>
-<td align="right">0.9183559</td>
-</tr>
-<tr class="odd">
-<td>V3</td>
-<td align="right">-1.694556</td>
-<td align="right">-1.360959</td>
-<td align="right">0.2946547</td>
-<td align="right">0.6956675</td>
-<td align="right">0.8334835</td>
-<td align="right">-3.456249</td>
-<td align="right">-0.4524787</td>
-<td align="right">0.0755769</td>
-<td align="right">0.1648504</td>
-<td align="right">0.4513863</td>
-<td align="right">0.0772104</td>
-<td align="right">0.5287710</td>
-<td align="right">0.8307616</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">te.est &lt;-<span class="st"> </span><span class="kw">calc_risk</span>(binary.boot, <span class="dt">CI.type =</span> <span class="st">&quot;pointwise&quot;</span>, <span class="dt">n.samps =</span> <span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="kw">head</span>(te.est, <span class="dv">3</span>)</a></code></pre></div>
+<pre><code>##          S.1         Y        R0        R1 Y.boot.se Y.lower.CL.2.5
+## V1 -2.328509 -1.770899 0.2983546 0.8267105 1.1943792      -4.768551
+## V2 -2.275699 -1.743722 0.2980453 0.8177536 1.1622104      -4.671015
+## V3 -1.694556 -1.360959 0.2946547 0.6956675 0.8334835      -3.456249
+##    Y.upper.CL.97.5 R0.boot.se R0.lower.CL.2.5 R0.upper.CL.97.5 R1.boot.se
+## V1      -0.6276106 0.09125321       0.1460172        0.4890998 0.06786962
+## V2      -0.6184582 0.08994238       0.1475266        0.4856823 0.06911306
+## V3      -0.4524787 0.07557692       0.1648504        0.4513863 0.07721039
+##    R1.lower.CL.2.5 R1.upper.CL.97.5
+## V1       0.6663453        0.9237321
+## V2       0.6556765        0.9183559
+## V3       0.5287710        0.8307616</code></pre>
 </div>
 </div>
 </div>
@@ -1209,28 +981,29 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 <h2>Additional examples</h2>
 <div id="plot-both-types-of-ci" class="section level3">
 <h3>Plot both types of CI</h3>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;TE&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">CI.type =</span> <span class="st">&quot;band&quot;</span>)</a>
-<a class="sourceLine" id="cb32-2" data-line-number="2">sbs &lt;-<span class="st"> </span><span class="kw">calc_risk</span>(binary.boot, <span class="dt">CI.type =</span> <span class="st">&quot;pointwise&quot;</span>, <span class="dt">n.samps =</span> <span class="dv">200</span>)</a>
-<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="kw">lines</span>(Y.lower.CL.<span class="fl">2.5</span> <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span>, <span class="dt">data =</span> sbs, <span class="dt">lty =</span> <span class="dv">3</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="kw">lines</span>(Y.upper.CL.<span class="fl">97.5</span> <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span>, <span class="dt">data =</span> sbs, <span class="dt">lty =</span> <span class="dv">3</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="kw">legend</span>(<span class="st">&quot;bottomright&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, </a>
-<a class="sourceLine" id="cb32-6" data-line-number="6">       <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;simultaneous CI&quot;</span>, <span class="st">&quot;pointwise CI&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw">plot</span>(binary.boot, <span class="dt">contrast =</span> <span class="st">&quot;TE&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">CI.type =</span> <span class="st">&quot;band&quot;</span>)</a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">sbs &lt;-<span class="st"> </span><span class="kw">calc_risk</span>(binary.boot, <span class="dt">CI.type =</span> <span class="st">&quot;pointwise&quot;</span>, <span class="dt">n.samps =</span> <span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb36-3" data-line-number="3"><span class="kw">lines</span>(Y.lower.CL.<span class="fl">2.5</span> <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span>, <span class="dt">data =</span> sbs, <span class="dt">lty =</span> <span class="dv">3</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb36-4" data-line-number="4"><span class="kw">lines</span>(Y.upper.CL.<span class="fl">97.5</span> <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span>, <span class="dt">data =</span> sbs, <span class="dt">lty =</span> <span class="dv">3</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb36-5" data-line-number="5"><span class="kw">legend</span>(<span class="st">&quot;bottomright&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, </a>
+<a class="sourceLine" id="cb36-6" data-line-number="6">       <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;simultaneous CI&quot;</span>, <span class="st">&quot;pointwise CI&quot;</span>))</a></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="plot-with-ggplot2" class="section level3">
 <h3>Plot with ggplot2</h3>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb33-2" data-line-number="2">TE.est &lt;-<span class="st"> </span><span class="kw">calc_risk</span>(binary.boot, <span class="dt">n.samps =</span> <span class="dv">200</span>)</a>
-<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="kw">ggplot</span>(TE.est, </a>
-<a class="sourceLine" id="cb33-4" data-line-number="4">       <span class="kw">aes</span>(<span class="dt">x =</span> S<span class="fl">.1</span>, <span class="dt">y =</span> Y, <span class="dt">ymin =</span> Y.lower.CL.<span class="fl">0.95</span>, <span class="dt">ymax =</span> Y.upper.CL.<span class="fl">0.95</span>)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb33-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_ribbon</span>(<span class="dt">alpha =</span> <span class="fl">.2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="kw">attr</span>(TE.est, <span class="st">&quot;Y.function&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a></code></pre></div>
+<pre><code>## Warning: package 'ggplot2' was built under R version 3.5.2</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">TE.est &lt;-<span class="st"> </span><span class="kw">calc_risk</span>(binary.boot, <span class="dt">n.samps =</span> <span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb39-2" data-line-number="2"><span class="kw">ggplot</span>(TE.est, </a>
+<a class="sourceLine" id="cb39-3" data-line-number="3">       <span class="kw">aes</span>(<span class="dt">x =</span> S<span class="fl">.1</span>, <span class="dt">y =</span> Y, <span class="dt">ymin =</span> Y.lower.CL.<span class="fl">0.95</span>, <span class="dt">ymax =</span> Y.upper.CL.<span class="fl">0.95</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_ribbon</span>(<span class="dt">alpha =</span> <span class="fl">.2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="kw">attr</span>(TE.est, <span class="st">&quot;Y.function&quot;</span>))</a></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="case-control-design" class="section level3">
 <h3>Case-control design</h3>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">cc.fit &lt;-<span class="st"> </span>binary.cc <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="st">  </span><span class="kw">risk_binary</span>(<span class="dt">D =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>()</a>
-<a class="sourceLine" id="cb34-3" data-line-number="3">cc.fit</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1">cc.fit &lt;-<span class="st"> </span>binary.cc <span class="op">+</span><span class="st"> </span><span class="kw">integrate_parametric</span>(S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb40-2" data-line-number="2"><span class="st">  </span><span class="kw">risk_binary</span>(<span class="dt">D =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>()</a>
+<a class="sourceLine" id="cb40-3" data-line-number="3">cc.fit</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1    S.0 cdfweights    BIP
 ## 1 0 0  NA     NA        0.2  0.335
@@ -1265,16 +1038,16 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 </div>
 <div id="survival-outcome" class="section level3">
 <h3>Survival outcome</h3>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">surv.fit &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> <span class="kw">Surv</span>(time.obs, event.obs), </a>
-<a class="sourceLine" id="cb36-2" data-line-number="2">                     <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP, <span class="dt">CPV =</span> CPV) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb36-3" data-line-number="3"><span class="st">  </span><span class="kw">integrate_semiparametric</span>(<span class="dt">formula.location =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP, <span class="dt">formula.scale =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb36-4" data-line-number="4"><span class="st">  </span><span class="kw">risk_exponential</span>(<span class="dt">D =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">20</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">surv.fit &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> <span class="kw">Surv</span>(time.obs, event.obs), </a>
+<a class="sourceLine" id="cb42-2" data-line-number="2">                     <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP, <span class="dt">CPV =</span> CPV) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb42-3" data-line-number="3"><span class="st">  </span><span class="kw">integrate_semiparametric</span>(<span class="dt">formula.location =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP, <span class="dt">formula.scale =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb42-4" data-line-number="4"><span class="st">  </span><span class="kw">risk_exponential</span>(<span class="dt">D =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">20</span>)</a></code></pre></div>
 <pre><code>## Warning in psdesign(fakedata, Z = Z, Y = Surv(time.obs, event.obs), S
 ## = S.obs, : tau missing in psdesign: assuming that the surrogate S was
 ## measured at time 0.</code></pre>
 <pre><code>## Bootstrapping 20 replicates:
 ## ===========================================================================</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">surv.fit</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">surv.fit</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  7  variables. 
 ##   Z          Y  S.1     S.0 cdfweights    BIP   CPV
 ## 1 0 0.3301972+ 1.49  0.3527          1  0.335 1.485
@@ -1315,7 +1088,7 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 ##   Out of 20 bootstraps,  20 converged ( 100 %)
 ## 
 ##   Test for wide effect modification on 1 degree of freedom. 2-sided p value  &lt; .0001</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">plot</span>(surv.fit)</a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw">plot</span>(surv.fit)</a></code></pre></div>
 <pre><code>## Warning in riskcalc(psdesign$risk.function, psdesign$augdata$Y,
 ## psdesign$estimates$par, : No time given for time to event outcome, using
 ## restricted mean survival: 0.4</code></pre>
@@ -1402,14 +1175,14 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 </div>
 <div id="continuous-outcome" class="section level3">
 <h3>Continuous outcome</h3>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">fakedata<span class="op">$</span>Y.cont &lt;-<span class="st"> </span><span class="kw">log</span>(fakedata<span class="op">$</span>time.obs <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>)</a>
-<a class="sourceLine" id="cb44-2" data-line-number="2">cont.fit &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.cont, </a>
-<a class="sourceLine" id="cb44-3" data-line-number="3">                     <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP, <span class="dt">CPV =</span> CPV) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb44-4" data-line-number="4"><span class="st">  </span><span class="kw">integrate_semiparametric</span>(<span class="dt">formula.location =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP, <span class="dt">formula.scale =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb44-5" data-line-number="5"><span class="st">  </span><span class="kw">risk_continuous</span>(<span class="dt">D =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">20</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">fakedata<span class="op">$</span>Y.cont &lt;-<span class="st"> </span><span class="kw">log</span>(fakedata<span class="op">$</span>time.obs <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb50-2" data-line-number="2">cont.fit &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.cont, </a>
+<a class="sourceLine" id="cb50-3" data-line-number="3">                     <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP, <span class="dt">CPV =</span> CPV) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="st">  </span><span class="kw">integrate_semiparametric</span>(<span class="dt">formula.location =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP, <span class="dt">formula.scale =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb50-5" data-line-number="5"><span class="st">  </span><span class="kw">risk_continuous</span>(<span class="dt">D =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">20</span>)</a></code></pre></div>
 <pre><code>## Bootstrapping 20 replicates:
 ## ===========================================================================</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">cont.fit</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">cont.fit</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  7  variables. 
 ##   Z      Y S.1     S.0 cdfweights    BIP   CPV
 ## 1 0 -1.078  NA  0.3527          1  0.335 1.485
@@ -1451,13 +1224,13 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 ##   Out of 20 bootstraps,  20 converged ( 100 %)
 ## 
 ##   Test for wide effect modification on 1 degree of freedom. 2-sided p value  &lt; .0001</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">plot</span>(cont.fit, <span class="dt">contrast =</span> <span class="st">&quot;risk&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1"><span class="kw">plot</span>(cont.fit, <span class="dt">contrast =</span> <span class="st">&quot;risk&quot;</span>)</a></code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAAAVFBMVEUAAAAAADoAAGYAOjoAOpAAZrY6AAA6ADo6AGY6OpA6kNtmAABmtv+QOgCQOmaQZgCQkNuQ2/+2ZgC2///bkDrb2//b////tmb/25D//7b//9v///8cbFhRAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAQaElEQVR4nO3da0PiShZG4fQZ7TMjx5mRw4jI//+fAwJKQlWue6feqlrPF7VbkwjLyhXSHAFhTeoFAPoQKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQRKKQZB9oAo6QK1HZyKBWBQppUoFSLLqlAj+O3OFAJrUBJFB1qgQItBAppkoFSL24kA2VLFDeagZIorqQCJUp0SQXaHTcJFlqBdhNlRV89tUBJFC16gRIl7igGysYnvmkG2l3P284bGRENtJMoK/1qyQZKojgTDpQqIR4o26IQD7TzjRRaHflA2RStm36g3URtlwPipAKNzoOBs1pSgfaEyChaKa1AexMd9V0ojFqgfT9CohWSDJQXzeNGMtB4iSRaG81ARyZKreVTDbTvR5vQpyiTdKDRUfTuUxItm3Sg0fzIshragY5MlFzLpR7ouCkwohYri0BHnBcl0UI5Bfr5erlFwx9/m0wukh9Vls8n0F3zcvlkf/tk0eSO4xIl1wK5BPr5+p3l7ul98eR6ceC+bC6BHjZ/3T7dt1fy0+/PNLwMFFqyvEbQcNf3p5ZmTRa6vLZBr0Oo2Tbo988NJYqyOO3FHzaXFXlk/LQf6hhFC5XFcdBRP/yTKONpQbIMNLaiH/h/ZCjPQCMJ0mV5cg00NlmOORUm60AHRlEG1AJkHWhkRT/w/8hJ3oGGEyTLguQeaGTqJFqKIgIdGEWpNWNFBDq4t2Q6M6ypjECHDouyys9WIYHG5kKiuSsp0IFjTshRSYEOHXNiFM1QUYEOJ+ozV/gpLNChmVFobqoIlJV7vkoMlKOiBSkxUI6KFqTIQIcT9Z077BQaqNRcsUDJgQbeHoJLSHJTcqDHwKr+7k1NKDQHhQfaO292ljJQQaCBFT2DaDYqCDSY6JqzxwJVBBqYHUdFM1FJoKElINEcVBRoYI/++7OVFwWjVRRo74oeoqoKlB36/NQVaMgtUUZTSRUGGh1FSVRQhYH2reihpsZAQ3NnFBVVZ6ChJeAMvaR6A40WCiUVB/owVjYMonpqDjQwiH5viq6+KAirO9AAdpa0uAR6u41Xzw25dZ7/6IpeaBkr5jOCfr5GbxQ/Z3LO4tuiqy8KupxW8Z+vz5aT8xa7zokVfXJe26D75q/e/w9O7nafboEuBBYBZyvvJI29X/wt1PZHV51ZcMxJQ1Z78d1grduJJWo7F0zhGejna+Rm8fMmF5yM6wh7myqFppN5oO1pGmwRdH6QUTS1kgJ9mMecYNkU1VJyoN1ZzhtgOf2ZVEWBPixCNFiO3OvIai/eVavXpr2EFJoMgYadkmyNr5xbSoRA4zp7S91zB2kWqjYE2qO7adr6SK+rINBe3Z2npvWx85/H9oas/9LVgECnmXJ86kiwy0kFOvZSknWFj9xPXsbVr34pg1Sgd/8dYLsAUxglGpguvQ4RDTT4IyPZLmh4SZwmW1Gv3V829ktnFOjoSbu0G9mh9/49juN7DT/hqh9HPwrm35hkcmPn2m/gZztTun7itrAP8x945tdakHXVFeiAgX7bCd++kvxNykGgU0wJGCYIdJrgIHq3Y0/Axgh0qiWbogQ8GYHO8bP0zeWyp8sFT9fEFqRGwF1VBtotacHHY2v93jsXqwWvq98sAjUMyi6VwBe903ZYiPA8yipYKlDHoDzcLdr0S+6T/I4ZBiwVaGaa0Bczn2SRv0m9fgl0Ab8D9yK9diXol0AXCm6LWv92or12eWxAEOhS4UJ9f79Mgu0aCjj0qxDoYuGTS+suQZa9jkKgJgI79OlSKapXArXRSCXalnWwBGokeMxJUl69Eqidu6f79tRnUIB4sARqSHk9P1q318S/AIGaSr5D7yHpAEug1hadoc/AylsEBGqtCazoixlMA5yDJVB7bmfos2AcLIG6aO3Q3z5JsyipLdzZcgp0d1qor1vN7eRvJuujvZ6vbRQNmzWy+gS6+/V2PGzOt+usNdDgRSQFb4lO93g4a72LRS53T/h8fXqvONBje4c+3VLkzSXQw+ZyJ9nt03vVgYY2RRlFp3EcQU+2z3UHKnaZU46ctkGvWR42TeWBHu9/VdKczm0v/rKS/3xtB7rs8v88FXGGPhmOg66gsnNLpjwDFb8VYiKkOQmBriU0iiZalJxMD/Tw38vHz3+Hd39+EGhLcEWfaFnyMSPQzVd2+9j++Q8CbQucW8KQGav4ffNyPn70PPgjBPqAvaWp5myD7k8P6uDwaTXfwrCen2jWTtJ5DF1rvsVhRT/JvL34/fU4/ArzLRyj6ICJgZ62Pb8tWsvX/YSEXqCcalnEcSYpieYx0cofkRgCFcAZ+rgZgZ4PhO6a5ul9lfkWLHS1aKJF0TUj0O3T+8fv5+N2+ECoxXxL1jrm1PqAmzlnkv762ovfs5O0XOCldTw0LfMC3Z7ijF0rbzzf4j0cuefc0r05q/jnw+bp/fKiTf/5Fq95XNHz4PyYtZPU/Hr7fF3UJ8/BvdAl92mWRA+HmdRwbqmFQDVwbimCQFUEEsWMc/Ev36fj2Yt3xMWiV4ygSh7PLVVf6PRA+66Td5hvZULv21i1eQfqV5xvxRhEj/Nek7T05R6T5lufuw3P25V4FT9ac0ZQdpKcsUP/g50kdZWv6AlU1P0o+vAvFSFQWQ+bolUi0Cw01V6JR6DKWjv014+pliURAtVW/YF7As1IjS9QJlB9Vb8ohEAz0FS8oifQ7NR15J5AM1Hr+zYSaDbqXM8TaFYeD4uW/kASaFZCl9yX/VB6Brpvml9vdpPD2eOmaNmcAt02zcvHv97jl9/X8Nh6ebiIpORR1CfQ7dP7cfs1eu4i79JY7iO6gppeW+cS6Ne4+fHnOdDY60OKfUBX0VrPN4//WBCnQM8v/Pz835ER1M3jMacyR1GfVfz3WzNeb0u3cHIIqOT9mZ12knaX3feH29XUeL94N6GX1hX3uHIcNGuhFX1ZD61noNyr01/xL1wi0MyFDtyXlCqB5i9wEUk5iRJoAQKvrSsGgRbmboe+iFjZiy9EaBAtoVACLUZZYd4QaJHKiZVAi3IXZuDfckSgZWlKO9JEoOUq4lV2BFqgwOnPbI85EWiJytlHItBCNaHPcqyVQIuX94lQAi1WJMzMHnkCLVj4YtG8hlECrcXjbUOyQKCFy7TLbwRavOCmaDZ79ARakww3RQm0CpEuM3gWCLQOkaFTfxgl0FqEtz/lnwcCrUj4jJL2U0GgNYmcW1J+Mgi0LpFN0QRLMhKB1quJfiGEQKsTubhJdEVPoBWKJZpgUQYRaOWanq8UEGidYq9WklvRE2itYtfZiz0zBFqzyGs+lZ4cAq1abEWfYlnCCLRukRNKOpuiBFq95uGT4JeJEChibz8iMYwSKKLXMysk6hrox+/IvY4JVE5sRZ+aS6CHzc8d5biZbB7i79uY9qnyGUH3zdftExhBcxJ9PV3SFb3TKv6wOd/lmEAzExtFEybqtg26/fVGoNnRe58xv52kXfNCoPmJvp4u0TPmuBf/8fsfD4FyO+4MSK3nPQ8zfb52bxe/aHJYS3RTdP1FcQ6UWyFmKropuvrzRqDol3hFT6CIiI2i6z51BIoYiWNOBIq4aKLrPX1czYRxEm2KEigGpD0sSqAYknRTlEAxKL635J8sgWKE6KV47okSKMZogp+uO2Ojb0wyOazoYdD0vPaHQDFW9Eq8o+OankAxWopTSwSKCe4SDfynyxzNvzHJ5LC6x0GUQKEgvp73WPETKKa6PyjKgXro6X0fPONoCRQz3D99gY1Rw2eXQLGY54qeQDHTwCjqMBebb0wyOSTQ/67hRs8wgWK+gb0lk1mYf2OSyUGAy8klAsUyfYOowTBKoFho4O4gCxMlUCzWvz9vN22bb0wyOaTWd7HokqebQGGj/2LR2QMrgcJK/0UkMxMlUHgwe34JFHb69+ePc552AoWhwRvSTl7REyhMtRNdfnKJQOGJM0kQNHTkfsKzT6Bw0ES/uP6TfXcEigmawUF0ZAEEihWIneo8bM5vTr+P34ybQGswfA3JiAr8At2d73d82ETuNUegFRhcz49Y0bsFek3zK9OFk0O22jtLcxJ1C/R6p+N9ZCVPoDWacVSUERTOhkfRvhqcAj3fcPv5eNtdWjg55K0dZbjQaA9eh5lOjf56O+3Id/rkfvFVGt5biibKcVCsbsrw5Bko9+pEhMapTgLFnfZTrnCqk0Bxb9bNPgkU65mRKIEioUSnOtefHLLReeaTnOpcf3LIx7Tb0RIoVjclUQKFgPVPda48OWRn5ChKoEhk3IqeQJHMQ6Kh7xk9sYUL4zs5lIpAIY1AkRYH6qGNA/UQx4F6ZItAoYED9dDGgXqI40A9skOgkJYsUGCURIFOYD5n+1+FRUw/QQJdc4o1LiKBuk2QRRSYIIGuOcUaF5FA3SbIIgpMkEDXnGKNi0igbhNkEQUmSKBrTrHGRSRQtwmyiAIT5NwkpBEopBEopBEopBEopBEopBEopBEopBEopBEopBEopBEopBEopCUL9PO1abq3nV/q459/201s3zS/3uwmd2a6fB4P4c7+dz5un96X/HiqQD9fT4/Ernm2nOZh84ddAPvT8u1tny3T5fN4CHen5TP+nU9/53kG+vH7r+PlETFzGvLsJne5IenW8g/IdPmODg/hYfNy/sWNB41MA72w/HPdNy97uyfL/g/Idvl+Jms84hkHunv6T86Bbm2fMctA/3yzneDRfnJfjB/C4840+NPDmOk26Je98V6SYQCXgcl4eHII1Pgh3NvudZ03lDIOdG+7j1RjoOYP4ampZUG17E7TyjdQ6/GzwlW8/UNo+kf59SDmF+jucvRuZ/bg7m6HA6V3ko72gdo9hHcuv7mJ3fWtFpdMMNkIulu02GGGATgcZjIP1PohvKRp/VeU3wj65eO3wx+/5WPrcKDe+Lm3fwjPLV3+Mo0nukCqQK+jv/BOiMNpP9tAHR7C7cL1cXCaeQYKjEKgkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagkEagXg6bpn3XBOOb0FSCQJ3sv96Fa/vz1l7GN6GpBYE6uby16M89M6xvQlMLAvXRvZuL001oykegTh5vb0CgcxCol4/fnZU6gc5BoI4+X+/f/5hA5yBQX3c3giPQOQjUx+1mLnf3YSDQOQjUx20vfs8IugyBOrncJ/3+VnAEOgeBevk61XlewQcGU4xGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJBGoJD2f50z77dNMICdAAAAAElFTkSuQmCC" /><!-- --></p>
 </div>
 <div id="categorical-s" class="section level3">
 <h3>Categorical S</h3>
 <p><code>S.obs.cat</code> and <code>BIP.cat</code> are factors:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">with</span>(fakedata, <span class="kw">table</span>(S.obs.cat, BIP.cat))</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw">with</span>(fakedata, <span class="kw">table</span>(S.obs.cat, BIP.cat))</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1499,11 +1272,11 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">cat.fit &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, </a>
-<a class="sourceLine" id="cb50-2" data-line-number="2">                     <span class="dt">S =</span> S.obs.cat, <span class="dt">BIP =</span> BIP.cat) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb50-3" data-line-number="3"><span class="st">  </span><span class="kw">integrate_nonparametric</span>(<span class="dt">formula =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="st">  </span><span class="kw">risk_binary</span>(Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">10</span>, <span class="dt">risk =</span> risk.probit) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a>
-<a class="sourceLine" id="cb50-5" data-line-number="5">cat.fit</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1">cat.fit &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, </a>
+<a class="sourceLine" id="cb56-2" data-line-number="2">                     <span class="dt">S =</span> S.obs.cat, <span class="dt">BIP =</span> BIP.cat) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb56-3" data-line-number="3"><span class="st">  </span><span class="kw">integrate_nonparametric</span>(<span class="dt">formula =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb56-4" data-line-number="4"><span class="st">  </span><span class="kw">risk_binary</span>(Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">10</span>, <span class="dt">risk =</span> risk.probit) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;BFGS&quot;</span>)</a>
+<a class="sourceLine" id="cb56-5" data-line-number="5">cat.fit</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y  S.1            S.0 cdfweights             BIP
 ## 1 0 0 &lt;NA&gt; (-0.198,0.503]          1  (0.0574,0.766]
@@ -1538,20 +1311,20 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 ##  Convergence:  TRUE 
 ## 
 ##  No bootstraps present, see ?ps_bootstrap.</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="kw">plot</span>(cat.fit)</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="kw">plot</span>(cat.fit)</a></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="pseudo-score" class="section level3">
 <h3>Pseudo-score</h3>
 <p>Categorical W allows for estimation of the model using the pseudo-score method for binary outcomes. <span class="math inline">\(S\)</span> may be continuous or categorical:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1">cat.fit.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, </a>
-<a class="sourceLine" id="cb53-2" data-line-number="2">                     <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP.cat) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb53-3" data-line-number="3"><span class="st">  </span><span class="kw">integrate_nonparametric</span>(<span class="dt">formula =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb53-4" data-line-number="4"><span class="st">  </span><span class="kw">risk_binary</span>(Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">10</span>, <span class="dt">risk =</span> risk.logit) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;pseudo-score&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb53-5" data-line-number="5"><span class="st">  </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">20</span>, <span class="dt">method =</span> <span class="st">&quot;pseudo-score&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1">cat.fit.ps &lt;-<span class="st"> </span><span class="kw">psdesign</span>(fakedata, <span class="dt">Z =</span> Z, <span class="dt">Y =</span> Y.obs, </a>
+<a class="sourceLine" id="cb59-2" data-line-number="2">                     <span class="dt">S =</span> S.obs, <span class="dt">BIP =</span> BIP.cat) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-3" data-line-number="3"><span class="st">  </span><span class="kw">integrate_nonparametric</span>(<span class="dt">formula =</span> S<span class="fl">.1</span> <span class="op">~</span><span class="st"> </span>BIP) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-4" data-line-number="4"><span class="st">  </span><span class="kw">risk_binary</span>(Y <span class="op">~</span><span class="st"> </span>S<span class="fl">.1</span> <span class="op">*</span><span class="st"> </span>Z, <span class="dt">D =</span> <span class="dv">10</span>, <span class="dt">risk =</span> risk.logit) <span class="op">+</span><span class="st"> </span><span class="kw">ps_estimate</span>(<span class="dt">method =</span> <span class="st">&quot;pseudo-score&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb59-5" data-line-number="5"><span class="st">  </span><span class="kw">ps_bootstrap</span>(<span class="dt">n.boots =</span> <span class="dv">20</span>, <span class="dt">method =</span> <span class="st">&quot;pseudo-score&quot;</span>)</a></code></pre></div>
 <pre><code>## Bootstrapping 20 replicates:
 ## ===========================================================================</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw">summary</span>(cat.fit.ps)</a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1"><span class="kw">summary</span>(cat.fit.ps)</a></code></pre></div>
 <pre><code>## Augmented data frame:  800  obs. by  6  variables. 
 ##   Z Y S.1     S.0 cdfweights             BIP
 ## 1 0 0  NA  0.3527          1  (0.0574,0.766]
@@ -1596,7 +1369,7 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 ## empirical  marginal     model 
 ##     0.526     0.526     0.532 
 ##  Model-based average TE is 1.1 % different from the empirical and 1.1 % different from the marginal.</code></pre>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="kw">plot</span>(cat.fit.ps)</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="kw">plot</span>(cat.fit.ps)</a></code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAAARVBMVEUAAAAAADoAAGYAOpAAZrY6AAA6ADo6AGY6kNtmAABmtv+QOgCQZgCQ2/+2ZgC2///bkDrb////tmb/25D//7b//9v////qpWpDAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAPXUlEQVR4nO3d22LaSBZGYdLtzMRhkqax4f0fdTjajo2gDntX/bVrfTeTHuOSkJdLSGBptQeErXqvAHAPgUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUIagUJaXqC79erkr3+WhgOSuAS6Wf04/2N7/UfVcJiXS6C79VuWm7//rR4OE3MJ9PX55/Wf24WdPIEiCTMopHm9Br1MobwGRR2fQA87+fMh2ML8SaBI5BRo6+EQFYFCmnegG47iUaPxDJr/BgGknX6Q1x9o7f/eXEDymtQ9EefhYCS7LMsl3xqMQGd1uziHxdS9506g0/hUpMsSyj/rsTim+QO7DIclXkV6xHhzOeYP3L+fpj/iKL4P62L8Yrz/gtZnBt2tFz8IWjIcMtjm4xtkwrBOu/jd+slyOCQw7Mh0oswL8st3mz/wbLv6effrBGrIpiSr/XddkF9GM39gl+FmZXFuyOx42+U4iUAHVteDQZiGM+XiIswf2GW4yVQ2URfm/aNuawQ6msoprzxN35lycanmD+wy3DSKEylPs0+Yb0s3f2CX4aZQmElBmpaH4ZUIdBQl5xAL0ixbkh8CHUHJ1spLs+FhTx4ClZedTfbEqRjmFYFKyy8nJzaJF5kPEKiw/EObxO8YocwLAlVVsF9PfFzJ2nRDoIryX0OmPFzuCD0Fgaop2K9bPk4NgWrJqyhx5hwzzTMC1ZJ3CG48pCIC1ZEz0aU8dqBj9WUEqiLjauyPuxs/zCsCVZB5ct1w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" /><!-- --></p>
 </div>
 </div>
@@ -1644,7 +1417,7 @@ P\left\{\hat{L}_\alpha \leq VE(s) \leq \hat{U}_\alpha\right\} \leq 1 - \alpha, \
 <p>Sachs, Michael C., and Erin E. Gabriel. 2016. <em>Pseval: Methods for Evaluating Principal Surrogates of Treatment Response</em>.</p>
 </div>
 <div id="ref-ggplot2">
-<p>Wickham, Hadley. 2009. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="http://ggplot2.org/book/" class="uri">http://ggplot2.org/book/</a>.</p>
+<p>Wickham, Hadley. 2009. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York.</p>
 </div>
 <div id="ref-WolfsonDiss">
 <p>Wolfson, J. 2009. “Statistical Methods for Identifying Surrogate Endpoints in Vaccine Trials.” Doctor of Philosophy Dissertation, Chair: Gilbert, Peter: University of Washington; Department of Biostatistics.</p>

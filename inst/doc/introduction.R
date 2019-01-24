@@ -60,20 +60,11 @@ binary.ps + integrate_parametric(S.0 ~ BIP)
 binary.ps <- binary.ps + risk_binary(model = Y ~ S.1 * Z, D = 50, risk = risk.logit)
 binary.ps
 
-## ----est, cache = TRUE---------------------------------------------------
-binary.est <- binary.ps + ps_estimate(method = "BFGS")
-binary.boot <- binary.est + ps_bootstrap(n.boots = 500, progress.bar = FALSE, 
-                            start = binary.est$estimates$par, method = "BFGS")
-binary.boot
-
 ## ----alltog, eval = FALSE------------------------------------------------
 #  binary.est <- psdesign(data = fakedata, Z = Z, Y = Y.obs, S = S.obs, BIP = BIP) +
 #    integrate_parametric(S.1 ~ BIP) +
 #    risk_binary(model = Y ~ S.1 * Z, D = 50, risk = risk.logit) +
 #    ps_estimate(method = "BFGS")
-
-## ----stg, cache = TRUE---------------------------------------------------
-calc_STG(binary.boot, progress.bar = FALSE)
 
 ## ----summary-------------------------------------------------------------
 smary <- summary(binary.boot)

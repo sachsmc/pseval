@@ -4,7 +4,7 @@
 #'   under treatment. Generally the candidate surrogate will be on the left side
 #'   in the formula, and the BIP or BIPs will be on the right side
 #' @param family Assumed distribution for the integration model. Must be
-#'   compatible with the \code{family} argument of \link{glm}. Currenly only
+#'   compatible with the \code{family} argument of \link{glm}. Currently only
 #'   Gaussian models are supported
 #' @param ... Arguments passed to \link{glm}
 #'

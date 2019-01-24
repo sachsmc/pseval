@@ -291,7 +291,7 @@ summary.psdesign <- function(object, digits = 3, sig.level = .05, ...){
 
 
 
-#' Test for wide effect modificiation
+#' Test for wide effect modification
 #'
 #' This runs a multivariate Wald test on the interaction terms of the model, using the bootstrap covariance
 #'

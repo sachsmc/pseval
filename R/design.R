@@ -2,7 +2,7 @@
 #'
 #' Generate mappings that describe how variables in the data are mapped to
 #' components of the principal surrogate analysis. Other than \code{data}, this
-#' is a list of key-value pairs desribing the common elements of a ps analysis.
+#' is a list of key-value pairs describing the common elements of a ps analysis.
 #' The required keys are Z, Y, and S. Optional keys are BIP, CPV, BSM, and
 #' weights. These elements are described in details below. Additional keys-value
 #' pairs can be included in \code{...}. This function generates an augmented
@@ -21,7 +21,7 @@
 #' @param CPV Optional expression defining the closeout placebo vaccination
 #'   measurement
 #' @param BSM Optional expression defining the baseline surrogate measurement
-#' @param weights optional expression defining weights to accomodate nonrandom
+#' @param weights optional expression defining weights to accommodate nonrandom
 #'   subsampling, such as case control or two phase
 #' @param tau numeric, When the outcome Y is a survival time, it is possible
 #'   that the surrogate was measured at some time tau after enrollment. Use the
