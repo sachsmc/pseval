@@ -1,7 +1,7 @@
 [![Travis-CI Build Status](https://travis-ci.org/sachsmc/pseval.svg?branch=master)](https://travis-ci.org/sachsmc/pseval)
 [![](http://cranlogs.r-pkg.org/badges/pseval)](https://CRAN.R-project.org/package=pseval)
 
-# pseval: Methods for Evaluting Principal Surrogates of Treatment Response
+# pseval: Methods for Evaluating Principal Surrogates of Treatment Response
 
 ## Installation
 
