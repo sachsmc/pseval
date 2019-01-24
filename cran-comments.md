@@ -3,6 +3,7 @@ This is a update that contains some important bugfixes and updates to documentat
 ## Test environments
 * local Windows install, R 3.5.0
 * ubuntu 12.04 (on travis-ci), R 3.3.1
+* rhub (R devel)
 * win-builder (devel and release)
 
 ## R CMD check results
