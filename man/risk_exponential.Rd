@@ -14,4 +14,3 @@ risk_exponential(model = Y ~ S.1 * Z, D = 5000)
 \description{
 Exponential risk model for time to event outcome
 }
-

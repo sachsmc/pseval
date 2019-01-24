@@ -17,4 +17,3 @@ the BIP and the S(1) must be categorical.}
 \description{
 Both S(1) and the BIP or set of BIPs must be categorical. This model integrates over the estimated distribution of S(1) | BIP
 }
-

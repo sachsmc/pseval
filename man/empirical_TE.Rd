@@ -14,4 +14,3 @@ empirical_TE(psdesign, t)
 \description{
 Compute the empirical Treatment Efficacy
 }
-

@@ -12,4 +12,3 @@ generate_example_data(n)
 \description{
 Generate sample data used for testing
 }
-

@@ -4,8 +4,9 @@
 \alias{calc_STG}
 \title{Calculate the Standardized total gain}
 \usage{
-calc_STG(psdesign, t, sig.level = 0.05, n.samps = 5000, bootstraps = TRUE,
-  permute = TRUE, permute.times = 2000, progress.bar = TRUE)
+calc_STG(psdesign, t, sig.level = 0.05, n.samps = 5000,
+  bootstraps = TRUE, permute = TRUE, permute.times = 2000,
+  progress.bar = TRUE)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
@@ -33,4 +34,3 @@ calculate bootstrap standard errors and confidence interval.}
 \description{
 Computes the standardized total gain for the risk difference. Optionally produces bootstrap standard errors and confidence intervals. The standardized total gain is the area between the risk difference curve and the horizontal line at the marginal risk difference. If the outcome is time to event then the STG is time-dependent, and a time point for evaluation is needed. If one is not provided then the restricted mean survival is estimated from the data and used.
 }
-

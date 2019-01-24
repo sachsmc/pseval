@@ -26,4 +26,3 @@ A list containing the parameter estimates, the convergence indicator, and residu
 \description{
 This estimates the location-scale model as described in Heagerty and Pepe (1999) using the Newton-Raphson method. The location and scale formulas must have the same outcome, but they may have different predictors.
 }
-

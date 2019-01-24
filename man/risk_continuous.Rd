@@ -17,4 +17,3 @@ S.1 and Z, with mean determined by the model formula. It also assumes that
 larger values of Y are more indicative of poor outcomes, e.g., blood
 pressure.
 }
-

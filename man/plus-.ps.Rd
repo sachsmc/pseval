@@ -25,4 +25,3 @@ object. Users will generally add them in the order that they appear.
 \description{
 This operator allows you to add objects to a psdesign object, such as integration models and risk models
 }
-

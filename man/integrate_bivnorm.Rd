@@ -23,4 +23,3 @@ applied in order to get the distribution of S(1) | W. That distribution is
 used to integrate over the missing S(1) values. This method requires a BIP in the
 design.
 }
-

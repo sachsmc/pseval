@@ -18,4 +18,3 @@ pseudo_score(psdesign, start = NULL, epsilon = 1e-05, maxit = 50)
 \description{
 Estimate parameters from a specified model using pseudo-score
 }
-

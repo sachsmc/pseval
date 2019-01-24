@@ -1,13 +1,16 @@
 citHeader("To cite pseval in publications use:")
 
-year = sub('.*(2[[:digit:]]{3})-.*', '\\1', meta$Date, perl = TRUE)
-vers = paste('R package version', meta$Version)
-
-citEntry(entry = "Manual",
- title = paste('pseval:', meta$Title),
-  author = 'Michael C. Sachs and Erin E. Gabriel',
-  year = year,
-  note = vers,
-  url = meta$URL,
-  textVersion = paste('Michael C. Sachs and Erin E. Gabriel (', year, '). pseval: ', meta$Title, '. ', vers, '.', sep = '')
+citEntry(entry = "Article",
+  title="An introduction to principal surrogate evaluation with the pseval package",
+  author="Sachs, Michael C and Gabriel, Erin E",
+  journal="The R journal",
+  volume="8",
+  number="2",
+  pages="277--292",
+  year="2016",
+  publisher="NIH Public Access",
+  url = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5774631/",
+  textVersion =  paste("Michael C. Sachs and Erin E. Gabriel (2016).",
+        "An Introduction to Principal Surrogate Evaluation with the pseval Package.",
+        "The R Journal: 8(2); 277-292.","URL https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5774631/.")
 )

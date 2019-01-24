@@ -20,4 +20,3 @@ Gaussian models are supported}
 \description{
 Parametric integration model for the missing S(1)
 }
-

@@ -25,4 +25,3 @@ These functions take the risk in the two treatment arms, and
   risk, and \code{"RD"} for the risk difference = risk_0(s) - risk_1(s).
 }
 \keyword{Internal}
-

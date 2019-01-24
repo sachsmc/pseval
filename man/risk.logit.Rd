@@ -15,4 +15,3 @@ A vector of probabilities
 \description{
 Logit link function
 }
-

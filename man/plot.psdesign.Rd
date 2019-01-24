@@ -49,4 +49,3 @@ the curve}
 Plot the treatment efficacy or another contrast of risk versus S.1 for an
 estimated psdesign object
 }
-

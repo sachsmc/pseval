@@ -14,4 +14,3 @@ empirical_VE(psdesign, t)
 \description{
 Included for backwards compatibility
 }
-

@@ -17,4 +17,3 @@ expand_augdata(model, psdesign, D = 500)
 Expand augmented data using the integration function
 }
 \keyword{Internal}
-

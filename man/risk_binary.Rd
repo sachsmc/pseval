@@ -17,4 +17,3 @@ E.g., risk.logit for the logistic model, risk.probit for the probit model}
 \description{
 Risk model for binary outcome
 }
-

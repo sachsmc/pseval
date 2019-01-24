@@ -14,4 +14,3 @@ risk_weibull(model = Y ~ S.1 * Z, D = 5000)
 \description{
 Weibull risk model for time to event outcome
 }
-

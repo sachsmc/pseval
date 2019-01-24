@@ -49,4 +49,3 @@ the subsequent steps, refer to the variables by the keys. See
 \link{add_integration} and \link{add_riskmodel} for information on how to
 proceed in the analysis.
 }
-

@@ -20,4 +20,3 @@ in the formula, and the BIP or BIPs will be on the right side}
 \description{
 Semiparametric integration model using the location-scale model
 }
-

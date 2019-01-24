@@ -31,4 +31,3 @@ add_integration(test, integrate_parametric(S.1 ~ BIP))
 test + integrate_parametric(S.1 ~ BIP)  # same as above
 
 }
-

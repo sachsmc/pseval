@@ -23,4 +23,3 @@ riskcalc(risk.function, Y, par, t, dat0, dat1)
 Calculate risks with handlers for survival data
 }
 \keyword{Internal}
-

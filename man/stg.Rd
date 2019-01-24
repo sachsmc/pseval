@@ -16,4 +16,3 @@ stg(R1, R0, stand = TRUE)
 \description{
 Compute the standardized total gain
 }
-

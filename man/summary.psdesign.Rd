@@ -21,4 +21,3 @@ Invisibly returns the printed table, along with the three estimates of vaccine e
 \description{
 Summary method for psdesign objects
 }
-

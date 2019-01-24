@@ -14,4 +14,3 @@ risk_poisson(model = Y ~ S.1 * Z, D = 5000)
 \description{
 Poisson risk model for count outcomes
 }
-

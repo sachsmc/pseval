@@ -21,4 +21,3 @@ available in \link{optim}. Defaults to "BFGS"}
 \description{
 Estimate parameters from a specified model using estimated maximum likelihood
 }
-

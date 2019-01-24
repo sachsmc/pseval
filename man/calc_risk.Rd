@@ -5,7 +5,8 @@
 \title{Calculate the risk and functions of the risk}
 \usage{
 calc_risk(psdesign, contrast = "TE", t, sig.level = 0.05,
-  CI.type = "band", n.samps = 5000, bootstraps = TRUE, newdata = NULL)
+  CI.type = "band", n.samps = 5000, bootstraps = TRUE,
+  newdata = NULL)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an
@@ -61,4 +62,3 @@ calc_risk(binary.boot, contrast = "TE", n.samps = 20)
 calc_risk(binary.boot, contrast = function(R0, R1) 1 - R1/R0, n.samps = 20)
 }
 }
-

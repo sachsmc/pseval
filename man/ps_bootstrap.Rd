@@ -25,4 +25,3 @@ available in \link{optim}. Defaults to "BFGS"}
 \description{
 Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood
 }
-

@@ -12,4 +12,3 @@ wem_test(x)
 \description{
 This runs a multivariate Wald test on the interaction terms of the model, using the bootstrap covariance
 }
-

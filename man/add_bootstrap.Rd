@@ -21,4 +21,3 @@ est1 <- test + integrate_parametric(S.1 ~ BIP) + risk_binary() + ps_estimate(met
 est1 + ps_bootstrap(method = "BFGS", start = est1$estimates$par, n.boots = 50)
 }
 }
-

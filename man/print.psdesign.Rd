@@ -18,4 +18,3 @@
 \description{
 Concisely print information about a psdesign object
 }
-

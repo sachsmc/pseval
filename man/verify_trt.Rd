@@ -13,4 +13,3 @@ verify_trt(D)
 Checks for two classes and gives a warning message indicating which level is assumed to be 0/1
 }
 \keyword{Internal}
-
