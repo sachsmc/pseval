@@ -1,4 +1,4 @@
-This is a update that contains some important bugfixes and updates to documentation and citation information
+This is a resubmission to fix two issues: removing additional repository, and reducing the runtime of the vignette. 
 
 ## Test environments
 * local Windows install, R 3.5.0
@@ -8,12 +8,6 @@ This is a update that contains some important bugfixes and updates to documentat
 
 ## R CMD check results
 There were no ERRORs. 
-
-There was 1 NOTE:
-
-Package suggested but not available for checking: 'printr'
-
-printr is suggested but not required. It enhances the vignette appearence but the vignette runs without it. 
 
 ## Downstream dependencies
 There are no downstream dependencies.
