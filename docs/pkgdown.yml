@@ -1,0 +1,9 @@
+pandoc: '3.2'
+pkgdown: 2.1.0
+pkgdown_sha: ~
+articles:
+  introduction: introduction.html
+last_built: 2025-04-07T07:18Z
+urls:
+  reference: https://sachsmc.github.io/pseval/reference
+  article: https://sachsmc.github.io/pseval/articles
