@@ -4,8 +4,7 @@
 \alias{summarize_bs}
 \title{Summarize bootstrap samples}
 \usage{
-summarize_bs(bootdf, estdf = NULL, sig.level = 0.05,
-  CI.type = "band")
+summarize_bs(bootdf, estdf = NULL, sig.level = 0.05, CI.type = "band")
 }
 \arguments{
 \item{bootdf}{Data frame containing bootstrapped estimates, with a column containing a convergence indicator}

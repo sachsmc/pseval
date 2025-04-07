@@ -4,9 +4,16 @@
 \alias{calc_STG}
 \title{Calculate the Standardized total gain}
 \usage{
-calc_STG(psdesign, t, sig.level = 0.05, n.samps = 5000,
-  bootstraps = TRUE, permute = TRUE, permute.times = 2000,
-  progress.bar = TRUE)
+calc_STG(
+  psdesign,
+  t,
+  sig.level = 0.05,
+  n.samps = 5000,
+  bootstraps = TRUE,
+  permute = TRUE,
+  permute.times = 2000,
+  progress.bar = TRUE
+)
 }
 \arguments{
 \item{psdesign}{A psdesign object. It must contain a risk model, an

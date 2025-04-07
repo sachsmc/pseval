@@ -7,7 +7,7 @@
 risk_weibull(model = Y ~ S.1 * Z, D = 5000)
 }
 \arguments{
-\item{model}{Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring}
+\item{model}{Formula specifying the risk model. The outcome should be a \link[survival]{Surv} object specifying right censoring}
 
 \item{D}{number of samples for simulated annealing}
 }

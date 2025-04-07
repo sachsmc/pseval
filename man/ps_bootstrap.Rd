@@ -4,8 +4,14 @@
 \alias{ps_bootstrap}
 \title{Estimate parameters from a specified model using bootstrap resampling and estimated maximum likelihood}
 \usage{
-ps_bootstrap(n.boots = 200, progress.bar = TRUE, start = NULL,
-  method = "BFGS", control = list(), ...)
+ps_bootstrap(
+  n.boots = 200,
+  progress.bar = TRUE,
+  start = NULL,
+  method = "BFGS",
+  control = list(),
+  ...
+)
 }
 \arguments{
 \item{n.boots}{Number of bootstrap replicates}

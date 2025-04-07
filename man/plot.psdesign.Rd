@@ -4,9 +4,20 @@
 \alias{plot.psdesign}
 \title{Plot summary statistics for a psdesign object}
 \usage{
-\method{plot}{psdesign}(x, t, contrast = "TE", sig.level = 0.05,
-  CI.type = "band", n.samps = 500, xlab = "S.1", ylab = contrast,
-  col = 1, lty = 1, lwd = 1, ...)
+\method{plot}{psdesign}(
+  x,
+  t,
+  contrast = "TE",
+  sig.level = 0.05,
+  CI.type = "band",
+  n.samps = 500,
+  xlab = "S.1",
+  ylab = contrast,
+  col = 1,
+  lty = 1,
+  lwd = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{A \link{psdesign} object that contains a risk model, integration

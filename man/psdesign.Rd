@@ -4,8 +4,18 @@
 \alias{psdesign}
 \title{Specify a design for a principal surrogate evaluation}
 \usage{
-psdesign(data, Z, Y, S, BIP = NULL, CPV = NULL, BSM = NULL,
-  weights = NULL, tau, ...)
+psdesign(
+  data,
+  Z,
+  Y,
+  S,
+  BIP = NULL,
+  CPV = NULL,
+  BSM = NULL,
+  weights = NULL,
+  tau,
+  ...
+)
 }
 \arguments{
 \item{data}{Data frame containing data to be analyzed}

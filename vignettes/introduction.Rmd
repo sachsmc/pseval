@@ -8,7 +8,7 @@ output:
         fig_height: 5
 bibliography: psreferences.bib
 vignette: >
-    %\VignetteIndexEntry{introduction}
+    %\VignetteIndexEntry{Introduction to Principal Surrogate Evaluation in R}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -42,10 +42,12 @@ Let $Z_i$ be the treatment indicator for subject $i$, where 0 indicates the cont
 ## Estimands 
 
 Criteria for $S$ to be a good surrogate are based on risk estimands that condition on the potential intermediate responses. The risk is defined as a mapping $g$ of the cumulative distribution function of $Y(z)$ conditional on the intermediate responses. The joint risk estimands conditions on the candidate surrogate under both level of treatment,  $(S(1), S(0))$. 
+
 $$
 risk_1(s_1, s_0) = g\left\{F_{s_1}\left[Y(1) | S(0) = s_0, S(1) = s_1\right]\right\}, \\
 risk_0(s_1, s_0) = g\left\{F_{s_1}\left[Y(0) | S(0) = s_0, S(1) = s_1\right]\right\}.
 $$
+
 For instance, for a binary outcome, the risk function may simply be the probability $risk_z(s_1, s_0) = P(Y(z) = 1 | S(0) = s_0, S(1) = s_1)$, or for a time-to-event outcome the risk function may be the cumulative distribution function $risk_z(s_1, s_0) = P(Y(z) \leq t | S(0) = s_0, S(1) = s_1)$. 
 
 Currently we focus only on marginal risk estimands which condition only on $S(1)$, the intermediate response or biomarker under active treatment: 

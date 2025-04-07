@@ -4,8 +4,14 @@
 \alias{sp_locscale}
 \title{Fit the semi-parametric location-scale model}
 \usage{
-sp_locscale(formula.location, formula.scale, data, weights, tol = 1e-06,
-  maxit = 100)
+sp_locscale(
+  formula.location,
+  formula.scale,
+  data,
+  weights,
+  tol = 1e-06,
+  maxit = 100
+)
 }
 \arguments{
 \item{formula.location}{Formula specifying the model for the location}

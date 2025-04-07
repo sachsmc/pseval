@@ -1,7 +1,5 @@
-^CRAN-RELEASE$
-^Meta$
-^doc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-cran-comments\.md
-index\.html
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

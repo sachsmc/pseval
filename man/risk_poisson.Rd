@@ -7,7 +7,7 @@
 risk_poisson(model = Y ~ S.1 * Z, D = 5000)
 }
 \arguments{
-\item{model}{Formula specifying the risk model. The outcome should be an integer of counts. This right side of the formula may contain an \link{offset} term.}
+\item{model}{Formula specifying the risk model. The outcome should be an integer of counts. This right side of the formula may contain an \link[stats]{offset} term.}
 
 \item{D}{number of samples for simulated annealing}
 }

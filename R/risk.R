@@ -61,7 +61,7 @@ risk_binary <- function(model = Y ~ S.1 * Z, D = 5000, risk = risk.logit){
 
 #' Weibull risk model for time to event outcome
 #'
-#' @param model Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring
+#' @param model Formula specifying the risk model. The outcome should be a \link[survival]{Surv} object specifying right censoring
 #' @param D number of samples for simulated annealing
 #'
 #' @export
@@ -137,7 +137,7 @@ risk_weibull <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
 #' Exponential risk model for time to event outcome
 #'
-#' @param model Formula specifying the risk model. The outcome should be a \link{Surv} object specifying right censoring
+#' @param model Formula specifying the risk model. The outcome should be a \link[survival]{Surv} object specifying right censoring
 #' @param D number of samples for simulated annealing
 #'
 #' @export
@@ -201,7 +201,7 @@ risk_exponential <- function(model = Y ~ S.1 * Z, D = 5000 ){
 
 #' Poisson risk model for count outcomes
 #'
-#' @param model Formula specifying the risk model. The outcome should be an integer of counts. This right side of the formula may contain an \link{offset} term.
+#' @param model Formula specifying the risk model. The outcome should be an integer of counts. This right side of the formula may contain an \link[stats]{offset} term.
 #' @param D number of samples for simulated annealing
 #'
 #' @export

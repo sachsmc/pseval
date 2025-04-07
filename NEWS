@@ -1,3 +1,7 @@
+pseval 1.3.2
+------------
+* fix cross-references in Rd files
+
 pseval 1.3.1
 ------------
 * bugfix: corrected likelihood in pseudo score weights
