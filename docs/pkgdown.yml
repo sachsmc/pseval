@@ -3,7 +3,7 @@ pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   introduction: introduction.html
-last_built: 2025-04-07T07:18Z
+last_built: 2025-04-08T07:54Z
 urls:
   reference: https://sachsmc.github.io/pseval/reference
   article: https://sachsmc.github.io/pseval/articles

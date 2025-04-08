@@ -1,4 +1,4 @@
-This is a resubmission to fix issues about Rd cross-references
+This is a resubmission to fix bad urls
 
 ## Test environments
 * ubuntu dev and release

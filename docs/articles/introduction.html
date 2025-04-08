@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pseval</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/sachsmc/pseval/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -58,9 +59,9 @@
                         <h4 data-toc-skip class="author">Michael C Sachs
 and Erin E Gabriel</h4>
             
-            <h4 data-toc-skip class="date">april 07, 2025</h4>
+            <h4 data-toc-skip class="date">april 08, 2025</h4>
       
-
+      <small class="dont-index">Source: <a href="https://github.com/sachsmc/pseval/blob/HEAD/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
       <div class="d-none name"><code>introduction.Rmd</code></div>
     </div>
 
@@ -200,7 +201,7 @@ the intermediate response or biomarker under active treatment:</p>
 risk_1(s_1) = g\left\{F_{s_1}\left[Y(1) | S(1) = s_1\right]\right\}, \\
 risk_0(s_1) = g\left\{F_{s_1}\left[Y(0) | S(1) = s_1\right]\right\}.
 $$</span></p>
-<p>Neither of the joint risk estimands are indentifiable in a standard
+<p>Neither of the joint risk estimands are identifiable in a standard
 randomized trial, as either S(0) or S(1) or both will be missing for
 each subject. In the special case where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S(0)</annotation></semantics></math>
@@ -212,7 +213,7 @@ and Hudgens 2008)</span>; S_i(0) = c for subjects i. This may occur
 outside the vaccine setting when one considers the AUC of a treatment
 drug as a surrogate; those receiving placebo will have no drug and
 therefore all placebo AUC will be 0. Under assumptions given below, and
-in the case CB setting, the marginal risk estimand is indentifiable in
+in the case CB setting, the marginal risk estimand is identifiable in
 the treatment arm.</p>
 <p>As well, as will be outlined below, there are specific trial
 augmentations that allow for the measurement or imputation of the
@@ -507,7 +508,7 @@ of a new R user. Along the way we will highlight the main features of
 outcomes and time-to-event, thus we will also need to load the
 <strong>survival</strong> package.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">pseval</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sachsmc.github.io/pseval/">pseval</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span></code></pre></div>
 <p>First let’s create an example dataset. The package provides the
 function <code>generate_example_data</code> which takes a single

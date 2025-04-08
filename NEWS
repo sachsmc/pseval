@@ -1,6 +1,7 @@
-pseval 1.3.2
+pseval 1.3.3
 ------------
 * fix cross-references in Rd files
+* fix bad urls
 
 pseval 1.3.1
 ------------
